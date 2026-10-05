@@ -47,6 +47,23 @@ test('Home accepts typed numbers without the change banner and opens first after
   await expect(page.getByRole('textbox', { name: 'People covered' })).toHaveValue('4');
 });
 
+test('restoring the website starts at Home while preserving family settings', async ({ page }) => {
+  await page.goto('/');
+  const home = page.getByRole('button', { name: 'Home', exact: true });
+  await expect(home).toHaveAttribute('aria-current', 'page');
+  await page.getByRole('textbox', { name: 'People covered' }).fill('5');
+  await page.getByRole('button', { name: 'Meals', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Meals', exact: true })).toHaveAttribute('aria-current', 'page');
+  // A browser can restore the existing React tree rather than mounting a new page.
+  await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true })));
+  await expect(home).toHaveAttribute('aria-current', 'page');
+  await expect(page.getByRole('textbox', { name: 'People covered' })).toHaveValue('5');
+  await page.getByRole('button', { name: /My food Tell us/ }).click();
+  await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true })));
+  await expect(home).toHaveAttribute('aria-current', 'page');
+  await expect(page.getByRole('textbox', { name: 'People covered' })).toHaveValue('5');
+});
+
 test('allergy suggestions support selection, keyboard input, and persistence', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: /My food Tell us/ }).click();

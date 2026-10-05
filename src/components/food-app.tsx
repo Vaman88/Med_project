@@ -52,6 +52,16 @@ export function FoodApp() {
   const [weight, setWeight] = useState("");
   const [checkedItems, setCheckedItems] = useState<string[]>([]);
   const body = { profile, pantry, prices };
+  useEffect(() => {
+    function startAtHome() {
+      setTab(0); setMyFood(false); setFoodSection('Diet'); setStatus('');
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+    // Also reset an open development tab after an update and a restored browser page.
+    startAtHome();
+    window.addEventListener('pageshow', startAtHome);
+    return () => window.removeEventListener('pageshow', startAtHome);
+  }, []);
   useEffect(() => { if (!cloudConfigured) { try { const saved = localStorage.getItem('healthy-steps-demo-v1'); if (saved) { const value = JSON.parse(saved); if (value.profile) setProfile(value.profile); if (value.pantry) setPantry(value.pantry); if (value.prices) setPrices(value.prices); } } catch {} } setLoaded(true); }, []);
   useEffect(() => { if (loaded && !cloudConfigured) localStorage.setItem('healthy-steps-demo-v1', JSON.stringify({ profile, pantry, prices })); }, [loaded, profile, pantry, prices]);
   const onCloudSession = useCallback((token: string | null) => { setCloudToken(token); if (!token && cloudConfigured) { setProfile(structuredClone(demoProfile)); setPantry(structuredClone(demoPantry)); setPrices(structuredClone(demoPrices)); setPlan(null); setMatches([]); setCheckedItems([]);  } }, []);
