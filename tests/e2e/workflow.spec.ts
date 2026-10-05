@@ -21,6 +21,17 @@ test('preview follows pantry then typed budget and suggestions without duplicate
 test('allergy menu supports keyboard selection and suggestions exclude the declared allergen',async({page})=>{
   await preview(page);await page.getByRole('button',{name:'Account',exact:true}).click();const allergy=page.getByRole('combobox',{name:'Food allergy',exact:true});await allergy.fill('pea');await allergy.press('ArrowDown');await allergy.press('Enter');await expect(page.locator('.saved-chip')).toContainText('Peanuts');await page.getByRole('button',{name:'Save food settings'}).click();await page.getByRole('button',{name:'Home',exact:true}).click();await suggestions(page);await expect(page.getByRole('heading',{name:'Banana and peanut butter bread'})).toHaveCount(0);
 });
+test('older retailer references show compatible meals without a budget claim',async({page})=>{
+  await page.clock.install({time:new Date('2026-11-10T12:00:00Z')});
+  await preview(page);
+  await page.getByRole('button',{name:'My pantry is empty — continue'}).click();
+  await page.getByRole('textbox',{name:'Food budget (USD)',exact:true}).fill('20');
+  await page.getByRole('button',{name:'Find my suggestions'}).click();
+  await expect(page.getByRole('heading',{name:'Review prices before shopping'})).toBeVisible();
+  await expect(page.getByText('Estimated basket',{exact:true})).toHaveCount(0);
+  await page.getByRole('button',{name:'See compatible meal ideas'}).click();
+  await expect(page.locator('.alternative-meals .recipe-card').first().getByText('Retailer prices need checking before shopping.')).toBeVisible();
+});
 test('extra meal options have spacing and Help combines chat with support',async({page},testInfo)=>{
   await preview(page);await suggestions(page);const more=page.getByRole('button',{name:'See other compatible meals'});await expect(more).toBeVisible();const previous=await page.locator('.price-note').boundingBox();const box=await more.boundingBox();expect(box!.y-previous!.y-previous!.height).toBeGreaterThanOrEqual(25);await more.click();await expect(more).toHaveCount(0);await expect(page.getByRole('button',{name:'Hide other options'})).toHaveAttribute('aria-expanded','true');
   await page.getByRole('button',{name:'Help',exact:true}).click();await expect(page.getByRole('link',{name:'Call 211'})).toBeVisible();await page.getByRole('button',{name:'How do I add allergies?',exact:true}).click();await expect(page.getByRole('log')).toContainText('Start typing');await page.getByRole('button',{name:'Open allergy settings',exact:true}).click();await expect(page.getByRole('button',{name:'Account',exact:true})).toHaveAttribute('aria-current','page');await page.getByRole('button',{name:'Help',exact:true}).click();await expect(page.getByRole('log')).toContainText('Start typing');await page.screenshot({path:testInfo.outputPath('help.png'),fullPage:true});

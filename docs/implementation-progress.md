@@ -10,7 +10,7 @@ Authenticated account setup, pantry/preferences persistence, consent receipts, d
 
 Signup creates the basic Auth identity after the account data-use acknowledgement, then collects food settings and signed terms after any required email confirmation. This avoids asking for allergy details twice after an email redirect. The planner also clears personal state when an Auth session switches users in the same browser.
 
-Current checks: 31 unit/API tests and 12 desktop/mobile browser cases passed; production build passed. Screenshots of account access, signed terms, suggestions and Help were reviewed. These checks cover the planner preview and forms; they do not substitute for live account testing.
+Current checks: 33 unit/API tests and 14 desktop/mobile browser cases passed; production build passed. Screenshots of account access, signed terms, suggestions and Help were reviewed. These checks cover the planner preview and forms; they do not substitute for live account testing. The basket now rejects stale price references and provides dated source links when a budget estimate cannot be confirmed.
 
 ## Earlier prototype validation (historical)
 

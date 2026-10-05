@@ -19,7 +19,7 @@ Open http://localhost:3197. The first screen is Log in / Sign up. Until Supabase
 - Signed-in users start on Home, at pantry entry. Restoring a browser page also returns to Home.
 - Add measured pantry amounts, then type a shopping budget. Suggestions deduct confirmed usable inventory, round purchases to whole packages, include entered fees and stay within the budget.
 - The basket covers up to three meal ideas. It is not a full week of food and does not establish nutritional adequacy.
-- Public Walmart and Target listings provide dated estimates and clickable references. Local prices, labels, stock and fees need checking. See [price reference notes](docs/price-references.md).
+- Public Walmart and Target listings provide dated estimates and clickable references. References older than 30 days are excluded from a confirmed budget basket; compatible meal ideas and source links remain available. Local prices, labels, stock and fees need checking. See [price reference notes](docs/price-references.md).
 - Account contains food settings, accepted terms and account deletion. Help chat runs locally with navigation buttons; no messages are sent to an external AI service.
 - The future layout cutoff is under 10 for the child layout and 10+ for the adult layout. This release only creates accounts for adults 18+; child profiles and permissions are not implemented.
 

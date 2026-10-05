@@ -82,4 +82,4 @@ export interface BudgetEstimate {
   estimateDate: string; storeId: string; feesIncluded: boolean;
 }
 export interface MealPlan { entries: MealPlanEntry[]; shoppingItems: ShoppingItem[]; budget: BudgetEstimate; warnings: string[] }
-export interface RecipeMatch { recipe: Recipe; score: number; missingIngredients: string[]; pantryMatch: number; estimatedPurchaseCents: number; hasMissingPrices: boolean; explanation?: string }
+export interface RecipeMatch { recipe: Recipe; score: number; missingIngredients: string[]; pantryMatch: number; estimatedPurchaseCents: number; hasMissingPrices: boolean; hasStalePrices: boolean; explanation?: string }

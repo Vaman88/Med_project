@@ -6,4 +6,6 @@ No ZIP-specific pricing or availability is claimed. A listing can be unavailable
 
 The selector evaluates compatible subsets of up to three recipes from the six-recipe prototype library, deducts confirmed compatible pantry quantities once, then buys whole packages for remaining requirements. It prefers more meal ideas and preference matches within budget, then lower cost. It does not optimize a complete diet or promise the cheapest basket among all US retailers.
 
+The basket accepts references checked in the past 30 days. A cheaper older listing cannot displace a current listing. If required references are older, the site shows compatible meal ideas and source links but does not confirm a shopping basket within budget. Meals that need no purchase can still use confirmed pantry amounts. Update the catalog from retailer listings before the reference date expires.
+
 All product labels and cross-contact information still need checking. Restriction filtering uses the prototype ingredient relationships and known product tags, not a professionally verified product catalog. Recipes are also labelled unreviewed in the website.

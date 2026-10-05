@@ -57,6 +57,34 @@ test('allergies remain hard gates and conflicting cheap packages cannot replace 
   assert.ok(result.selected.every(match=>recipes.some(recipe=>recipe.id===match.recipe.id)));
   state.members![0].allergies[0].status='pending_confirmation';assert.equal(recommendBasket(state,[]).selected.length,0);
 });
+test('a newer eligible listing wins over a cheaper stale listing', () => {
+  const now=new Date('2026-10-05T12:00:00Z');
+  const state=profile();
+  state.excludedIngredientIds=['beans','corn','rice','bread','peanut-butter','yogurt','carrot','hummus'];
+  const prices=valuePrices.map(price=>price.ingredientId==='oats'&&price.retailer==='Walmart'?{...price,observedAt:'2026-08-01',priceCents:1}:price);
+  const result=recommendBasket(state,[],prices,now);
+  assert.ok(result.plan);
+  const oats=result.plan.shoppingItems.find(item=>item.ingredientId==='oats');
+  assert.ok(oats);
+  assert.equal(prices.find(price=>price.id===oats.priceObservationId)?.retailer,'Target');
+  assert.equal(result.plan.budget.stalePriceCount,0);
+});
+test('old price references do not produce a claimed within-budget basket', () => {
+  const now=new Date('2026-10-05T12:00:00Z');
+  const old=valuePrices.map(price=>({...price,observedAt:'2026-08-01'}));
+  const result=recommendBasket(profile(),[],old,now);
+  assert.equal(result.plan,null);
+  assert.equal(result.pricesNeedRefresh,true);
+  assert.match(result.message,/more than 30 days old/);
+  assert.ok(result.alternatives.length>0);
+  assert.ok(result.alternatives.some(match=>match.hasStalePrices));
+  const covered=[{id:'oats',ingredientId:'oats',quantity:500,unit:'g',foodState:'dry',quantityConfirmed:true},{id:'banana',ingredientId:'banana',quantity:5,unit:'each',foodState:'raw',quantityConfirmed:true}] as const;
+  const pantryOnly=profile();pantryOnly.weeklyBudgetCents=0;
+  const pantryResult=recommendBasket(pantryOnly,covered.map(item=>({...item})),old,now);
+  assert.ok(pantryResult.plan);
+  assert.equal(pantryResult.plan.shoppingItems.length,0);
+  assert.equal(pantryResult.pricesNeedRefresh,false);
+});
 test('website help describes current steps and returns usable navigation actions', () => {
   assert.equal(siteGuideReply('budget',profile(),0).actions[0].destination,'budget');
   assert.match(siteGuideReply('meal plan',profile(),0).text,/three steps/);
