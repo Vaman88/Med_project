@@ -16,11 +16,21 @@ const records: [string,string,number,number,string,string,string,string?][] = [
   ['carrot','Baby peeled carrots',453,129,'1 lb bag','Walmart','https://www.walmart.com/c/kp/baby-carrots'],
   ['hummus','Marketside Classic Hummus',283,287,'10 oz tub','Walmart','https://www.walmart.com/ip/128642379'],
   ['oats','Good & Gather Old Fashioned Oats',1190,439,'42 oz canister','Target','https://www.target.com/p/-/A-79364999'],
+  ['banana','Good & Gather Fresh Banana',1,29,'1 banana','Target','https://www.target.com/p/-/A-15013944'],
+  ['beans','Good & Gather Low Sodium Black Beans',240,99,'15.5 oz can','Target','https://www.target.com/p/-/A-78666534','240 g drained beans per can is a conservative estimate, not the net label weight.'],
+  ['rice','Good & Gather 90 Second Whole Grain Brown Rice',249,139,'8.8 oz pouch','Target','https://www.target.com/p/-/A-54600505'],
+  ['tomato','Good & Gather Diced Tomatoes',411,99,'14.5 oz can','Target','https://www.target.com/p/-/A-79359679'],
+  ['corn','Good & Gather Golden Sweet Whole Kernel Corn',200,89,'15.25 oz can','Target','https://www.target.com/p/-/A-79466788','200 g drained corn per can is a conservative estimate.'],
+  ['bread','Market Pantry 100% Whole Wheat Sandwich Bread',18,199,'20 oz loaf','Target','https://www.target.com/p/-/A-85593788','18 usable slices per loaf is an estimate. Check your package.'],
+  ['peanut-butter','Good & Gather Creamy Peanut Butter',454,199,'16 oz jar','Target','https://www.target.com/p/-/A-84067786','Online ingredients list possible soybean oil. Check the package if soy is a concern.'],
+  ['yogurt','Good & Gather Greek Plain Nonfat Yogurt',907,299,'32 oz tub','Target','https://www.target.com/p/-/A-94895373'],
+  ['carrot','Good & Gather Fresh Baby-Cut Carrots',453,139,'1 lb bag','Target','https://www.target.com/p/-/A-94669568'],
+  ['hummus','Good & Gather Classic Hummus',283,299,'10 oz tub','Target','https://www.target.com/p/-/A-54531895'],
 ];
 export const valuePrices: ValuePrice[] = records.map(([ingredientId,productName,packageQuantity,priceCents,packageLabel,retailer,sourceUrl,quantityNote],index) => ({
   id:`value-price-${index}`, ingredientId,productName,packageQuantity,priceCents,packageLabel,retailer,sourceUrl,quantityNote,
   packageUnit: ['banana','bread'].includes(ingredientId) ? 'each' : 'g', storeId:'value-us', observedAt:checked,
   sourceType:'retailer-reference', locationLabel:'U.S. public online reference; local price and availability vary',
-  labelStatus:'unknown', productTags: ingredientId === 'peanut-butter' ? ['peanut'] : ingredientId === 'yogurt' ? ['milk','dairy'] : ingredientId === 'bread' ? ['wheat','gluten'] : ingredientId === 'hummus' ? ['sesame'] : [],
+  labelStatus:'unknown', productTags: ingredientId === 'peanut-butter' ? retailer === 'Target' ? ['peanut','soy'] : ['peanut'] : ingredientId === 'yogurt' ? ['milk','dairy'] : ingredientId === 'bread' ? ['wheat','gluten'] : ingredientId === 'hummus' ? ['sesame'] : [],
 }));
 export const formatMoney = (cents: number) => new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(cents/100);

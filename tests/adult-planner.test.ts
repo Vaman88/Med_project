@@ -78,6 +78,13 @@ test('a suggested basket uses one retailer for every item it asks the user to bu
   const stores=new Set(result.plan.shoppingItems.map(item=>prices.find(price=>price.id===item.priceObservationId)?.retailer));
   assert.ok(stores.size<=1);
 });
+test('complete Target references can win when their whole basket costs less', () => {
+  const state=profile();
+  const prices=valuePrices.map(price=>price.retailer==='Target'?{...price,priceCents:1}:price);
+  const result=recommendBasket(state,[],prices,new Date('2026-10-05T12:00:00Z'));
+  assert.ok(result.plan?.shoppingItems.length);
+  assert.ok(result.plan.shoppingItems.every(item=>prices.find(price=>price.id===item.priceObservationId)?.retailer==='Target'));
+});
 test('new pantry meals stay eligible only when their ingredients fit the account', () => {
   const state=profile();state.weeklyBudgetCents=3000;
   const pantry=[{id:'bread',ingredientId:'bread',quantity:4,unit:'each' as const,foodState:'ready-to-eat' as const,quantityConfirmed:true}];

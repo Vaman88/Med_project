@@ -20,6 +20,8 @@ Two more unreviewed prototype meals use ingredients already covered by the pantr
 
 Pantry items can now be edited in place through the entry form. The desktop and mobile browser workflow verifies that changing an amount keeps one item rather than adding a duplicate. A separate `test:e2e:local` command tests the already running development site; all 14 browser cases passed on October 5.
 
+Target public product references now cover all 11 prototype ingredients, so the planner can compare a complete Target basket with Walmart. It still uses dated online references and checks one retailer per basket; prices and stock are not ZIP-specific or live.
+
 ## Earlier prototype validation (historical)
 
 - `npm run typecheck`: passed.
