@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 const config: NextConfig = {
+  distDir: process.env.HEALTHY_STEPS_AUTH_TEST === "1" ? ".next-auth-test" : ".next",
   poweredByHeader: false,
   devIndicators: false,
   async headers() {

@@ -8,7 +8,8 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test tests/*.test.ts",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:auth-flow": "node scripts/run-auth-flow-test.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",
