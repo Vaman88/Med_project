@@ -12,22 +12,34 @@ export function recommendBasket(profile: HouseholdProfile, pantry: PantryItem[],
   const compatible = matchRecipes(current,pantry,planningOptions);
   let best: { matches:RecipeMatch[]; plan:MealPlan; rank:number } | null = null;
   let pricesNeedRefresh = false;
-  for (let mask=1; mask < 2 ** compatible.length; mask++) {
-    const matches = compatible.filter((_,index) => mask & 2 ** index);
-    if (matches.length > 3) continue;
+  // The library can grow beyond the small prototype. Enumerate only baskets
+  // that we can actually show, instead of scanning every subset of recipes.
+  for (let first=0; first<compatible.length; first++) for (let second=first; second<compatible.length; second++) for (let third=second; third<compatible.length; third++) {
+    if (first===second && second!==third) continue;
+    const matches = first===second && second===third
+      ? [compatible[first]]
+      : second===third
+        ? [compatible[first],compatible[second]]
+        : [compatible[first],compatible[second],compatible[third]];
     const entries = matches.map((match,index) => ({ id:`idea-${index}`,day:index,mealType:match.recipe.mealTypes[0],recipeId:match.recipe.id,plannedServings:current.householdSize }));
     // Compute actual basket requirements first, then choose the cheapest whole-package
     // option for each missing ingredient. No assumed fractional package purchases.
     const initial = calculatePlan(current,pantry,entries,planningOptions);
     if (initial.budget.stalePriceCount) pricesNeedRefresh = true;
-    const chosenPrices = initial.shoppingItems.map(item => prices.filter(price => price.ingredientId === item.ingredientId && price.storeId === current.preferredStoreId && !productConflict(price,current) && Number.isSafeInteger(price.priceCents) && price.priceCents >= 0 && price.packageQuantity > 0 && Number.isFinite(price.packageQuantity) && Number.isFinite(Date.parse(price.observedAt)) && Date.parse(price.observedAt) <= now.getTime() && now.getTime()-Date.parse(price.observedAt) <= 30*86400000).sort((a,b) => {
-      const cost = (price:ValuePrice) => { const size = convertQuantity(price.packageQuantity,price.packageUnit,item.unit as PantryItem['unit']); return size ? Math.ceil((item.newQuantityNeeded-1e-8)/size)*price.priceCents : Infinity; };
-      return cost(a)-cost(b) || a.id.localeCompare(b.id);
-    })[0]).filter((price): price is ValuePrice => !!price);
-    const plan = calculatePlan(current,pantry,entries,{prices:chosenPrices,allowSyntheticDemo:true,now});
-    if (plan.budget.missingPriceCount || plan.budget.totalCents > current.weeklyBudgetCents) continue;
-    const rank = matches.length*100 + new Set(matches.flatMap(match => match.recipe.mealTypes)).size*5 + matches.reduce((sum,match) => sum+match.score,0)*10 - plan.budget.totalCents/10000;
-    if (!best || rank > best.rank) best = {matches,plan,rank};
+    // One basket must be shoppable at one retailer. A cheap item at another
+    // store is not a valid substitute for a missing item in this basket.
+    const retailers = [...new Set(prices.map(price => price.retailer))];
+    if (!retailers.length && !initial.shoppingItems.length) retailers.push('');
+    for (const retailer of retailers) {
+      const chosenPrices = initial.shoppingItems.map(item => prices.filter(price => price.retailer === retailer && price.ingredientId === item.ingredientId && price.storeId === current.preferredStoreId && !productConflict(price,current) && Number.isSafeInteger(price.priceCents) && price.priceCents >= 0 && price.packageQuantity > 0 && Number.isFinite(price.packageQuantity) && Number.isFinite(Date.parse(price.observedAt)) && Date.parse(price.observedAt) <= now.getTime() && now.getTime()-Date.parse(price.observedAt) <= 30*86400000).sort((a,b) => {
+        const cost = (price:ValuePrice) => { const size = convertQuantity(price.packageQuantity,price.packageUnit,item.unit as PantryItem['unit']); return size ? Math.ceil((item.newQuantityNeeded-1e-8)/size)*price.priceCents : Infinity; };
+        return cost(a)-cost(b) || a.id.localeCompare(b.id);
+      })[0]).filter((price): price is ValuePrice => !!price);
+      const plan = calculatePlan(current,pantry,entries,{prices:chosenPrices,allowSyntheticDemo:true,now});
+      if (plan.budget.missingPriceCount || plan.budget.totalCents > current.weeklyBudgetCents) continue;
+      const rank = matches.length*100 + new Set(matches.flatMap(match => match.recipe.mealTypes)).size*5 + matches.reduce((sum,match) => sum+match.score,0)*10 - plan.budget.totalCents/10000;
+      if (!best || rank > best.rank) best = {matches,plan,rank};
+    }
   }
   if (!best) return { selected:[], alternatives:compatible, plan:null, pantryUse:[], prices, pricesNeedRefresh,
     message:pricesNeedRefresh ? 'Some retailer price references are more than 30 days old. We cannot confirm a basket fits your budget until those prices are checked again. Compatible meal ideas are below.' : compatible.length ? 'No complete basket fits this budget yet. Add foods you already have, adjust the budget, or explore food support below.' : 'No meal in the current library fits all of your food settings. Keep your restrictions and explore food support or update any information that needs checking.' };

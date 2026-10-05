@@ -62,12 +62,21 @@ test('a newer eligible listing wins over a cheaper stale listing', () => {
   const state=profile();
   state.excludedIngredientIds=['beans','corn','rice','bread','peanut-butter','yogurt','carrot','hummus'];
   const prices=valuePrices.map(price=>price.ingredientId==='oats'&&price.retailer==='Walmart'?{...price,observedAt:'2026-08-01',priceCents:1}:price);
-  const result=recommendBasket(state,[],prices,now);
+  const result=recommendBasket(state,[{id:'banana',ingredientId:'banana',quantity:2,unit:'each',foodState:'raw',quantityConfirmed:true}],prices,now);
   assert.ok(result.plan);
   const oats=result.plan.shoppingItems.find(item=>item.ingredientId==='oats');
   assert.ok(oats);
   assert.equal(prices.find(price=>price.id===oats.priceObservationId)?.retailer,'Target');
   assert.equal(result.plan.budget.stalePriceCount,0);
+});
+test('a suggested basket uses one retailer for every item it asks the user to buy', () => {
+  const state=profile();
+  const cheaperTargetOats=valuePrices.find(item=>item.ingredientId==='oats'&&item.retailer==='Target')!;
+  const prices=valuePrices.map(price=>price.id===cheaperTargetOats.id?{...price,priceCents:1}:price);
+  const result=recommendBasket(state,[],prices,new Date('2026-10-05T12:00:00Z'));
+  assert.ok(result.plan);
+  const stores=new Set(result.plan.shoppingItems.map(item=>prices.find(price=>price.id===item.priceObservationId)?.retailer));
+  assert.ok(stores.size<=1);
 });
 test('old price references do not produce a claimed within-budget basket', () => {
   const now=new Date('2026-10-05T12:00:00Z');

@@ -14,6 +14,8 @@ Current checks: 33 unit/API tests and 14 desktop/mobile browser cases passed; pr
 
 Two separate browser simulations now cover manual login after email confirmation and direct confirmation-link return, followed by account completion, pantry and budget saving, recommendations, and reload persistence with the installed Supabase browser SDK. They use protocol mocks and prove the client flow only. Real email delivery, Supabase row policies and cross-account isolation still require the deferred project connection.
 
+Basket selection now evaluates only one-, two-, and three-meal combinations, so a larger future recipe library does not trigger an exponential subset scan. Every priced item in a suggested basket comes from one retailer. Unit/API tests pass with this constraint; it does not add reviewed recipes or live local store pricing.
+
 ## Earlier prototype validation (historical)
 
 - `npm run typecheck`: passed.
