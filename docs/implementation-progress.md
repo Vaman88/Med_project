@@ -12,7 +12,7 @@ Signup creates the basic Auth identity after the account data-use acknowledgemen
 
 Current checks: 33 unit/API tests and 14 desktop/mobile browser cases passed; production build passed. Screenshots of account access, signed terms, suggestions and Help were reviewed. These checks cover the planner preview and forms; they do not substitute for live account testing. The basket now rejects stale price references and provides dated source links when a budget estimate cannot be confirmed.
 
-A separate browser simulation now covers email-confirmation resumption, account completion, pantry and budget saving, recommendations, and reload persistence with the installed Supabase browser SDK. It uses protocol mocks and proves the client flow only. Real email delivery, Supabase row policies and cross-account isolation still require the deferred project connection.
+Two separate browser simulations now cover manual login after email confirmation and direct confirmation-link return, followed by account completion, pantry and budget saving, recommendations, and reload persistence with the installed Supabase browser SDK. They use protocol mocks and prove the client flow only. Real email delivery, Supabase row policies and cross-account isolation still require the deferred project connection.
 
 ## Earlier prototype validation (historical)
 

@@ -116,3 +116,29 @@ test('email confirmation resumes food setup and saves the adult planner', async 
   await page.getByRole('button', { name: 'Account', exact: true }).click();
   await expect(page.locator('.saved-chip')).toContainText('Peanuts');
 });
+
+test('confirmation link restores setup and removes session tokens from the URL', async ({ page }) => {
+  const details = { name: 'Sam Example', city: 'Madison', state: 'WI', age: 28 };
+  const user = {
+    id: '22222222-2222-4222-8222-222222222222', aud: 'authenticated', role: 'authenticated',
+    email: 'sam@example.test', email_confirmed_at: '2026-10-05T12:00:00Z',
+    app_metadata: { provider: 'email', providers: ['email'] },
+    user_metadata: { account_details: details },
+    created_at: '2026-10-05T12:00:00Z', updated_at: '2026-10-05T12:00:00Z',
+  };
+  await page.route('http://127.0.0.1:3199/auth/v1/**', async route => {
+    if (new URL(route.request().url()).pathname !== '/auth/v1/user') throw new Error(`Unexpected auth request: ${route.request().url()}`);
+    await route.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify({ user }) });
+  });
+  await page.route('**/api/account', async route => {
+    expect(route.request().method()).toBe('GET');
+    expect(route.request().headers().authorization).toBe('Bearer confirmed-test-token');
+    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ account: null }) });
+  });
+  await page.goto('/#access_token=confirmed-test-token&refresh_token=confirmed-test-refresh&expires_in=3600&token_type=bearer&type=signup');
+  await expect(page.getByRole('heading', { name: 'Food that works for you' })).toBeVisible();
+  await expect(page.getByRole('combobox', { name: 'Food allergy' })).toBeVisible();
+  await expect.poll(() => page.url()).not.toContain('access_token');
+  await page.reload();
+  await expect(page.getByRole('heading', { name: 'Food that works for you' })).toBeVisible();
+});

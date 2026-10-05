@@ -43,7 +43,7 @@ npm run test:auth-flow
 
 Browser tests start a production server on port 3197; stop the development server on that port first. Tests cover desktop/mobile signup forms, pantry and budget planning, allergy selection, Help, additional-meal spacing, page restoration and keyboard access. SQL checks require a disposable configured Supabase database and are separate from these tests.
 
-`test:auth-flow` uses a separate local server and browser protocol mocks. It exercises Supabase's browser SDK through email-confirmation resumption, signed food setup, saved pantry and budget, and a reload. It never contacts a real Supabase project and cannot verify database row policies, actual email delivery or account deletion.
+`test:auth-flow` uses a separate local server and browser protocol mocks. It exercises Supabase's browser SDK through the email-confirmation link return, signed food setup, saved pantry and budget, and a reload. It never contacts a real Supabase project and cannot verify database row policies, actual email delivery or account deletion.
 
 ## Prototype boundaries
 
