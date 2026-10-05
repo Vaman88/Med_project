@@ -16,6 +16,8 @@ Two separate browser simulations now cover manual login after email confirmation
 
 Basket selection now evaluates only one-, two-, and three-meal combinations, so a larger future recipe library does not trigger an exponential subset scan. Every priced item in a suggested basket comes from one retailer. Unit/API tests pass with this constraint; it does not add reviewed recipes or live local store pricing.
 
+Two more unreviewed prototype meals use ingredients already covered by the pantry and retailer-reference catalogs: hummus and carrot sandwiches, inspired by [USDA MyPlate’s sandwich guide](https://www.myplate.gov/sites/default/files/2024-01/BuildABetterSandwichWithMyPlate-01-03-24.pdf), and bean and corn rice bowls. An allergy check confirms the sesame-containing sandwich is excluded when sesame is declared. These additions do not satisfy the guide’s professional recipe review gate.
+
 ## Earlier prototype validation (historical)
 
 - `npm run typecheck`: passed.

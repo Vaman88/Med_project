@@ -47,7 +47,7 @@ Browser tests start a production server on port 3197; stop the development serve
 
 ## Prototype boundaries
 
-Six original synthetic recipe examples remain unreviewed. No verified nutrient or product-label catalog, automatic location pricing, photo analysis, live AI or child authorization is connected. Existing stateless demonstration APIs and legacy planning components remain in the codebase for compatibility, but the new website uses the adult flow. Original implementation-guide work is tracked in [implementation progress](docs/implementation-progress.md).
+Eight prototype recipe examples remain unreviewed. The hummus and carrot sandwich is an original adaptation inspired by [USDA MyPlate’s sandwich guide](https://www.myplate.gov/sites/default/files/2024-01/BuildABetterSandwichWithMyPlate-01-03-24.pdf); USDA has not reviewed this adaptation. No verified nutrient or product-label catalog, automatic location pricing, photo analysis, live AI or child authorization is connected. Existing stateless demonstration APIs and legacy planning components remain in the codebase for compatibility, but the new website uses the adult flow. Original implementation-guide work is tracked in [implementation progress](docs/implementation-progress.md).
 
 ## Code map
 

@@ -78,6 +78,17 @@ test('a suggested basket uses one retailer for every item it asks the user to bu
   const stores=new Set(result.plan.shoppingItems.map(item=>prices.find(price=>price.id===item.priceObservationId)?.retailer));
   assert.ok(stores.size<=1);
 });
+test('new pantry meals stay eligible only when their ingredients fit the account', () => {
+  const state=profile();state.weeklyBudgetCents=3000;
+  const pantry=[{id:'bread',ingredientId:'bread',quantity:4,unit:'each' as const,foodState:'ready-to-eat' as const,quantityConfirmed:true}];
+  const plain=recommendBasket(state,pantry,valuePrices,new Date('2026-10-05T12:00:00Z'));
+  assert.ok([...plain.selected,...plain.alternatives].some(match=>match.recipe.id==='hummus-carrot-sandwich'));
+  state.members![0].noKnownAllergies=false;
+  state.members![0].allergies=[{rawText:'Sesame',canonicalId:'sesame',status:'confirmed'}];
+  const restricted=recommendBasket(state,pantry,valuePrices,new Date('2026-10-05T12:00:00Z'));
+  assert.ok(![...restricted.selected,...restricted.alternatives].some(match=>match.recipe.id==='hummus-carrot-sandwich'));
+  assert.ok([...restricted.selected,...restricted.alternatives].some(match=>match.recipe.id==='bean-corn-rice'));
+});
 test('old price references do not produce a claimed within-budget basket', () => {
   const now=new Date('2026-10-05T12:00:00Z');
   const old=valuePrices.map(price=>({...price,observedAt:'2026-08-01'}));

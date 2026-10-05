@@ -38,6 +38,12 @@ export const recipes: Recipe[] = [
   { id: 'carrot-hummus', title: 'Carrots with hummus', yieldServings: 2, equipment: [], prepMinutes: 10, cookMinutes: 0, mealTypes: ['snack'], ingredients: [
     { ingredientId: 'carrot', quantity: 200, unit: 'g', foodState: 'raw' }, { ingredientId: 'hummus', quantity: 100, unit: 'g', foodState: 'ready-to-eat' },
   ], steps: ['Wash 200 g carrots under running water, trim, and cut into pieces appropriate for the people eating.', 'Divide carrots and 100 g hummus into two portions.'], reviewStatus: 'synthetic-demo', provenance },
+  { id: 'hummus-carrot-sandwich', title: 'Hummus and carrot sandwiches', yieldServings: 2, equipment: [], prepMinutes: 10, cookMinutes: 0, mealTypes: ['lunch'], ingredients: [
+    { ingredientId: 'bread', quantity: 4, unit: 'each', foodState: 'ready-to-eat' }, { ingredientId: 'hummus', quantity: 100, unit: 'g', foodState: 'ready-to-eat' }, { ingredientId: 'carrot', quantity: 160, unit: 'g', foodState: 'raw' },
+  ], steps: ['Wash and finely shred 160 g carrots.', 'Spread 25 g hummus on each of four slices of bread. Divide the shredded carrots between two slices and close each sandwich with another slice.', 'Serve promptly. Check the hummus and bread product labels for allergens.'], reviewStatus: 'synthetic-demo', provenance: 'Original unreviewed prototype combination inspired by USDA MyPlate Build a Better Sandwich: https://www.myplate.gov/sites/default/files/2024-01/BuildABetterSandwichWithMyPlate-01-03-24.pdf. Check product labels; this adaptation was not reviewed by USDA.' },
+  { id: 'bean-corn-rice', title: 'Bean and corn rice bowls', yieldServings: 2, equipment: ['microwave'], prepMinutes: 5, cookMinutes: 5, mealTypes: ['lunch', 'dinner'], ingredients: [
+    { ingredientId: 'beans', quantity: 240, unit: 'g', foodState: 'ready-to-eat' }, { ingredientId: 'rice', quantity: 250, unit: 'g', foodState: 'ready-to-eat' }, { ingredientId: 'corn', quantity: 200, unit: 'g', foodState: 'ready-to-eat' },
+  ], steps: ['Drain canned beans and corn; measure 240 g beans and 200 g corn.', 'Heat the ready-to-eat rice following its package directions. Heat the beans and corn in a covered, vented microwave-safe bowl, stirring partway through.', 'Divide the rice, beans and corn between two bowls. Eat promptly.'], reviewStatus: 'synthetic-demo', provenance },
 ];
 const recipePreferences: Record<string, { flavorTags: string[]; textureTags: string[]; cuisineTags: string[] }> = {
   'banana-oats': { flavorTags: ['sweet','mild'], textureTags: ['soft'], cuisineTags: ['breakfast bowl'] },
@@ -46,6 +52,8 @@ const recipePreferences: Record<string, { flavorTags: string[]; textureTags: str
   'banana-toast': { flavorTags: ['sweet'], textureTags: ['crunchy'], cuisineTags: ['toast'] },
   'yogurt-banana': { flavorTags: ['sweet','mild'], textureTags: ['smooth'], cuisineTags: ['breakfast bowl'] },
   'carrot-hummus': { flavorTags: ['savory'], textureTags: ['crunchy','smooth'], cuisineTags: ['snack'] },
+  'hummus-carrot-sandwich': { flavorTags: ['savory','mild'], textureTags: ['crunchy','smooth'], cuisineTags: ['sandwich'] },
+  'bean-corn-rice': { flavorTags: ['savory','mild'], textureTags: ['soft'], cuisineTags: ['rice bowl'] },
 };
 for (const recipe of recipes) Object.assign(recipe, recipePreferences[recipe.id]);
 
