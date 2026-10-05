@@ -9,6 +9,7 @@
     "typecheck": "tsc --noEmit",
     "test": "tsx --test tests/*.test.ts",
     "test:e2e": "playwright test",
+    "test:e2e:local": "playwright test --config playwright.local.config.ts",
     "test:auth-flow": "node scripts/run-auth-flow-test.mjs"
   },
   "dependencies": {

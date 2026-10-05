@@ -13,7 +13,8 @@ test('first visit opens account access and signup collects adult details, prefer
 });
 test('preview follows pantry then typed budget and suggestions without duplicate pantry purchases',async({page},testInfo)=>{
   await preview(page);await expect(page.getByRole('button',{name:'Home',exact:true})).toHaveAttribute('aria-current','page');
-  await page.getByRole('button',{name:'Add to pantry'}).click();await page.getByRole('combobox',{name:'Food',exact:true}).selectOption('banana');await page.getByRole('button',{name:'Add to pantry'}).click();await suggestions(page);
+  await page.getByRole('button',{name:'Add to pantry'}).click();await page.getByRole('button',{name:'Edit Rolled oats'}).click();await page.getByRole('textbox',{name:'Amount'}).fill('800');await page.getByRole('button',{name:'Save pantry item'}).click();await expect(page.locator('.pantry-list')).toContainText('800 g');await expect(page.locator('.pantry-list li')).toHaveCount(1);
+  await page.getByRole('combobox',{name:'Food',exact:true}).selectOption('banana');await page.getByRole('button',{name:'Add to pantry'}).click();await suggestions(page);
   await expect(page.getByText('Preferences or pantry changed.',{exact:false})).toHaveCount(0);
   await expect(page.getByText('Use what you have',{exact:true})).toBeVisible();await expect(page.getByText('No need to buy again',{exact:true}).first()).toBeVisible();
   await page.screenshot({path:testInfo.outputPath('suggestions.png'),fullPage:true});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);

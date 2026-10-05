@@ -18,6 +18,8 @@ Basket selection now evaluates only one-, two-, and three-meal combinations, so 
 
 Two more unreviewed prototype meals use ingredients already covered by the pantry and retailer-reference catalogs: hummus and carrot sandwiches, inspired by [USDA MyPlate’s sandwich guide](https://www.myplate.gov/sites/default/files/2024-01/BuildABetterSandwichWithMyPlate-01-03-24.pdf), and bean and corn rice bowls. An allergy check confirms the sesame-containing sandwich is excluded when sesame is declared. These additions do not satisfy the guide’s professional recipe review gate.
 
+Pantry items can now be edited in place through the entry form. The desktop and mobile browser workflow verifies that changing an amount keeps one item rather than adding a duplicate. A separate `test:e2e:local` command tests the already running development site; all 14 browser cases passed on October 5.
+
 ## Earlier prototype validation (historical)
 
 - `npm run typecheck`: passed.

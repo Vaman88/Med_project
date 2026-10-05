@@ -17,7 +17,7 @@ Open http://localhost:3197. The first screen is Log in / Sign up. Until Supabase
 
 - Signup asks adult age, name, city/state and email/password first. After any required email confirmation, it collects allergies and food preferences without asking the person to enter them twice. Typed signature and explicit acceptance record the current terms version. Optional health-related food settings need separate consent.
 - Signed-in users start on Home, at pantry entry. Restoring a browser page also returns to Home.
-- Add measured pantry amounts, then type a shopping budget. Suggestions deduct confirmed usable inventory, round purchases to whole packages, include entered fees and stay within the budget.
+- Add and edit measured pantry amounts, then type a shopping budget. Suggestions deduct confirmed usable inventory, round purchases to whole packages, include entered fees and stay within the budget.
 - The basket covers up to three meal ideas. It is not a full week of food and does not establish nutritional adequacy.
 - Public Walmart and Target listings provide dated estimates and clickable references. A suggested shopping basket uses prices from one retailer; references older than 30 days are excluded from a confirmed budget basket. Compatible meal ideas and source links remain available when a complete basket cannot be priced. Local prices, labels, stock and fees need checking. See [price reference notes](docs/price-references.md).
 - Account contains food settings, accepted terms and account deletion. Help chat runs locally with navigation buttons; no messages are sent to an external AI service.
@@ -42,6 +42,8 @@ npm run test:auth-flow
 ```
 
 Browser tests start a production server on port 3197; stop the development server on that port first. Tests cover desktop/mobile signup forms, pantry and budget planning, allergy selection, Help, additional-meal spacing, page restoration and keyboard access. SQL checks require a disposable configured Supabase database and are separate from these tests.
+
+When the development server is already running on port 3197, use `npm run test:e2e:local` to run the same browser cases against it without stopping the site.
 
 `test:auth-flow` uses a separate local server and browser protocol mocks. It exercises Supabase's browser SDK through the email-confirmation link return, signed food setup, saved pantry and budget, and a reload. It never contacts a real Supabase project and cannot verify database row policies, actual email delivery or account deletion.
 
