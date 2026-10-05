@@ -27,3 +27,14 @@ Deleting a household cascades its members, sensitive context, restrictions, pant
 For complete account deletion, authenticate a fresh session and validate the requester server-side, remove all owned Storage objects, delete private price observations (or let the Auth FK cascade), then use Supabase Admin Auth's delete-user API. Deleting the Auth user cascades household data. Do not expose an unauthenticated admin deletion endpoint. Review provider retention and backup expiration separately; immediate database deletion does not promise erasure of provider logs or backups.
 
 Sources: [Supabase row-level security](https://supabase.com/docs/guides/database/postgres/row-level-security), [Storage access control](https://supabase.com/docs/guides/storage/security/access-control), and [Storage schema](https://supabase.com/docs/guides/storage/schema/design).
+
+
+## Adult account rebuild (October 5, 2026)
+
+The latest migration creates `adult_accounts` and immutable `account_consents` receipts. Setup writes both in one transaction, derives the owner from `auth.uid()`, enforces adult age and a matching typed signature, and records server time. Authenticated clients may read their own rows and update only their own food profile/pantry. Identity and consent receipts cannot be rewritten through client table grants. Account deletion is a function with no user-ID argument: it removes the calling Auth user and cascades owned data.
+
+New account and recommendation endpoints validate bearer tokens through Supabase Auth, derive ownership from the authenticated identity and validate bounded schemas. Recommendations load saved restrictions rather than accepting client allergy overrides. The labelled planner preview stays in memory and writes nothing to Supabase.
+
+Run `supabase/tests/adult_account_isolation.sql` as postgres in a disposable migrated project. It covers atomic setup/receipt, signature mismatch, owner reads, denied cross-owner writes, immutable identity/consent, own updates, own deletion with cascades, surviving other accounts and denied anonymous access. Its fixture JSON intentionally tests database access boundaries; full API schemas are tested separately. This SQL has been written but **not executed** because project configuration is deferred.
+
+After connection, verify real email confirmation, login/logout, token refresh, password recovery, incomplete-onboarding resumption, cross-device pantry and preference persistence, two-account REST isolation and deletion. Supabase's own stored backups and provider retention policies must be checked before making any broader retention promise.

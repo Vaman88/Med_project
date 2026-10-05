@@ -13,7 +13,7 @@ export function convertQuantity(quantity: number, from: Unit, to: Unit): number 
   return quantity * units[from].factor / units[to].factor;
 }
 function context(options: PlanningOptions) { return { ingredients: options.ingredients ?? demoIngredients, recipes: options.recipes ?? demoRecipes, prices: options.prices ?? demoPrices, now: options.now ?? new Date(), maxPriceAgeDays: options.maxPriceAgeDays ?? 30, allowSyntheticDemo: options.allowSyntheticDemo ?? true }; }
-function productConflict(price: PriceObservation, profile: HouseholdProfile): boolean {
+export function productConflict(price: PriceObservation, profile: HouseholdProfile): boolean {
   const tags = price.productTags ?? [];
   const allergies = effectiveAllergies(profile).ids;
   const rules = effectiveRules(profile);

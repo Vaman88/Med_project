@@ -2,7 +2,15 @@
 
 The original guide remains the source specification. This log records actual implementation, not completion claims for externally dependent acceptance criteria.
 
-## Validation of this prototype
+## Adult rebuild ? October 5, 2026
+
+The adult flow supersedes the earlier tab layout below: Log in / Sign up, four-stage onboarding with signed data-use terms and allergies, then Home (pantry ? budget ? basket and meal ideas). Account holds food preferences and privacy controls; Help combines local chat and food-support resources. Preview is temporary memory only. Dated public retailer references replace synthetic prices in this flow. Child layout remains future work, with the agreed cutoff under 10 versus age 10+; account registration remains adult-managed.
+
+Authenticated account setup, pantry/preferences persistence, consent receipts, deletion and recommendations are implemented with a new migration and bounded server APIs. Supabase configuration is deferred at the user's request; real hosted auth and database isolation are still unverified. The new rollback SQL check is `supabase/tests/adult_account_isolation.sql`. The original guide's outstanding recipe review, nutrient evidence and production release gates remain open.
+
+Current checks: 31 unit/API tests and 12 desktop/mobile browser cases passed; production build passed. Screenshots of account access, signed terms, suggestions and Help were reviewed. These checks cover the planner preview and forms; they do not substitute for live account testing.
+
+## Earlier prototype validation (historical)
 
 - `npm run typecheck`: passed.
 - `npm test`: 24 calculation, food-settings, nutrition-evidence, and API tests passed.

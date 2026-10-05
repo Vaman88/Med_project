@@ -1,167 +1,33 @@
-import { test, expect } from "@playwright/test";
-test("demo navigates all tabs and recalculates a priced plan", async ({ page }, testInfo) => {
-  await page.goto("/");
-  await expect(page.getByRole("button", { name: "Home", exact: true })).toHaveAttribute('aria-current', 'page');
-  await page.getByRole("button", { name: "Meals", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "What can we make today?" })).toBeVisible();
-  await page.screenshot({ path: testInfo.outputPath("planner.png"), fullPage: true });
-  await page.getByRole("button", { name: "Find compatible meals" }).click();
-  await expect(page.getByRole("region", { name: "Compatible recipes" })).toBeVisible();
-  await page.getByRole("button", { name: "Build my week" }).click();
-  await expect(page.getByRole("heading", { name: "Your seven-day draft" })).toBeVisible();
-  await expect(page.locator(".planned-meal")).toHaveCount(14);
-  await expect(page.getByRole("heading", { name: "Your shopping list" })).toBeVisible();
-  await page.locator('select[aria-label="Swap Monday dinner"]').selectOption("bean-corn-salad");
-  await expect(page.getByRole("status")).toContainText("recalculated");
-  await page.getByRole("button", { name: "Home", exact: true }).click();
-  await page.getByLabel("peanut", { exact: true }).check();
-  await page.getByRole("button", { name: "Meals", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Your seven-day draft" })).toHaveCount(0);
-  await page.getByRole("button", { name: "Find compatible meals" }).click();
-  await expect(page.getByRole("heading", { name: "Banana and peanut butter bread" })).toHaveCount(0);
-  await page.getByRole("button", { name: "Learn", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Start with the basics" })).toBeVisible();
-  await page.getByRole("button", { name: "Help", exact: true }).click();
-  await expect(page.getByRole("link", { name: "Call 211" })).toBeVisible();
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-});
+import { test, expect, type Page } from '@playwright/test';
+async function preview(page:Page){await page.goto('/');await page.getByRole('button',{name:'Preview the planner without an account'}).click();}
+async function suggestions(page:Page){await page.getByRole('button',{name:/continue/i}).click();await page.getByRole('textbox',{name:'Food budget (USD)',exact:true}).fill('20');await page.getByRole('button',{name:'Find my suggestions'}).click();await expect(page.getByRole('heading',{name:'Your meal ideas'})).toBeVisible();}
 
-test('Home accepts typed numbers without the change banner and opens first after a reload', async ({ page }) => {
-  await page.goto('/');
-  const people = page.getByRole('textbox', { name: 'People covered' });
-  await people.fill('4');
-  await people.press('Tab');
-  await page.getByRole('textbox', { name: 'Weekly groceries (USD)' }).fill('123.45');
-  await page.getByRole('textbox', { name: 'Available minutes per meal' }).click();
-  await expect(page.getByText('Preferences or pantry changed.', { exact: false })).toHaveCount(0);
-  await people.fill('0');
-  await people.press('Tab');
-  await expect(people).toHaveValue('4');
-  await expect(people).toHaveAttribute('aria-invalid', 'true');
-  await people.fill('4');
-  await people.press('Tab');
-  await page.getByRole('button', { name: 'Meals', exact: true }).click();
-  await expect(page.locator('.budget-preview strong')).toHaveText('$123.45');
-  await page.reload();
-  await expect(page.getByRole('button', { name: 'Home', exact: true })).toHaveAttribute('aria-current', 'page');
-  await expect(page.getByRole('textbox', { name: 'People covered' })).toHaveValue('4');
+test('first visit opens account access and signup collects adult details, preferences and signed terms',async({page},testInfo)=>{
+  await page.goto('/');await expect(page.getByRole('heading',{name:'Welcome back'})).toBeVisible();
+  await page.screenshot({path:testInfo.outputPath('account-access.png'),fullPage:true});
+  await page.getByRole('button',{name:'Sign up',exact:true}).click();await page.getByLabel('Your age',{exact:true}).fill('9');await page.getByRole('button',{name:'Continue',exact:true}).click();await expect(page.locator('.access-panel').getByRole('alert')).toContainText('parent or guardian');
+  await page.getByLabel('Your age',{exact:true}).fill('30');await page.getByRole('button',{name:'Continue',exact:true}).click();
+  await page.getByLabel('Full name',{exact:true}).fill('Alex Example');await page.getByLabel('City',{exact:true}).fill('Austin');await page.getByRole('combobox',{name:'State',exact:true}).selectOption('TX');await page.getByLabel('Email',{exact:true}).fill('alex@example.test');await page.getByLabel(/^Password/).fill('example-password-123');await page.getByLabel('Confirm password',{exact:true}).fill('example-password-123');await page.getByRole('button',{name:'Continue',exact:true}).click();
+  await expect(page.getByRole('heading',{name:'Food that works for you'})).toBeVisible();await page.getByLabel('I have no known food allergies').check();await page.getByRole('button',{name:'Continue',exact:true}).click();
+  await expect(page.getByRole('heading',{name:'Your information, your choice'})).toBeVisible();await expect(page.getByText('What your information is used for',{exact:true})).toBeVisible();await page.screenshot({path:testInfo.outputPath('terms.png'),fullPage:true});
 });
-
-test('restoring the website starts at Home while preserving family settings', async ({ page }) => {
-  await page.goto('/');
-  const home = page.getByRole('button', { name: 'Home', exact: true });
-  await expect(home).toHaveAttribute('aria-current', 'page');
-  await page.getByRole('textbox', { name: 'People covered' }).fill('5');
-  await page.getByRole('button', { name: 'Meals', exact: true }).click();
-  await expect(page.getByRole('button', { name: 'Meals', exact: true })).toHaveAttribute('aria-current', 'page');
-  // A browser can restore the existing React tree rather than mounting a new page.
-  await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true })));
-  await expect(home).toHaveAttribute('aria-current', 'page');
-  await expect(page.getByRole('textbox', { name: 'People covered' })).toHaveValue('5');
-  await page.getByRole('button', { name: /My food Tell us/ }).click();
-  await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true })));
-  await expect(home).toHaveAttribute('aria-current', 'page');
-  await expect(page.getByRole('textbox', { name: 'People covered' })).toHaveValue('5');
+test('preview follows pantry then typed budget and suggestions without duplicate pantry purchases',async({page},testInfo)=>{
+  await preview(page);await expect(page.getByRole('button',{name:'Home',exact:true})).toHaveAttribute('aria-current','page');
+  await page.getByRole('button',{name:'Add to pantry'}).click();await page.getByRole('combobox',{name:'Food',exact:true}).selectOption('banana');await page.getByRole('button',{name:'Add to pantry'}).click();await suggestions(page);
+  await expect(page.getByText('Preferences or pantry changed.',{exact:false})).toHaveCount(0);
+  await expect(page.getByText('Use what you have',{exact:true})).toBeVisible();await expect(page.getByText('No need to buy again',{exact:true}).first()).toBeVisible();
+  await page.screenshot({path:testInfo.outputPath('suggestions.png'),fullPage:true});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);
 });
-
-test('allergy suggestions support selection, keyboard input, and persistence', async ({ page }) => {
-  await page.goto('/');
-  await page.getByRole('button', { name: /My food Tell us/ }).click();
-  await page.getByRole('button', { name: 'With a grown-up' }).click();
-  await page.getByRole('tab', { name: 'Allergies' }).click();
-  const allergy = page.getByRole('combobox', { name: 'Food allergy', exact: true });
-  await allergy.fill('pea');
-  await expect(page.getByRole('option', { name: 'Peanuts', exact: true })).toBeVisible();
-  await allergy.press('ArrowDown');
-  await allergy.press('Enter');
-  await expect(page.getByText('Selected allergy: peanut', { exact: true })).toBeVisible();
-  await allergy.fill('alm');
-  await page.getByRole('option', { name: 'Almonds', exact: true }).click();
-  await expect(page.getByText('Selected allergy: almond', { exact: true })).toBeVisible();
-  await expect(page.locator('.allergy-list .saved-chip')).toHaveCount(2);
-  await page.reload();
-  await page.getByRole('button', { name: /My food Tell us/ }).click();
-  await page.getByRole('tab', { name: 'Allergies' }).click();
-  await expect(page.getByText('Selected allergy: peanut', { exact: true })).toBeVisible();
-  await page.getByRole('button', { name: 'Meals', exact: true }).click();
-  await page.getByRole('button', { name: 'Find compatible meals' }).click();
-  await expect(page.getByRole('status')).toContainText('A caregiver account must be connected');
-  await expect(page.getByRole('heading', { name: 'Banana and peanut butter bread' })).toHaveCount(0);
+test('allergy menu supports keyboard selection and suggestions exclude the declared allergen',async({page})=>{
+  await preview(page);await page.getByRole('button',{name:'Account',exact:true}).click();const allergy=page.getByRole('combobox',{name:'Food allergy',exact:true});await allergy.fill('pea');await allergy.press('ArrowDown');await allergy.press('Enter');await expect(page.locator('.saved-chip')).toContainText('Peanuts');await page.getByRole('button',{name:'Save food settings'}).click();await page.getByRole('button',{name:'Home',exact:true}).click();await suggestions(page);await expect(page.getByRole('heading',{name:'Banana and peanut butter bread'})).toHaveCount(0);
 });
-
-test('more meals has its own space and chat guides navigation while keeping conversation', async ({ page }, testInfo) => {
-  await page.goto('/');
-  await page.getByRole('button', { name: 'Meals', exact: true }).click();
-  await page.getByRole('button', { name: 'Find compatible meals' }).click();
-  await expect(page.locator('.recipe-card')).toHaveCount(3);
-  const more = page.getByRole('button', { name: 'Show more', exact: true });
-  await expect(more).toBeVisible();
-  const grid = await page.locator('.recipe-grid').boundingBox();
-  const button = await more.boundingBox();
-  expect(button!.y - (grid!.y + grid!.height)).toBeGreaterThanOrEqual(20);
-  await more.click();
-  await expect(page.locator('.recipe-card')).toHaveCount(6);
-  await expect(page.getByRole('button', { name: 'Show fewer', exact: true })).toHaveAttribute('aria-expanded', 'true');
-  await expect(page.locator('.assistant-panel')).toHaveCount(0);
-  await page.getByRole('button', { name: 'Chat', exact: true }).click();
-  await page.getByRole('button', { name: 'How do I add allergies?', exact: true }).click();
-  await expect(page.getByRole('log')).toContainText('start typing', { ignoreCase: true });
-  await page.getByRole('textbox', { name: 'Your message', exact: true }).fill('Where?');
-  await page.getByRole('button', { name: 'Send', exact: true }).click();
-  await expect(page.getByRole('log').locator('.chat-message.guide').last()).toContainText('Allergies');
-  await page.getByRole('button', { name: 'Open allergy settings', exact: true }).last().click();
-  await expect(page.getByRole('tab', { name: 'Allergies', exact: true })).toHaveAttribute('aria-selected', 'true');
-  await page.getByRole('button', { name: 'Chat', exact: true }).click();
-  await expect(page.getByRole('log')).toContainText('Where?');
-  await page.getByRole('textbox', { name: 'Your message', exact: true }).fill('What is my budget?');
-  await page.getByRole('button', { name: 'Send', exact: true }).click();
-  await expect(page.getByRole('log').locator('.chat-message.guide').last()).toContainText('Your weekly budget is');
-  await page.screenshot({ path: testInfo.outputPath('chat.png'), fullPage: true });
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+test('extra meal options have spacing and Help combines chat with support',async({page},testInfo)=>{
+  await preview(page);await suggestions(page);const more=page.getByRole('button',{name:'See other compatible meals'});await expect(more).toBeVisible();const previous=await page.locator('.price-note').boundingBox();const box=await more.boundingBox();expect(box!.y-previous!.y-previous!.height).toBeGreaterThanOrEqual(25);await more.click();await expect(more).toHaveCount(0);await expect(page.getByRole('button',{name:'Hide other options'})).toHaveAttribute('aria-expanded','true');
+  await page.getByRole('button',{name:'Help',exact:true}).click();await expect(page.getByRole('link',{name:'Call 211'})).toBeVisible();await page.getByRole('button',{name:'How do I add allergies?',exact:true}).click();await expect(page.getByRole('log')).toContainText('Start typing');await page.getByRole('button',{name:'Open allergy settings',exact:true}).click();await expect(page.getByRole('button',{name:'Account',exact:true})).toHaveAttribute('aria-current','page');await page.getByRole('button',{name:'Help',exact:true}).click();await expect(page.getByRole('log')).toContainText('Start typing');await page.screenshot({path:testInfo.outputPath('help.png'),fullPage:true});
 });
-test("keyboard navigation and age-appropriate optional BMI", async ({ page }) => {
-  await page.goto("/");
-  await page.keyboard.press("Tab");
-  await expect(page.getByRole("link", { name: "Skip to content" })).toBeFocused();
-  await page.getByRole("button", { name: "Home", exact: true }).click();
-  await page.getByLabel("Hide BMI and weight content").uncheck();
-  await page.getByText("Optional BMI screening", { exact: true }).click();
-  await page.getByRole("combobox", { name: "Age group", exact: true }).selectOption("teen");
-  await expect(page.getByRole("link", { name: "Use CDC’s child and teen calculator" })).toBeVisible();
-  await expect(page.getByLabel("Weight (kg)")).toHaveCount(0);
-  await page.getByRole("combobox", { name: "Age group", exact: true }).selectOption("infant");
-  await expect(page.getByText("BMI calculators are not used for children under 2.")).toBeVisible();
+test('browser restoration returns to Home and preview refresh clears temporary data',async({page})=>{
+  await preview(page);await page.getByRole('button',{name:'Help',exact:true}).click();await page.evaluate(()=>window.dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true})));await expect(page.getByRole('button',{name:'Home',exact:true})).toHaveAttribute('aria-current','page');await expect(page.getByRole('heading',{name:'What is in your pantry?'})).toBeVisible();await page.reload();await expect(page.getByRole('heading',{name:'Welcome back'})).toBeVisible();
 });
-test('My food settings persist locally and gate unresolved allergies', async ({ page }) => {
-  await page.goto('/');
-  await page.getByRole('button', { name: 'Home', exact: true }).click();
-  await page.getByRole('button', { name: /My food Tell us/ }).click();
-  await expect(page.getByRole('tab', { name: 'Diet' })).toHaveAttribute('aria-selected','true');
-  await page.getByRole('tab', { name: 'Diet' }).focus();
-  await page.keyboard.press('ArrowRight');
-  await expect(page.getByRole('tab', { name: 'Allergies' })).toBeFocused();
-  await expect(page.getByRole('tab', { name: 'Allergies' })).toHaveAttribute('aria-selected','true');
-  await page.getByRole('button', { name: 'With a grown-up' }).click();
-  await page.getByRole('tab', { name: 'Diet' }).click();
-  await page.getByRole('button', { name: 'No pork' }).click();
-  await page.getByRole('tab', { name: 'Allergies' }).click();
-  await page.getByLabel('Food allergy').fill('groundnuts, nuts');
-  await page.getByRole('button', { name: 'Add', exact: true }).click();
-  await expect(page.getByText('Does this mean peanut?')).toBeVisible();
-  await expect(page.getByText('Needs checking — please clarify this food.')).toBeVisible();
-  await page.reload();
-  await page.getByRole('button', { name: 'Home', exact: true }).click();
-  await page.getByRole('button', { name: /My food Tell us/ }).click();
-  await page.getByRole('tab', { name: 'Allergies' }).click();
-  await expect(page.getByText('groundnuts', { exact: true })).toBeVisible();
-});
-test('My food tabs remain readable at 360 pixels and simulated 200 percent zoom', async ({ page }) => {
-  await page.setViewportSize({ width: 720, height: 900 });
-  await page.goto('/');
-  await page.getByRole('button', { name: 'Home', exact: true }).click();
-  await page.getByRole('button', { name: /My food Tell us/ }).click();
-  await page.evaluate(() => { document.documentElement.style.zoom = '2'; });
-  await expect(page.getByRole('tab', { name: 'Allergies' })).toBeVisible();
-  await expect(page.getByRole('tab', { name: 'Nutrients' })).toBeVisible();
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+test('keyboard skip link and 360-pixel layout work',async({page})=>{
+  await page.setViewportSize({width:360,height:800});await page.goto('/');await page.keyboard.press('Tab');await expect(page.getByRole('link',{name:'Skip to content'})).toBeFocused();await page.getByRole('button',{name:'Preview the planner without an account'}).click();await page.getByRole('button',{name:'Account',exact:true}).click();await expect(page.getByRole('combobox',{name:'Food allergy',exact:true})).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);
 });

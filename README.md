@@ -1,6 +1,6 @@
-# Healthy Steps — family food settings and meal planning
+# Healthy Steps
 
-Implementation started from [the build guide](food_support_app_implementation.md). This repository delivers the guide's first useful milestone: enter a budget, restrictions, equipment and confirmed pantry amounts, then generate compatible meals and a package-aware shopping list.
+A simple adult food planner: account setup, pantry, shopping budget, then ingredients and meal ideas. Help combines a local website guide with official food-support resources.
 
 ## Run locally
 
@@ -8,56 +8,52 @@ Requires Node.js 20.9 or newer and npm.
 
 ```powershell
 npm install
-npm run dev
+npm run dev -- --port 3197
 ```
 
-Open http://localhost:3000. No API keys are needed for the demo. Demo settings persist in this browser until Reset is used. The planner sends its current profile, pantry, and price snapshot to the local server. Images are not uploaded.
+Open http://localhost:3197. The first screen is Log in / Sign up. Until Supabase is connected, choose **Preview the planner without an account**. Preview uses memory only; refreshing or exiting clears it. No pretend accounts or passwords are saved locally.
 
-For caregiver account sync, copy `.env.example` to `.env.local`, fill in the Supabase project URL and publishable key, and apply the migrations in `supabase/migrations` in filename order. The app then offers an email sign-in link and authenticated food-settings Save. Only the publishable key belongs in this file; never put a service-role key in a public environment variable. The project must allow the local or deployed URL as an Auth redirect destination.
+## Adult experience
+
+- Signup asks adult age, name, city/state, email/password, allergies and food preferences. Typed signature and explicit acceptance record the current terms version. Optional health-related food settings need separate consent.
+- Signed-in users start on Home, at pantry entry. Restoring a browser page also returns to Home.
+- Add measured pantry amounts, then type a shopping budget. Suggestions deduct confirmed usable inventory, round purchases to whole packages, include entered fees and stay within the budget.
+- The basket covers up to three meal ideas. It is not a full week of food and does not establish nutritional adequacy.
+- Public Walmart and Target listings provide dated estimates and clickable references. Local prices, labels, stock and fees need checking. See [price reference notes](docs/price-references.md).
+- Account contains food settings, accepted terms and account deletion. Help chat runs locally with navigation buttons; no messages are sent to an external AI service.
+- The future layout cutoff is under 10 for the child layout and 10+ for the adult layout. This release only creates accounts for adults 18+; child profiles and permissions are not implemented.
+
+## Connect Supabase later
+
+Copy `.env.example` to `.env.local` and set the project URL and publishable key. Apply all `supabase/migrations` in filename order. In Supabase Auth, enable email/password sign-in and configure the local and deployed site URLs as allowed confirmation and password-recovery redirect URLs. Restart the app after changing environment variables; rebuild on Netlify after changing deployment variables.
+
+The new account implementation uses `adult_accounts`, `account_consents`, owner RLS, authenticated `/api/account` and `/api/recommendations` routes, and transaction functions for setup and deletion. Only the publishable key belongs in browser environment variables. See [database setup and verification](docs/database.md).
+
+**Supabase configuration is deferred at the user's request.** Live signup, email confirmation, password recovery, cross-account isolation, persistence and deletion have not yet been verified against a running project. The written terms describe intended product data use and have not received legal review.
+
+## Verify
 
 ```powershell
 npm run typecheck
 npm test
 npm run build
-npx playwright install chromium
 npm run test:e2e
 ```
 
-Windows sandbox restrictions can block Node worker processes or the Playwright browser download; those commands may require execution permission in the development environment.
+Browser tests start a production server on port 3197; stop the development server on that port first. Tests cover desktop/mobile signup forms, pantry and budget planning, allergy selection, Help, additional-meal spacing, page restoration and keyboard access. SQL checks require a disposable configured Supabase database and are separate from these tests.
 
-## What works
+## Prototype boundaries
 
-- Five responsive Home, Meals, Learn, Help, and Chat tabs, plus My food with Diet, Allergies, Favorites, and Nutrients sub-tabs. New visits open on Home.
-- Direct number entry on Home, a searchable allergy menu with keyboard selection, and a built-in website chat guide with navigation buttons and conversation history during the session. Chat uses local website guidance; no live AI service is connected.
-- Member-specific food preferences, typed allergy proposals and confirmation, medical-consent fields, and an optional authenticated caregiver save endpoint. A configured Supabase project is required for account sync.
-- Budget, shared household allergy union, vegetarian/vegan and ingredient exclusions, equipment, meal slots, cooking-time ranking, fees and uncertainty buffer.
-- Optional BMI, initially hidden and collapsed when enabled; local-only height/weight; CDC routing for ages 2–19; no calculator under 2.
-- Manual confirmed pantry entry with explicit quantity, unit and food state.
-- Six measured **synthetic, unreviewed** recipe examples, canonical ingredient IDs and hard restriction/equipment gates. Shared meals combine member exclusions; unresolved allergies hold suggestions.
-- Seven-day generation, ingredient scaling, pantry reservations, compatible-unit conversions, full-package checkout costs, missing/stale price status, editable package prices, and complete recalculation after swaps.
-- Explicit linked batch accounting in the engine (not automatic scheduling or exposed in the current UI).
-- Strict bounded server request validation and an offline deterministic assistant fallback.
-- National food-support and education links checked September 30, 2026.
-- Supabase migrations with owner RLS, member food tables, reviewed nutrient-record storage, and private storage policies; see [database setup and verification](docs/database.md).
-
-## Honest boundaries
-
-This is a runnable development prototype, not a complete first release. Synthetic recipes and prices are permitted **only for this labeled demo**. They have not undergone clinical/content review. No retailer or live AI is connected. Household size scales servings; this does not establish individual nutrient adequacy. The heuristic planner does not guarantee the cheapest possible basket.
-
-The demo planning API remains stateless and accepts bounded snapshots. The optional caregiver food-settings endpoint uses Supabase Auth and owner RLS, but no project credentials are installed in this repository, so live sign-in, database isolation, and account sync have not been verified. No production rate limits are configured. Do not enable private uploads yet: `/api/photos/analyze` returns a manual-entry fallback without reading or retaining the image body.
-
-The caregiver account path still needs hosted verification and a separate child authorization model. Medical and nutrient content requires qualified review; no verified nutrient records or product labels are seeded. Automatic batch scheduling, reviewed substitutions, a 30–50 approved recipe library, state-specific SNAP routing, a local pilot directory, reviewed videos/transcripts, provider integrations and release review remain open. These are tracked step by step in [implementation progress](docs/implementation-progress.md).
+Six original synthetic recipe examples remain unreviewed. No verified nutrient or product-label catalog, automatic location pricing, photo analysis, live AI or child authorization is connected. Existing stateless demonstration APIs and legacy planning components remain in the codebase for compatibility, but the new website uses the adult flow. Original implementation-guide work is tracked in [implementation progress](docs/implementation-progress.md).
 
 ## Code map
 
 | Area | Location |
 | --- | --- |
-| Responsive UI | `src/components/food-app.tsx`, `src/app/globals.css` |
-| Typed domain and synthetic fixtures | `src/lib/domain.ts`, `src/lib/demo-data.ts` |
-| Deterministic calculation and matching | `src/lib/planning.ts` |
-| Runtime validation and API | `src/lib/validation.ts`, `src/app/api/` |
-| Verified national entry points | `src/lib/resources.ts` |
-| Database foundation and isolation checks | `supabase/`, `docs/database.md` |
+| Adult UI and account setup | `src/components/adult-planner.tsx`, `account-access.tsx`, `food-preferences.tsx` |
+| Account schemas and terms | `src/lib/account.ts` |
+| Basket selection and retailer references | `src/lib/recommendations.ts`, `value-prices.ts` |
+| Deterministic inventory and calculations | `src/lib/planning.ts` |
+| Account and recommendation endpoints | `src/app/api/account/`, `src/app/api/recommendations/` |
+| Account migration and isolation assertions | `supabase/migrations/202610050001_adult_accounts.sql`, `supabase/tests/adult_account_isolation.sql` |
 | Calculation/API/browser checks | `tests/` |
-
-Private features should use authenticated Supabase clients and ownership checks rather than adapting these public demo snapshot routes into record-based endpoints. No service-role credentials belong in the browser.

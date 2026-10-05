@@ -60,7 +60,7 @@ export interface Recipe {
 export interface PriceObservation {
   id: string; ingredientId: string; storeId: string; productName: string;
   packageQuantity: number; packageUnit: Unit; priceCents: number;
-  observedAt: string; sourceType: 'synthetic-demo' | 'user-entered' | 'reviewed'; locationLabel: string;
+  observedAt: string; sourceType: 'synthetic-demo' | 'user-entered' | 'reviewed' | 'retailer-reference'; locationLabel: string;
   productTags?: string[]; labelStatus?: 'verified' | 'unknown'; labelSource?: string;
 }
 export interface MealPlanEntry {

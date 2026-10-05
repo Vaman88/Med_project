@@ -6,7 +6,7 @@ import { siteGuideReply, type GuideDestination, type GuideAction } from '@/lib/s
 
 type Message = { role: 'user' | 'guide'; text: string; actions?: GuideAction[] };
 const welcome: Message = { role: 'guide', text: 'Hi, I’m your Healthy Steps guide. I can help you find your way around, set up your food settings, and understand the meal planner. What would you like help with?' };
-const prompts = ['How do I get started?', 'How do I add allergies?', 'How do I build my week?', 'Where can I find food support?'];
+const prompts = ['How do I get started?', 'How do I add allergies?', 'How do I find meal ideas?', 'Where can I find food support?'];
 
 export function SupportChat({ profile, pantryCount, onNavigate }: {
   profile: HouseholdProfile; pantryCount: number; onNavigate: (destination: GuideDestination) => void;
