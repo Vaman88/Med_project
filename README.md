@@ -27,7 +27,8 @@ Windows sandbox restrictions can block Node worker processes or the Playwright b
 
 ## What works
 
-- Four responsive Home, Meals, Learn, and Help tabs, plus My food with Diet, Allergies, Favorites, and Nutrients sub-tabs.
+- Five responsive Home, Meals, Learn, Help, and Chat tabs, plus My food with Diet, Allergies, Favorites, and Nutrients sub-tabs. New visits open on Home.
+- Direct number entry on Home, a searchable allergy menu with keyboard selection, and a built-in website chat guide with navigation buttons and conversation history during the session. Chat uses local website guidance; no live AI service is connected.
 - Member-specific food preferences, typed allergy proposals and confirmation, medical-consent fields, and an optional authenticated caregiver save endpoint. A configured Supabase project is required for account sync.
 - Budget, shared household allergy union, vegetarian/vegan and ingredient exclusions, equipment, meal slots, cooking-time ranking, fees and uncertainty buffer.
 - Optional BMI, initially hidden and collapsed when enabled; local-only height/weight; CDC routing for ages 2–19; no calculator under 2.

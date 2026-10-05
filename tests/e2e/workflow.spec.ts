@@ -1,6 +1,8 @@
 import { test, expect } from "@playwright/test";
 test("demo navigates all tabs and recalculates a priced plan", async ({ page }, testInfo) => {
   await page.goto("/");
+  await expect(page.getByRole("button", { name: "Home", exact: true })).toHaveAttribute('aria-current', 'page');
+  await page.getByRole("button", { name: "Meals", exact: true }).click();
   await expect(page.getByRole("heading", { name: "What can we make today?" })).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath("planner.png"), fullPage: true });
   await page.getByRole("button", { name: "Find compatible meals" }).click();
@@ -21,6 +23,83 @@ test("demo navigates all tabs and recalculates a priced plan", async ({ page }, 
   await expect(page.getByRole("heading", { name: "Start with the basics" })).toBeVisible();
   await page.getByRole("button", { name: "Help", exact: true }).click();
   await expect(page.getByRole("link", { name: "Call 211" })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+});
+
+test('Home accepts typed numbers without the change banner and opens first after a reload', async ({ page }) => {
+  await page.goto('/');
+  const people = page.getByRole('textbox', { name: 'People covered' });
+  await people.fill('4');
+  await people.press('Tab');
+  await page.getByRole('textbox', { name: 'Weekly groceries (USD)' }).fill('123.45');
+  await page.getByRole('textbox', { name: 'Available minutes per meal' }).click();
+  await expect(page.getByText('Preferences or pantry changed.', { exact: false })).toHaveCount(0);
+  await people.fill('0');
+  await people.press('Tab');
+  await expect(people).toHaveValue('4');
+  await expect(people).toHaveAttribute('aria-invalid', 'true');
+  await people.fill('4');
+  await people.press('Tab');
+  await page.getByRole('button', { name: 'Meals', exact: true }).click();
+  await expect(page.locator('.budget-preview strong')).toHaveText('$123.45');
+  await page.reload();
+  await expect(page.getByRole('button', { name: 'Home', exact: true })).toHaveAttribute('aria-current', 'page');
+  await expect(page.getByRole('textbox', { name: 'People covered' })).toHaveValue('4');
+});
+
+test('allergy suggestions support selection, keyboard input, and persistence', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: /My food Tell us/ }).click();
+  await page.getByRole('button', { name: 'With a grown-up' }).click();
+  await page.getByRole('tab', { name: 'Allergies' }).click();
+  const allergy = page.getByRole('combobox', { name: 'Food allergy', exact: true });
+  await allergy.fill('pea');
+  await expect(page.getByRole('option', { name: 'Peanuts', exact: true })).toBeVisible();
+  await allergy.press('ArrowDown');
+  await allergy.press('Enter');
+  await expect(page.getByText('Selected allergy: peanut', { exact: true })).toBeVisible();
+  await allergy.fill('alm');
+  await page.getByRole('option', { name: 'Almonds', exact: true }).click();
+  await expect(page.getByText('Selected allergy: almond', { exact: true })).toBeVisible();
+  await expect(page.locator('.allergy-list .saved-chip')).toHaveCount(2);
+  await page.reload();
+  await page.getByRole('button', { name: /My food Tell us/ }).click();
+  await page.getByRole('tab', { name: 'Allergies' }).click();
+  await expect(page.getByText('Selected allergy: peanut', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Meals', exact: true }).click();
+  await page.getByRole('button', { name: 'Find compatible meals' }).click();
+  await expect(page.getByRole('status')).toContainText('A caregiver account must be connected');
+  await expect(page.getByRole('heading', { name: 'Banana and peanut butter bread' })).toHaveCount(0);
+});
+
+test('more meals has its own space and chat guides navigation while keeping conversation', async ({ page }, testInfo) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Meals', exact: true }).click();
+  await page.getByRole('button', { name: 'Find compatible meals' }).click();
+  await expect(page.locator('.recipe-card')).toHaveCount(3);
+  const more = page.getByRole('button', { name: 'Show more', exact: true });
+  await expect(more).toBeVisible();
+  const grid = await page.locator('.recipe-grid').boundingBox();
+  const button = await more.boundingBox();
+  expect(button!.y - (grid!.y + grid!.height)).toBeGreaterThanOrEqual(20);
+  await more.click();
+  await expect(page.locator('.recipe-card')).toHaveCount(6);
+  await expect(page.getByRole('button', { name: 'Show fewer', exact: true })).toHaveAttribute('aria-expanded', 'true');
+  await expect(page.locator('.assistant-panel')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Chat', exact: true }).click();
+  await page.getByRole('button', { name: 'How do I add allergies?', exact: true }).click();
+  await expect(page.getByRole('log')).toContainText('start typing', { ignoreCase: true });
+  await page.getByRole('textbox', { name: 'Your message', exact: true }).fill('Where?');
+  await page.getByRole('button', { name: 'Send', exact: true }).click();
+  await expect(page.getByRole('log').locator('.chat-message.guide').last()).toContainText('Allergies');
+  await page.getByRole('button', { name: 'Open allergy settings', exact: true }).last().click();
+  await expect(page.getByRole('tab', { name: 'Allergies', exact: true })).toHaveAttribute('aria-selected', 'true');
+  await page.getByRole('button', { name: 'Chat', exact: true }).click();
+  await expect(page.getByRole('log')).toContainText('Where?');
+  await page.getByRole('textbox', { name: 'Your message', exact: true }).fill('What is my budget?');
+  await page.getByRole('button', { name: 'Send', exact: true }).click();
+  await expect(page.getByRole('log').locator('.chat-message.guide').last()).toContainText('Your weekly budget is');
+  await page.screenshot({ path: testInfo.outputPath('chat.png'), fullPage: true });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });
 test("keyboard navigation and age-appropriate optional BMI", async ({ page }) => {

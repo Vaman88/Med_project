@@ -11,6 +11,14 @@ const aliases: Record<string, string> = {
   'tree nut': 'tree-nut', 'tree nuts': 'tree-nut', treenuts: 'tree-nut',
   almond: 'almond', almonds: 'almond', walnut: 'walnut', walnuts: 'walnut', cashew: 'cashew', cashews: 'cashew', pecan: 'pecan', pecans: 'pecan',
 };
+const allergyLabels: Record<string, string> = {
+  peanut: 'Peanuts', 'tree-nut': 'Tree nuts', milk: 'Milk', egg: 'Eggs', wheat: 'Wheat', soy: 'Soy', fish: 'Fish',
+  shellfish: 'Shellfish', sesame: 'Sesame', almond: 'Almonds', walnut: 'Walnuts', cashew: 'Cashews', pecan: 'Pecans',
+  salmon: 'Salmon', tuna: 'Tuna', cod: 'Cod', shrimp: 'Shrimp', crab: 'Crab', lobster: 'Lobster',
+};
+export const allergyOptions = Object.entries(allergyLabels).map(([id, label]) => ({
+  id, label, searchTerms: [label.toLowerCase(), ...Object.keys(aliases).filter(alias => aliases[alias] === id)],
+}));
 export function proposeAllergies(input: string): FoodAllergy[] {
   return input.split(',').map(rawText => rawText.trim()).filter(Boolean).slice(0, 20).map(rawText => {
     const key = rawText.toLowerCase().replace(/\s+/g, ' ');
