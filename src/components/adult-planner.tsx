@@ -17,6 +17,7 @@ const foodStates: Record<string,FoodState> = { oats:'dry',banana:'raw',carrot:'r
 const amounts: Record<string,number> = { oats:500,banana:1,carrot:450,beans:240,rice:250,tomato:400,corn:200,bread:2,'peanut-butter':100,yogurt:200,hummus:100 };
 export function AdultPlanner() {
   const [account,setAccount] = useState<AccountState|null>(null);
+  const [accountUserId,setAccountUserId] = useState('');
   const [token,setToken] = useState('');
   const [preview,setPreview] = useState(false);
   const [view,setView] = useState<'home'|'help'|'account'>('home');
@@ -36,15 +37,19 @@ export function AdultPlanner() {
   const [showMore,setShowMore] = useState(false);
   const [accountTab,setAccountTab] = useState<'food'|'privacy'>('food');
   const [sessionKey,setSessionKey] = useState(0);
-  const ready=useCallback((saved:AccountState,currentToken:string)=>{setAccount(saved);setProfile(saved.profile);setPantry(saved.pantry);setToken(currentToken);setPreview(false);setView('home');setStep(0);setSuggestions(null);setFeedback('');},[]);
+  const ready=useCallback((saved:AccountState,currentToken:string,userId:string)=>{setAccount(saved);setAccountUserId(userId);setProfile(saved.profile);setPantry(saved.pantry);setToken(currentToken);setPreview(false);setView('home');setStep(0);setSuggestions(null);setFeedback('');setIngredientId('oats');setAmount('500');setUnit('g');setFoodState('dry');setDeleteText('');setChecked([]);},[]);
   useEffect(()=>{
     if(!cloudConfigured)return;
     const {data}=browserCloud().auth.onAuthStateChange((event,session)=>{
-      if(event==='SIGNED_OUT'){setAccount(null);setToken('');setPreview(false);setPantry([]);setProfile(startingProfile());setSuggestions(null);setSessionKey(key=>key+1);}
-      else if(session)setToken(session.access_token);
+      if(event==='SIGNED_OUT'||(session&&accountUserId&&session.user.id!==accountUserId)){
+        setAccount(null);setAccountUserId('');setToken(session?.access_token??'');setPreview(false);
+        setPantry([]);setProfile(startingProfile());setSuggestions(null);setChecked([]);
+        setDeleteText('');setIngredientId('oats');setAmount('500');setUnit('g');
+        setFoodState('dry');setFeedback('');setView('home');setStep(0);setSessionKey(key=>key+1);
+      } else if(session)setToken(session.access_token);
     });
     return()=>data.subscription.unsubscribe();
-  },[]);
+  },[accountUserId]);
   useEffect(()=>{
     function startAtHome(){setView('home');setStep(0);setFeedback('');window.scrollTo({top:0,behavior:'instant'});}
     window.addEventListener('pageshow',startAtHome);return()=>window.removeEventListener('pageshow',startAtHome);
@@ -68,7 +73,7 @@ export function AdultPlanner() {
     if(pantry.length>=100){setFeedback('Review your pantry items before adding more.');return;}
     setPantry(current=>[...current,{id:crypto.randomUUID(),ingredientId,quantity,unit,foodState,quantityConfirmed:true}]);invalidate();
   }
-  async function logOut(){if(!preview)await browserCloud().auth.signOut({scope:'local'});setAccount(null);setPreview(false);setToken('');setPantry([]);setProfile(startingProfile());setSuggestions(null);setSessionKey(key=>key+1);setView('home');setStep(0);}
+  async function logOut(){if(!preview)await browserCloud().auth.signOut({scope:'local'});setAccount(null);setAccountUserId('');setPreview(false);setToken('');setPantry([]);setProfile(startingProfile());setSuggestions(null);setIngredientId('oats');setAmount('500');setUnit('g');setFoodState('dry');setDeleteText('');setChecked([]);setSessionKey(key=>key+1);setView('home');setStep(0);}
   const entered=!!account||preview;
   return <div className="app-shell rebuilt-app"><a className="skip-link" href="#main-content">Skip to content</a>
     <header className="header"><button className="brand brand-button" onClick={()=>navigate('home')} aria-label="Healthy Steps home"><span className="brand-icon" aria-hidden="true">✳</span>Healthy Steps</button><span className="header-note">Small steps. Everyday meals.</span>{entered&&<button className="text-button" onClick={()=>{void logOut().catch(()=>setFeedback('Could not log out. Please try again.'));}}>{preview?'Exit preview':'Log out'}</button>}</header>

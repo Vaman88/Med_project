@@ -15,7 +15,7 @@ Open http://localhost:3197. The first screen is Log in / Sign up. Until Supabase
 
 ## Adult experience
 
-- Signup asks adult age, name, city/state, email/password, allergies and food preferences. Typed signature and explicit acceptance record the current terms version. Optional health-related food settings need separate consent.
+- Signup asks adult age, name, city/state and email/password first. After any required email confirmation, it collects allergies and food preferences without asking the person to enter them twice. Typed signature and explicit acceptance record the current terms version. Optional health-related food settings need separate consent.
 - Signed-in users start on Home, at pantry entry. Restoring a browser page also returns to Home.
 - Add measured pantry amounts, then type a shopping budget. Suggestions deduct confirmed usable inventory, round purchases to whole packages, include entered fees and stay within the budget.
 - The basket covers up to three meal ideas. It is not a full week of food and does not establish nutritional adequacy.

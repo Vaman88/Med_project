@@ -8,6 +8,8 @@ The adult flow supersedes the earlier tab layout below: Log in / Sign up, four-s
 
 Authenticated account setup, pantry/preferences persistence, consent receipts, deletion and recommendations are implemented with a new migration and bounded server APIs. Supabase configuration is deferred at the user's request; real hosted auth and database isolation are still unverified. The new rollback SQL check is `supabase/tests/adult_account_isolation.sql`. The original guide's outstanding recipe review, nutrient evidence and production release gates remain open.
 
+Signup creates the basic Auth identity after the account data-use acknowledgement, then collects food settings and signed terms after any required email confirmation. This avoids asking for allergy details twice after an email redirect. The planner also clears personal state when an Auth session switches users in the same browser.
+
 Current checks: 31 unit/API tests and 12 desktop/mobile browser cases passed; production build passed. Screenshots of account access, signed terms, suggestions and Help were reviewed. These checks cover the planner preview and forms; they do not substitute for live account testing.
 
 ## Earlier prototype validation (historical)
