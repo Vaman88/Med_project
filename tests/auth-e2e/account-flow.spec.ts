@@ -72,6 +72,7 @@ test('email confirmation resumes food setup and saves the adult planner', async 
   });
 
   await page.goto('/');
+  await page.getByRole('button', { name: 'Caregiver account' }).click();
   await page.getByRole('button', { name: 'Sign up', exact: true }).click();
   await page.getByLabel('Your age', { exact: true }).fill('30');
   await page.getByRole('button', { name: 'Continue' }).click();

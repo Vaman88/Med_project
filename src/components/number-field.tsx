@@ -2,8 +2,8 @@
 
 import { useEffect, useId, useState } from 'react';
 
-export function NumberField({ label, value, min = 0, max = 10000, decimal = false, onChange }: {
-  label: string; value: number; min?: number; max?: number; decimal?: boolean; onChange: (value: number) => void;
+export function NumberField({ label, value, min = 0, max = 10000, decimal = false, live = false, onChange }: {
+  label: string; value: number; min?: number; max?: number; decimal?: boolean; live?: boolean; onChange: (value: number) => void;
 }) {
   const [draft, setDraft] = useState(String(value));
   const [editing, setEditing] = useState(false);
@@ -19,7 +19,7 @@ export function NumberField({ label, value, min = 0, max = 10000, decimal = fals
   }
   return <label htmlFor={id}>{label}<input id={id} type="text" inputMode={decimal ? 'decimal' : 'numeric'} value={draft}
     aria-invalid={!!error} aria-describedby={error ? `${id}-error` : undefined}
-    onFocus={() => setEditing(true)} onChange={event => { setDraft(event.target.value); setError(''); }} onBlur={commit}
+    onFocus={() => setEditing(true)} onChange={event => { const text=event.target.value;setDraft(text);setError('');const number=Number(text);if(live&&/^\d+(?:\.\d+)?$/.test(text.trim())&&Number.isFinite(number)&&number>=min&&number<=max&&(decimal||Number.isInteger(number)))onChange(number); }} onBlur={commit}
     onKeyDown={event => { if (event.key === 'Enter') { event.preventDefault(); event.currentTarget.blur(); } }} />
     {error && <small className="field-error" id={`${id}-error`}>{error}</small>}</label>;
 }
