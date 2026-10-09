@@ -31,6 +31,10 @@ Specification: `C:\Users\reach\Downloads\HealthySteps_Redesign_Implementation.md
 - The two account confirmation simulations and a production build passed. Guest kitchen/meal layouts had no horizontal overflow at 360, 768 and 1440 pixels.
 - Hosted Supabase remains unconfigured. No live authentication or database verification is claimed.
 
+## Visual refresh, October 9
+
+The warm kitchen theme now includes a photo-led landing page, self-hosted Nunito Sans, Tabler icons, compact navigation, clearer pantry/budget panels and illustrated recipe cards. See [visual-refresh.md](visual-refresh.md) for references, generated asset prompts and verification. The production build and all 18 guest/caregiver browser cases passed.
+
 ## Remaining guide requirements
 
-The redesign is started, not complete. Next: searchable pantry categories and household basics, credible reviewed recipe expansion (including frozen foods and eggs), three-/seven-day planning with saved meals and swaps, updated Meal Helper, education with captions, pantry photography, low-bandwidth controls, offline caching, broader 360/768/1440 layout review and source review for food-support additions. The landing food visual and recipe photography are also pending. Custom frozen foods and eggs currently remain reference-only rather than receiving invented cooking instructions or prices.
+The redesign is started, not complete. Next: searchable pantry categories and household basics, credible reviewed recipe expansion (including frozen foods and eggs), three-/seven-day planning with saved meals and swaps, updated Meal Helper, education with captions, pantry photography, low-bandwidth controls, offline caching, broader 360/768/1440 layout review and source review for food-support additions. The landing visual and eight illustrative recipe images were added in the visual refresh; recipe review is still pending. Custom frozen foods and eggs currently remain reference-only rather than receiving invented cooking instructions or prices.
