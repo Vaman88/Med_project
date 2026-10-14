@@ -1,6 +1,6 @@
 # Healthy Steps
 
-A family food planner: start as a guest, add pantry food, choose a grocery budget, then explore meal ideas and a shopping basket. The existing caregiver account flow remains available as a secondary action.
+A family food planner: start as a guest, add pantry food, choose a grocery budget, then explore meal ideas and a shopping basket.
 
 ## Run locally
 
@@ -11,7 +11,7 @@ npm install
 npm run dev -- --port 3197
 ```
 
-Open http://localhost:3197 and choose **Try Meal Planner** or **Try a sample pantry**. Guest pantry, budget and food settings save in this browser; use **Clear my information** to remove them. Other people using this browser can see those settings. If browser storage is unavailable, the site reports that changes are temporary. The secondary **Caregiver account** action preserves the existing login/signup flow; real accounts still require Supabase.
+Open http://localhost:3197 and choose **Try Meal Planner** or **Try a sample pantry**. Guest pantry, budget and food settings save in this browser; use **Clear my information** to remove them. Other people using this browser can see those settings. If browser storage is unavailable, the site reports that changes are temporary.
 
 The October 9 redesign is in progress. The first slice adds a guest kitchen, optional measured pantry amounts, free-text foods, sample inventory, visible budget/family controls, pantry-based meal groups and a printable suggested basket. Custom foods and missing amounts are saved but cannot be counted as verified recipe inventory. The weekly planner, wider reviewed recipe catalog, education media, photo recognition and offline caching remain pending. See [redesign progress](docs/redesign-progress.md).
 

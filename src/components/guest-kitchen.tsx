@@ -11,7 +11,7 @@ import type { Equipment, FoodState, HouseholdProfile, Unit } from '@/lib/domain'
 import { NumberField } from './number-field';
 import { FoodPreferences } from './food-preferences';
 
-export function GuestKitchen({onAccount}:{onAccount:()=>void}) {
+export function GuestKitchen() {
   const [started,setStarted]=useState(false);
   const [loaded,setLoaded]=useState(false);
   const [profile,setProfile]=useState<HouseholdProfile>(guestProfile);
@@ -75,7 +75,6 @@ export function GuestKitchen({onAccount}:{onAccount:()=>void}) {
       {started ? <nav className="simple-nav" aria-label="Main navigation">
         {([['kitchen', 'My Kitchen', IconBasket], ['meals', 'Meal Ideas', IconChefHat], ['help', 'Find Food Help', IconHeartHandshake]] as const).map(([id, name, Icon]) => <button key={id} aria-current={view === id ? 'page' : undefined} className={view === id ? 'active' : ''} onClick={() => go(id)}><Icon size={19} aria-hidden="true" />{name}</button>)}
       </nav> : <span className="header-note">Made for everyday family meals</span>}
-      <button className="text-button account-link" onClick={onAccount}>Caregiver account<IconArrowRight size={17} aria-hidden="true" /></button>
     </header>
     <main id="main-content" tabIndex={-1}>
       {!started ? <>

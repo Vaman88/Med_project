@@ -21,8 +21,7 @@
 .kitchen-app .brand { color: var(--green); font-weight: 800; letter-spacing: -1px; }
 .kitchen-app .brand-button { text-align: left; white-space: nowrap; line-height: 1.2; }
 .brand-tagline { display: block; color: var(--muted); font-size: 11px; font-weight: 400; letter-spacing: 0; margin-top: 5px; }
-.kitchen-app .header-note { font-size: 13px; }
-.kitchen-app .account-link { display: inline-flex; align-items: center; gap: 9px; white-space: nowrap; text-decoration: none; font-size: 13px; }
+.kitchen-app .header-note { font-size: 13px; margin-left: auto; }
 .kitchen-app .simple-nav { display: flex; gap: 5px; margin-left: auto; border: 0; background: transparent; padding: 0; }
 .kitchen-app .simple-nav button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; border: 0; border-radius: 10px; padding: 10px 14px; font-size: 14px; white-space: nowrap; }
 .kitchen-app .simple-nav button.active { background: #e5eedf; color: var(--green); }
@@ -153,13 +152,10 @@
 .kitchen-app footer { padding: 26px 4.5%; background: #f4f5ed; }
 .kitchen-app footer .brand { font-size: 22px; }
 .kitchen-app footer small { font-size: 12px; }
-.account-return { max-width: 1280px; margin: auto; padding: 8px 5%; }
 @media (max-width: 1100px) {
   .brand-tagline { display: none; }
   .kitchen-app .header { gap: 14px; }
   .kitchen-app .simple-nav button { padding: 10px; }
-  .kitchen-app .account-link { font-size: 12px; }
-  .kitchen-app .account-link svg { display: none; }
   .guest-hero { gap: 30px; }
   .guest-hero h1 { font-size: 52px; }
   .hero-photo img { height: 370px; }
@@ -170,7 +166,6 @@
   .kitchen-app .header { flex-wrap: wrap; padding-block: 12px; }
   .kitchen-app .simple-nav { order: 3; width: 100%; margin: 2px 0 0; }
   .kitchen-app .simple-nav button { flex: 1; }
-  .kitchen-app .account-link { margin-left: auto; }
   .guest-hero h1 { font-size: 44px; }
   .hero-photo img { height: 350px; }
   .kitchen-how { gap: 18px; }
@@ -184,7 +179,6 @@
 @media (max-width: 650px) {
   .kitchen-app .header { min-height: 74px; padding-inline: 20px; }
   .kitchen-app .brand { font-size: 22px; }
-  .kitchen-app .account-link { font-size: 12px; }
   .kitchen-app .simple-nav { gap: 4px; }
   .kitchen-app .simple-nav button { flex-direction: column; gap: 4px; font-size: 12px; padding: 8px 4px; }
   .kitchen-app main { padding: 24px 20px 40px; }
