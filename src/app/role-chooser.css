@@ -1,0 +1,47 @@
+.rc-app {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  padding: 32px 16px;
+  background: #fbf7ee;
+  color: #2f3a2c;
+}
+.rc-head { text-align: center; }
+.rc-head h1 { margin: 6px 0; font-size: clamp(1.8rem, 4vw, 2.6rem); }
+.rc-head p { margin: 0; opacity: 0.75; }
+.rc-kicker { font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; font-size: 0.8rem; color: #6f8a5f; }
+.rc-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; width: min(760px, 100%); }
+.rc-card {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 10px;
+  padding: 26px; border-radius: 22px; border: 2px solid #e3dcc8; background: #fffdf8;
+  color: inherit; font: inherit; text-align: left; cursor: pointer;
+  box-shadow: 0 6px 18px rgba(80, 60, 30, 0.08);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.rc-card:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(80, 60, 30, 0.14); border-color: #b9ccaa; }
+.rc-card:focus-visible { outline: 3px solid #4d7a3a; outline-offset: 3px; }
+.rc-child { background: #fff4e8; }
+.rc-adult { background: #f1f6ec; }
+.rc-art { font-size: 3rem; line-height: 1; }
+.rc-title { font-size: 1.3rem; font-weight: 800; }
+.rc-text { opacity: 0.8; line-height: 1.4; }
+.rc-go { margin-top: auto; padding: 8px 16px; border-radius: 999px; background: #3f6b34; color: #fff; font-weight: 700; }
+.role-switch {
+  position: fixed; left: 12px; bottom: 12px; z-index: 40;
+  padding: 8px 14px; border-radius: 999px; border: 1px solid #d8cfb8;
+  background: #fffdf8; color: #2f3a2c; font: inherit; font-size: 0.9rem; cursor: pointer;
+}
+@media (max-width: 640px) { .rc-grid { grid-template-columns: 1fr; } .rc-card { padding: 20px; } }
+@media (prefers-color-scheme: dark) {
+  .rc-app { background: #1d221b; color: #eef0e6; }
+  .rc-card { background: #272d24; border-color: #3b4437; }
+  .rc-child { background: #2e2a22; }
+  .rc-adult { background: #232d22; }
+  .rc-go { background: #6f9a5c; color: #101510; }
+  .role-switch { background: #272d24; color: #eef0e6; border-color: #3b4437; }
+}
+/* Keep the switch button out of the way while a dish is being cooked. */
+body:has(.ck-app) .role-switch { display: none; }

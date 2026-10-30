@@ -21,7 +21,7 @@ export function productConflict(price: PriceObservation, profile: HouseholdProfi
     rules.includes('dairy_free') && tags.some(tag => tag === 'milk' || tag === 'dairy') ||
     (rules.includes('gluten_free') || rules.includes('celiac')) && tags.includes('gluten') ||
     rules.includes('exclude_beef') && tags.includes('beef') || rules.includes('exclude_pork') && tags.includes('pork') ||
-    rules.includes('pescatarian') && tags.some(tag => ['beef','pork','poultry'].includes(tag));
+    rules.includes('pescatarian') && tags.some(tag => ['beef','pork','poultry','meat'].includes(tag));
 }
 export function validateProfile(profile: HouseholdProfile): void {
   if (!Number.isInteger(profile.householdSize) || profile.householdSize < 1 || profile.householdSize > 30) throw new Error('Household size must be a whole number from 1 to 30.');
@@ -45,7 +45,7 @@ export function recipeExclusionReasons(recipe: Recipe, profile: HouseholdProfile
     if (allergenConflict) reasons.push(`Conflicts with a declared allergy: ${ingredient.name}.`);
     if (profile.excludedIngredientIds.includes(ingredient.id)) reasons.push(`Excluded ingredient: ${ingredient.name}.`);
     if (profile.dietaryRestrictions.includes('vegetarian') && !ingredient.vegetarian || profile.dietaryRestrictions.includes('vegan') && !ingredient.vegan) reasons.push(`Conflicts with dietary restriction: ${ingredient.name}.`);
-    if (rules.includes('vegetarian') && !ingredient.vegetarian || rules.includes('vegan') && !ingredient.vegan || rules.includes('pescatarian') && tags.some(tag => ['beef','pork','poultry'].includes(tag))) reasons.push(`Conflicts with dietary pattern: ${ingredient.name}.`);
+    if (rules.includes('vegetarian') && !ingredient.vegetarian || rules.includes('vegan') && !ingredient.vegan || rules.includes('pescatarian') && tags.some(tag => ['beef','pork','poultry','meat'].includes(tag))) reasons.push(`Conflicts with dietary pattern: ${ingredient.name}.`);
     if (rules.includes('exclude_beef') && tags.includes('beef') || rules.includes('exclude_pork') && tags.includes('pork')) reasons.push(`Excluded meat or derivative: ${ingredient.name}.`);
     if (rules.includes('dairy_free') && tags.includes('dairy')) reasons.push(`Contains dairy: ${ingredient.name}.`);
     if (members.some(member => member.eggAllowed === false) && tags.includes('egg') || members.some(member => member.dairyAllowed === false) && tags.some(tag => tag === 'milk' || tag === 'dairy')) reasons.push(`Not allowed for a household member: ${ingredient.name}.`);

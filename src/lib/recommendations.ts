@@ -14,13 +14,15 @@ export function recommendBasket(profile: HouseholdProfile, pantry: PantryItem[],
   let pricesNeedRefresh = false;
   // The library can grow beyond the small prototype. Enumerate only baskets
   // that we can actually show, instead of scanning every subset of recipes.
-  for (let first=0; first<compatible.length; first++) for (let second=first; second<compatible.length; second++) for (let third=second; third<compatible.length; third++) {
+  // A recipe with a missing price can never be part of a fully priced basket, so keep it out of the search.
+  const searchable = compatible.filter(match => !match.hasMissingPrices);
+  for (let first=0; first<searchable.length; first++) for (let second=first; second<searchable.length; second++) for (let third=second; third<searchable.length; third++) {
     if (first===second && second!==third) continue;
     const matches = first===second && second===third
-      ? [compatible[first]]
+      ? [searchable[first]]
       : second===third
-        ? [compatible[first],compatible[second]]
-        : [compatible[first],compatible[second],compatible[third]];
+        ? [searchable[first],searchable[second]]
+        : [searchable[first],searchable[second],searchable[third]];
     const entries = matches.map((match,index) => ({ id:`idea-${index}`,day:index,mealType:match.recipe.mealTypes[0],recipeId:match.recipe.id,plannedServings:current.householdSize }));
     // Compute actual basket requirements first, then choose the cheapest whole-package
     // option for each missing ingredient. No assumed fractional package purchases.

@@ -1,0 +1,100 @@
+IMAGE ATTRIBUTION - Healthy Steps meal photos (sourced from Wikimedia Commons)
+All files: cropped to 4:3, resized to 1200x900, converted to WebP.
+Full table: docs/image-credits.md
+
+kids-avocado-toast.webp
+  Source: https://commons.wikimedia.org/wiki/File:Avocado_toast_with_sesame_seeds.jpg
+  Author: Jami430
+  License: CC BY-SA 4.0
+  Modified: cropped/resized/converted to WebP
+
+kids-banana-oat-cookies.webp
+  Source: https://commons.wikimedia.org/wiki/File:Banana_and_chocolate_oatmeal_cookies_01.jpg
+  Author: Ytha67
+  License: CC BY-SA 4.0
+  Modified: cropped/resized/converted to WebP
+
+kids-bean-bowl.webp
+  Source: https://commons.wikimedia.org/wiki/File:Colourful_bean_salad.jpg
+  Author: Paul Goyette
+  License: CC BY-SA 2.0
+  Modified: cropped/resized/converted to WebP
+
+kids-brownies.webp
+  Source: https://commons.wikimedia.org/wiki/File:Chocolate_brownies_without_table.jpg
+  Author: en:User:Gdr
+  License: CC BY-SA 3.0
+  Modified: cropped/resized/converted to WebP
+
+kids-egg-muffins.webp
+  Source: https://commons.wikimedia.org/wiki/File:Egg-muffin_(49218808517).jpg
+  Author: Meg H
+  License: CC BY 2.0
+  Modified: cropped/resized/converted to WebP
+
+kids-fruit-kabobs.webp
+  Source: https://commons.wikimedia.org/wiki/File:Fruit_skewers.jpg
+  Author: Aerous
+  License: CC BY-SA 4.0
+  Modified: cropped/resized/converted to WebP
+
+kids-fruit-salad.webp
+  Source: https://commons.wikimedia.org/wiki/File:Fruit_salad_(1).jpg
+  Author: Renee Comet (photographer), National Cancer Institute
+  License: Public domain
+  Modified: cropped/resized/converted to WebP
+
+kids-oatmeal-bowl.webp
+  Source: https://commons.wikimedia.org/wiki/File:Banana_blueberry_oatmeal.jpg
+  Author: Shisma
+  License: CC BY 4.0
+  Modified: cropped/resized/converted to WebP
+
+kids-pancakes.webp
+  Source: https://commons.wikimedia.org/wiki/File:Liat_Portal_for_Foodie_Disorder_-_Banana_and_Strawberry_Pancakes.jpg
+  Author: HaJunkiyada
+  License: CC BY-SA 4.0
+  Modified: cropped/resized/converted to WebP
+
+kids-parfait.webp
+  Source: https://commons.wikimedia.org/wiki/File:Yogurt_parfait_with_granola_and_blueberries_in_shot_glasses_with_silverware_spoons_(17098581522).jpg
+  Author: Personal Creations
+  License: CC BY 2.0
+  Modified: cropped/resized/converted to WebP
+
+kids-pizza.webp
+  Source: https://commons.wikimedia.org/wiki/File:Homemade_veg_pizza..jpg
+  Author: Dikshita Bairagi
+  License: CC BY-SA 4.0
+  Modified: cropped/resized/converted to WebP
+
+kids-quesadilla.webp
+  Source: https://commons.wikimedia.org/wiki/File:Cut-up_quesadilla.jpg
+  Author: Paul Goyette
+  License: CC BY-SA 2.0
+  Modified: cropped/resized/converted to WebP
+
+kids-tomato-pasta.webp
+  Source: https://commons.wikimedia.org/wiki/File:Pennes_%C3%A0_la_tomate.jpg
+  Author: Arnaud 25
+  License: CC0
+  Modified: cropped/resized/converted to WebP
+
+kids-veggie-fried-rice.webp
+  Source: https://commons.wikimedia.org/wiki/File:Vegetable_Fried_Rice.JPG
+  Author: Nundhaa
+  License: CC BY-SA 4.0
+  Modified: cropped/resized/converted to WebP
+
+kids-veggie-wrap.webp
+  Source: https://commons.wikimedia.org/wiki/File:Smoked_chicken_and_avocado_wrap.jpg
+  Author: Takeaway
+  License: CC BY-SA 3.0
+  Modified: cropped/resized/converted to WebP
+
+kids-veggies.webp
+  Source: https://commons.wikimedia.org/wiki/File:Crudites_Platter.JPG
+  Author: Phoenixcatering
+  License: CC BY-SA 3.0
+  Modified: cropped/resized/converted to WebP
+

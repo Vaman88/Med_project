@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Colorful vegetable sticks around hummus">
+  <rect width="640" height="640" fill="#edf1df"/><circle cx="320" cy="320" r="270" fill="#fff9ea" stroke="#dbd8c4" stroke-width="13"/>
+  <ellipse cx="320" cy="330" rx="125" ry="105" fill="#c8ab77" stroke="#6a694f" stroke-width="10"/><ellipse cx="320" cy="320" rx="104" ry="84" fill="#ead8aa"/><path d="M261 314c26-35 96-38 122-1-12 37-95 53-122 1z" fill="#d7c18f"/>
+  <path d="M111 190l37-18 141 71-28 48zM108 258l30-21 135 62-23 42zM157 128l37-10 110 106-37 30z" fill="#f18b48" stroke="#b65c34" stroke-width="7"/>
+  <path d="M393 188l34-31 124 91-27 34zM394 247l32-31 118 98-31 33z" fill="#82b789" stroke="#416e51" stroke-width="7"/>
+  <path d="M133 408l24-41 140-14 8 47zM158 476l16-44 133-35 13 43z" fill="#e65f4f" stroke="#a53d38" stroke-width="7"/>
+  <path d="M384 394l42-24 104 77-31 37zM380 449l34-30 89 89-35 32z" fill="#f3cd6c" stroke="#ba953c" stroke-width="7"/>
+</svg>

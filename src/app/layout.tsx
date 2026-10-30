@@ -2,6 +2,19 @@ import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import "./kitchen.css";
+import "./little-kitchen.css";
+import "./kitchen-game.css";
+import "./assembly-game.css";
+import "./child-redesign.css";
+import "./game-usability.css";
+import "./meal-picker.css";
+import "./customer-order.css";
+import "./recipe-builder.css";
+import "./cooking-studio.css";
+import "./kitchen-menu.css";
+import "./adult-planner.css";
+import "./role-chooser.css";
+import { FoodDefsHost } from "@/components/food-art";
 const kitchenFont = localFont({
   src: [
     { path: '../../public/fonts/nunito-sans-400.ttf', weight: '400', style: 'normal' },
@@ -18,5 +31,5 @@ export const metadata: Metadata = {
 };
 export const viewport: Viewport = { width: "device-width", initialScale: 1 };
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en" className={kitchenFont.variable}><body>{children}</body></html>;
+  return <html lang="en" className={kitchenFont.variable}><body><FoodDefsHost />{children}</body></html>;
 }

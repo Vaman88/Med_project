@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Yogurt cup with banana and strawberries">
+  <rect width="640" height="640" fill="#f6e9db"/><circle cx="320" cy="300" r="248" fill="#fcebd6"/>
+  <ellipse cx="320" cy="544" rx="190" ry="35" fill="#c8b09a" opacity=".4"/>
+  <path d="M170 190h300l-42 338c-5 31-42 52-108 52s-103-21-108-52z" fill="#d9e7de" stroke="#46614b" stroke-width="13"/>
+  <path d="M188 248h264l-11 99H199z" fill="#fffaf0"/><path d="M201 347h240l-13 86H212z" fill="#ec7380"/><path d="M212 433h216l-11 83c-3 22-38 37-97 37s-94-15-97-37z" fill="#fff8e7"/>
+  <ellipse cx="320" cy="198" rx="155" ry="66" fill="#fffdf2" stroke="#46614b" stroke-width="12"/>
+  <ellipse cx="250" cy="178" rx="49" ry="28" fill="#f5d573" stroke="#dba94e" stroke-width="7" transform="rotate(-18 250 178)"/>
+  <ellipse cx="373" cy="178" rx="49" ry="28" fill="#f5d573" stroke="#dba94e" stroke-width="7" transform="rotate(16 373 178)"/>
+  <path d="M294 187c-12-39 11-68 38-55 23 10 24 42 8 67-16 25-37 28-46-12z" fill="#e95159" stroke="#a73540" stroke-width="7"/>
+  <path d="M312 134l-22-18 25 5 8-23 5 24 23-8-18 21" fill="#4f9b5f"/>
+  <circle cx="300" cy="170" r="3" fill="#ffe49b"/><circle cx="326" cy="164" r="3" fill="#ffe49b"/><circle cx="316" cy="191" r="3" fill="#ffe49b"/>
+</svg>

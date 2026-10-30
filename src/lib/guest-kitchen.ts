@@ -4,6 +4,7 @@ import { ingredients, demoPantry } from './demo-data';
 import { profileSchema } from './validation';
 import { calculatePlan, matchRecipes } from './planning';
 import { valuePrices } from './value-prices';
+import { findCatalogFood } from './food-catalog';
 import type { HouseholdProfile, PantryItem, RecipeMatch } from './domain';
 
 export const GUEST_STORAGE_KEY = 'healthy-steps-kitchen-v1';
@@ -22,7 +23,10 @@ export function guestProfile():HouseholdProfile { return {...startingProfile('Fa
 export function resolveKitchenFood(label:string):string|undefined {
   const text=label.trim().toLowerCase();
   const aliases:Record<string,string>={'rice':'rice','cooked rice pouch':'rice','black beans':'beans','canned black beans':'beans','canned beans':'beans','beans':'beans','oatmeal':'oats','oats':'oats','bananas':'banana','canned corn':'corn','canned tomatoes':'tomato','carrots':'carrot'};
-  return ingredients.find(item=>item.name.toLowerCase()===text||item.id===text)?.id??aliases[text];
+  const known=ingredients.find(item=>item.name.toLowerCase()===text||item.id===text)?.id??(Object.hasOwn(aliases,text)?aliases[text]:undefined);
+  if(known) return known;
+  const catalogId=findCatalogFood(text)?.ingredientId;
+  return catalogId&&ingredients.some(item=>item.id===catalogId)?catalogId:undefined;
 }
 export function measuredPantry(foods:KitchenFood[]):PantryItem[] {
   return foods.filter(food=>food.ingredientId&&food.quantity).map(food=>({id:food.id,ingredientId:food.ingredientId!,quantity:food.quantity!,unit:food.unit,foodState:food.foodState,quantityConfirmed:true,...(food.bestByDate?{expiryDate:food.bestByDate}:{})}));

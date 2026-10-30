@@ -1,0 +1,1662 @@
+.counter-app {
+  --counter-ink: #283c31;
+  --counter-cream: #fcf5e9;
+  --counter-wood: #c38d58;
+  --counter-shadow: #593d29;
+  background: #f8f1e4;
+  color: var(--counter-ink);
+}
+.counter-game {
+  max-width: 1340px;
+  margin: auto;
+  padding: 28px 32px 70px;
+  min-height: auto;
+}
+.counter-app .little-header {
+  max-width: 1340px;
+}
+.counter-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 18px;
+}
+.counter-heading h1 {
+  font-size: clamp(34px, 4vw, 52px);
+  line-height: 1.05;
+  letter-spacing: -1.9px;
+  margin: 0 0 8px;
+}
+.counter-heading p {
+  font-size: 16px;
+  line-height: 1.45;
+  margin: 0;
+}
+.counter-heading-actions {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.counter-heading-actions span {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 700;
+}
+.counter-heading-actions button {
+  border: 1px solid #c7cbb7;
+  background: #fffaf0;
+  border-radius: 24px;
+  padding: 8px 14px;
+  min-height: 44px;
+  color: #2a4533;
+  font-size: 13px;
+  font-weight: 800;
+}
+.counter-stages {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  margin: 0 0 18px;
+  padding: 0;
+}
+.counter-stages li {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px 6px 7px;
+  border-radius: 999px;
+  border: 1px solid #d8d5c4;
+  background: #fffaf0;
+  color: #49604b;
+  font-size: 13px;
+  font-weight: 800;
+}
+.counter-stages li span {
+  display: grid;
+  place-items: center;
+  width: 23px;
+  height: 23px;
+  border-radius: 50%;
+  background: #e9e9d8;
+}
+.counter-stages li.current {
+  border-color: #a86738;
+  background: #f9df9a;
+  color: #283c31;
+}
+.counter-stages li.current span,
+.counter-stages li.done span {
+  background: #315f43;
+  color: white;
+}
+.counter-stages li.done {
+  background: #e7efdf;
+}
+.counter-task {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  background: #fffdf6;
+  border: 1px solid #e5dfcc;
+  border-bottom: 5px solid #d3b482;
+  box-shadow: 0 10px 30px #46372313;
+  padding: 20px 24px;
+  border-radius: 22px;
+  margin-bottom: 18px;
+}
+.counter-task-icon {
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  background: #e6edd9;
+  color: #31543a;
+}
+.counter-task-copy {
+  flex: 1;
+  min-width: 0;
+}
+.counter-label {
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #875f39;
+}
+.counter-task h2 {
+  font-size: 24px;
+  line-height: 1.2;
+  margin: 3px 0 4px;
+  letter-spacing: -0.5px;
+}
+.counter-task p {
+  font-size: 15px;
+  line-height: 1.5;
+  margin: 0 0 11px;
+}
+.counter-progress {
+  height: 13px;
+  background: #e9e8d8;
+  max-width: 570px;
+  border-radius: 100px;
+  overflow: hidden;
+  border: 1px solid #d2d4bd;
+}
+.counter-progress span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #90a95c, #4d8452);
+  border-radius: 100px;
+  transition: width 0.24s ease;
+}
+.counter-task small {
+  margin-top: 4px;
+  font-weight: 800;
+  font-size: 12px;
+}
+.counter-task .counter-feedback {
+  color: #7a482c;
+  background: #fceccd;
+  border-radius: 9px;
+  padding: 7px 10px;
+  margin: 6px 0 0;
+  width: max-content;
+  max-width: 100%;
+}
+.counter-scene {
+  border-radius: 28px;
+  overflow: hidden;
+  border: 1px solid #b9ab94;
+  box-shadow: 0 18px 46px #3e35272b;
+  background: #d5ad7c;
+  isolation: isolate;
+}
+.counter-backsplash {
+  height: 96px;
+  position: relative;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 45px, #b8c4b6 46px 48px),
+    repeating-linear-gradient(90deg, #e7ebdb 0 108px, #b8c4b6 109px 111px);
+  border-bottom: 8px solid #8b6644;
+}
+.counter-window {
+  position: absolute;
+  right: 15%;
+  top: 12px;
+  width: 132px;
+  height: 71px;
+  background: linear-gradient(#a6d9e1, #e2f0d9);
+  border: 8px solid #faf4de;
+  box-shadow: 0 3px 8px #25372d4c;
+  overflow: hidden;
+}
+.counter-window:before {
+  content: "";
+  position: absolute;
+  left: 49%;
+  height: 100%;
+  width: 5px;
+  background: #faf4de;
+  z-index: 2;
+}
+.counter-window .sun {
+  position: absolute;
+  right: 12px;
+  top: 8px;
+  background: #fbd478;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+.counter-window .hill {
+  position: absolute;
+  bottom: -19px;
+  left: -20px;
+  width: 155px;
+  height: 58px;
+  border-radius: 50%;
+  background: #8ab089;
+}
+.counter-hanging {
+  position: absolute;
+  left: 12%;
+  top: 0;
+  display: flex;
+  gap: 36px;
+}
+.pan-hook {
+  display: block;
+  width: 13px;
+  height: 22px;
+  border: 5px solid #4c6758;
+  border-top: 0;
+  border-radius: 0 0 14px 14px;
+}
+.counter-shelf {
+  position: relative;
+  background: #ede3d1;
+  padding: 12px 22px 20px;
+  border-bottom: 9px solid #9d704b;
+  box-shadow: 0 7px 0 #64452e;
+  z-index: 1;
+}
+.counter-shelf-title {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 6px;
+}
+.counter-shelf-title strong {
+  font-size: 15px;
+}
+.counter-shelf-title span {
+  font-size: 12px;
+  color: #526251;
+}
+.counter-food-list {
+  display: flex;
+  gap: 9px;
+  overflow-x: auto;
+  padding: 4px 1px 8px;
+  scrollbar-color: #a68768 #eee4d2;
+}
+.counter-food-slot {
+  flex: 0 0 126px;
+}
+.counter-grab {
+  touch-action: none;
+  user-select: none;
+  cursor: grab;
+}
+.counter-grab:active {
+  cursor: grabbing;
+}
+.counter-grab.dragging {
+  position: relative;
+  z-index: 20;
+  filter: drop-shadow(0 12px 12px #302a2359);
+}
+.counter-food-slot .counter-grab,
+.counter-food-used {
+  height: 109px;
+  width: 100%;
+  border: 1px solid #c9c1ae;
+  border-radius: 15px;
+  background: #fffdf7;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  color: #324638;
+  box-shadow: 0 3px 0 #d3c1a3;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 3px;
+}
+.counter-food-slot img {
+  height: 68px;
+  width: 100px;
+  object-fit: contain;
+  pointer-events: none;
+}
+.counter-food-slot .counter-grab:hover,
+.counter-food-slot .counter-grab.chosen {
+  background: #eaf4df;
+  border-color: #52744a;
+}
+.counter-food-used {
+  opacity: 0.64;
+  box-shadow: none;
+  border-style: dashed;
+}
+.counter-food-used img {
+  filter: saturate(0.5);
+}
+.counter-food-used small {
+  font-size: 10px;
+  line-height: 1;
+  color: #6d7366;
+}
+.counter-surface {
+  position: relative;
+  padding: 23px 24px 26px;
+  background: repeating-linear-gradient(
+    90deg,
+    #cc9967 0 120px,
+    #c58d5b 122px 125px,
+    #d2a171 128px 246px
+  );
+  box-shadow: inset 0 13px 15px #754d2d40;
+}
+.counter-surface:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    4deg,
+    #fff5db10 0 2px,
+    transparent 3px 21px
+  );
+}
+.counter-workarea {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1.16fr 0.9fr 0.93fr;
+  grid-template-rows: 248px 230px;
+  gap: 15px;
+}
+.counter-zone {
+  position: relative;
+  min-width: 0;
+  border-radius: 22px;
+  background: #f4ecd9e8;
+  border: 2px solid #ebdec5;
+  box-shadow:
+    0 7px 0 #6b472f55,
+    inset 0 2px 0 #fff7e9;
+  overflow: hidden;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.counter-zone.can-drop {
+  border: 3px dashed #4c874e;
+  box-shadow:
+    0 0 0 5px #e4f3d08a,
+    0 7px 0 #6b472f55;
+  cursor: pointer;
+}
+.counter-zone.can-drop:after {
+  content: "Drop here";
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  background: #2b633d;
+  color: white;
+  border-radius: 8px;
+  padding: 3px 7px;
+  font-size: 11px;
+  font-weight: 800;
+  z-index: 4;
+  pointer-events: none;
+}
+.zone-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+  padding: 0 8px 8px;
+}
+.zone-top span {
+  color: #8c7156;
+  font-size: 11px;
+  font-weight: 900;
+}
+.zone-top h3 {
+  font-size: 14px;
+  line-height: 1.2;
+  margin: 0;
+  letter-spacing: 0.2px;
+}
+.counter-zone#counter-board {
+  grid-column: 1;
+  grid-row: 1/3;
+}
+.counter-zone#counter-bowl {
+  grid-column: 2;
+  grid-row: 1;
+}
+.counter-cup-zone {
+  grid-column: 2;
+  grid-row: 2;
+  max-width: 100%;
+}
+.counter-zone#counter-tray {
+  grid-column: 3;
+  grid-row: 1;
+}
+.counter-zone#counter-appliance {
+  grid-column: 3;
+  grid-row: 2;
+}
+.counter-zone#counter-plate {
+  position: absolute;
+  right: calc(100% - 32%);
+  bottom: 4px;
+  width: 200px;
+  height: 172px;
+  display: none;
+}
+.counter-board {
+  position: relative;
+  width: 100%;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  background: linear-gradient(90deg, #deb681, #f0d09a 35%, #dfae72);
+  border: 9px solid #b47c46;
+  border-radius: 22px;
+  box-shadow:
+    0 5px 0 #916036,
+    inset 0 0 0 2px #f5d6a5;
+  color: #63472e;
+  text-align: center;
+  font-weight: 800;
+  overflow: hidden;
+}
+.counter-board:before {
+  content: "";
+  position: absolute;
+  right: 19px;
+  top: 13px;
+  width: 30px;
+  height: 12px;
+  border: 3px solid #bc8c56;
+  border-radius: 20px;
+}
+.board-grain {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    5deg,
+    transparent 0 27px,
+    #a67f4d19 28px 30px
+  );
+  pointer-events: none;
+}
+.counter-board > p {
+  max-width: 200px;
+  margin: auto;
+  font-size: 18px;
+  line-height: 1.3;
+}
+.board-mark {
+  display: grid;
+  gap: 5px;
+  place-items: center;
+}
+.board-mark span {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #659057;
+  color: white;
+  font-size: 34px;
+  line-height: 1.3;
+}
+.counter-pieces {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, 1fr);
+  width: 95%;
+  height: 80%;
+  gap: 2px;
+}
+.counter-piece {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  display: grid;
+  place-items: center;
+  touch-action: manipulation;
+}
+.counter-piece img {
+  width: 100%;
+  height: 90%;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 3px #5a46373d);
+  pointer-events: none;
+}
+.counter-piece span {
+  position: absolute;
+  right: 5px;
+  bottom: 3px;
+  border-radius: 30px;
+  padding: 2px 7px;
+  background: #fff8e8;
+  color: #4c5541;
+  font-size: 11px;
+  font-weight: 900;
+  box-shadow: 0 1px 4px #392d2340;
+}
+.counter-piece:disabled {
+  opacity: 1;
+  cursor: default;
+}
+.counter-piece.stage-3 img {
+  filter: drop-shadow(0 2px 2px #5a463740);
+}
+.prepared-token {
+  position: absolute;
+  inset: auto 10px 6px;
+  z-index: 5;
+  border: 2px solid #4e884e;
+  background: #fbf8e9;
+  border-radius: 14px;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #2d653e;
+  font-weight: 900;
+  font-size: 12px;
+}
+.prepared-token img {
+  width: 56px;
+  height: 42px;
+  object-fit: contain;
+}
+.counter-bowl {
+  position: relative;
+  width: min(100%, 210px);
+  height: 158px;
+  border-radius: 50%;
+  background: linear-gradient(140deg, #7b3925, #8a5031);
+  border: 17px solid #f2e5cd;
+  box-shadow:
+    0 10px 0 #b8a189,
+    inset 0 10px 18px #4b2c24b9;
+  display: grid;
+  place-items: center;
+  margin: auto;
+  overflow: hidden;
+}
+.bowl-contents {
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: #a8643d;
+  transition: background 0.25s;
+}
+.bowl-contents.bowl-brownies {
+  background: #63402e;
+}
+.bowl-contents.bowl-pancakes {
+  background: #dcac64;
+}
+.bowl-contents.mixed-1 {
+  filter: contrast(1.08) saturate(0.95);
+}
+.bowl-contents.mixed-2 {
+  filter: brightness(0.85) saturate(0.8);
+}
+.bowl-contents.mixed-3 {
+  filter: brightness(0.72) saturate(0.7);
+}
+.bowl-contents:after {
+  content: "";
+  position: absolute;
+  inset: 15px;
+  border-radius: 50%;
+  border: 6px solid #f9d49f35;
+  transform: rotate(-22deg);
+}
+.bowl-foods {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.bowl-foods img {
+  width: 51px;
+  height: 43px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 2px #2b201d4d);
+}
+.bowl-stir {
+  position: relative;
+  z-index: 2;
+  border: 1px solid #fff6df94;
+  border-radius: 50%;
+  background: #f8efd929;
+  color: #fff8e8;
+  font-size: 12px;
+  font-weight: 900;
+  width: 104px;
+  height: 55px;
+  align-self: center;
+  justify-self: center;
+}
+.bowl-stir:disabled {
+  opacity: 0;
+  pointer-events: none;
+}
+.stirring .bowl-contents {
+  animation: counter-stir 0.35s ease;
+}
+.pour-token {
+  font-size: 12px;
+  font-weight: 800;
+  background: #fff8e7;
+  border: 2px solid #4e884e;
+  border-radius: 12px;
+  color: #2e643c;
+  padding: 6px 10px;
+  min-height: 38px;
+}
+.pour-flow {
+  display: inline-block;
+  background: #9b663b;
+  width: 12px;
+  height: 19px;
+  margin-right: 7px;
+  transform: rotate(25deg);
+  border-radius: 50%;
+}
+.counter-prep-cup {
+  border: 12px solid #f2e9d7;
+  border-radius: 50%;
+  background: #d0c1a7;
+  width: 156px;
+  height: 126px;
+  box-shadow:
+    0 7px 0 #ae9681,
+    inset 0 5px 10px #82684d6b;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  margin: auto;
+  font-size: 13px;
+  color: #6c614d;
+  font-weight: 800;
+}
+.counter-prep-cup .counter-grab {
+  padding: 0 3px;
+  border: 0;
+  background: transparent;
+  color: #2e6137;
+  font-size: 11px;
+  font-weight: 900;
+}
+.counter-prep-cup img {
+  display: block;
+  width: 94px;
+  height: 68px;
+  object-fit: contain;
+  margin: auto;
+}
+.counter-vessel {
+  position: relative;
+  width: min(100%, 220px);
+  height: 142px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 800;
+  color: #5d5144;
+}
+.baking-tray {
+  background: #5e655f;
+  border: 10px solid #a4ada3;
+  border-radius: 22px;
+  box-shadow:
+    0 7px 0 #343e36,
+    inset 0 4px 7px #1e2828b8;
+}
+.skillet {
+  background: #423f3b;
+  border: 12px solid #767975;
+  border-radius: 50%;
+  box-shadow:
+    0 8px 0 #39332c,
+    inset 0 0 0 4px #b5b9a6;
+}
+.skillet:after {
+  content: "";
+  position: absolute;
+  right: -38px;
+  width: 49px;
+  height: 19px;
+  background: #544b3d;
+  border: 5px solid #82877e;
+  border-radius: 4px 18px 18px 4px;
+  z-index: -1;
+}
+.counter-vessel > p {
+  color: #f4e9d1;
+  margin: 0;
+}
+.counter-batter {
+  height: 80%;
+  width: 80%;
+  border-radius: 35%;
+  box-shadow: inset 0 4px 7px #58332880;
+  background: #65412d;
+}
+.counter-batter.pancakes {
+  background: #e0b867;
+  border-radius: 50%;
+  width: 83%;
+  height: 89%;
+}
+.pizza-build {
+  position: relative;
+  width: 90%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+.pizza-build > img:first-child {
+  height: 100%;
+  width: 100%;
+  object-fit: contain;
+}
+.pizza-sauce {
+  position: absolute;
+  width: 64%;
+  height: 75%;
+  border-radius: 50%;
+  background: #cf4e33a8;
+  pointer-events: none;
+}
+.pizza-cheese {
+  position: absolute;
+  width: 60%;
+  height: 68%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 25% 24%, #fff5d3 0 7px, transparent 8px),
+    radial-gradient(circle at 65% 64%, #fff6e0 0 9px, transparent 10px),
+    radial-gradient(circle at 66% 20%, #fff6e0 0 9px, transparent 10px),
+    #f7e8b0a9;
+  pointer-events: none;
+}
+.pizza-build .pizza-pepper {
+  position: absolute;
+  inset: 10%;
+  width: 78%;
+  height: 77%;
+  object-fit: contain;
+  pointer-events: none;
+}
+.dish-grip {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 36px;
+  border: 0;
+  background: #245d3c;
+  color: white;
+  font-size: 11px;
+  font-weight: 800;
+  border-radius: 0 0 9px 9px;
+}
+.counter-appliance {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.counter-appliance.oven {
+  background: linear-gradient(130deg, #76887c, #51665a);
+  border: 9px solid #9bafa1;
+  border-radius: 20px;
+  box-shadow:
+    0 8px 0 #3c5447,
+    inset 0 3px 0 #d1dfd0;
+}
+.oven-face {
+  position: relative;
+  width: 88%;
+  height: 73%;
+  perspective: 400px;
+}
+.oven-interior {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, #544032, #272a27 75%);
+  border: 7px solid #34493c;
+  border-radius: 12px;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+.is-heating .oven-interior {
+  background: radial-gradient(
+    ellipse at center,
+    #e18936,
+    #62382c 50%,
+    #2c2926 85%
+  );
+  animation: oven-pulse 1s ease-in-out infinite alternate;
+}
+.oven-interior:before,
+.oven-interior:after {
+  content: "";
+  position: absolute;
+  width: 130%;
+  height: 2px;
+  background: #9c9b83;
+  bottom: 24%;
+  left: -15%;
+}
+.oven-interior:after {
+  bottom: 40%;
+}
+.oven-dish {
+  position: relative;
+  z-index: 1;
+  width: 78%;
+  height: 80%;
+  display: grid;
+  place-items: center;
+}
+.oven-dish img {
+  height: 100%;
+  max-width: 100%;
+  object-fit: cover;
+  border-radius: 45%;
+  box-shadow: 0 5px 8px #1e1d17a8;
+}
+.oven-dish .uncooked {
+  width: 100%;
+  height: 65%;
+  border: 5px solid #7e8c82;
+  background: #78503c;
+  border-radius: 26px;
+}
+.oven-dish .uncooked.pizza {
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 36% 35%, #e8d692 0 12%, transparent 13%),
+    radial-gradient(circle at 60% 60%, #c34530 0 15%, transparent 16%), #ce8b4b;
+}
+.oven-door {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  border: 6px solid #b4c5b6;
+  background: #72877c;
+  border-radius: 11px;
+  transform-origin: bottom;
+  backface-visibility: hidden;
+  z-index: 3;
+  transition:
+    transform 0.65s cubic-bezier(0.19, 0.8, 0.2, 1),
+    opacity 0.65s;
+  cursor: pointer;
+}
+.oven-door.open {
+  transform: scaleY(0.32);
+  opacity: 0.82;
+}
+.oven-door.shut {
+  transform: rotateX(0);
+  opacity: 1;
+}
+.oven-handle {
+  position: absolute;
+  left: 14%;
+  right: 14%;
+  top: 8%;
+  height: 11px;
+  border-radius: 7px;
+  background: linear-gradient(#e9eee5, #889f90);
+  box-shadow: 0 3px 4px #29342d8a;
+}
+.oven-glass {
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  top: 28%;
+  bottom: 10%;
+  background: #21392dcc;
+  border: 5px solid #435d4b;
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 2px #8cae9529;
+}
+.is-heating .oven-glass {
+  background: #9b572877;
+  box-shadow: inset 0 0 20px #ee8f40;
+}
+.heat-dial {
+  position: absolute;
+  right: 4px;
+  top: 3px;
+  width: 33px;
+  height: 33px;
+  border-radius: 50%;
+  border: 4px solid #c9d4c5;
+  background: #708776;
+  color: white;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  box-shadow: 0 2px 0 #354e3f;
+}
+.heat-dial:not(:disabled) {
+  box-shadow:
+    0 0 0 4px #f4d16d,
+    0 2px 0 #354e3f;
+}
+.heat-count {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  font-size: 15px;
+  font-weight: 900;
+  color: #ffeab2;
+  background: #34483a;
+  padding: 2px 8px;
+  border-radius: 8px;
+}
+.cooked-dish {
+  position: absolute;
+  bottom: -3px;
+  left: 12%;
+  right: 12%;
+  height: 58px;
+  border: 2px solid #2f7e42;
+  border-radius: 15px;
+  background: #fff5db;
+  color: #23552e;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px;
+  font-size: 10px;
+  font-weight: 900;
+  z-index: 6;
+}
+.cooked-dish img {
+  height: 50px;
+  width: 66px;
+  object-fit: cover;
+  border-radius: 9px;
+}
+.stove {
+  border: 7px solid #9ba89b;
+  border-radius: 17px;
+  background: linear-gradient(#aaa99e, #657970);
+  box-shadow: 0 7px 0 #4c6253;
+}
+.stove-burner {
+  width: 148px;
+  height: 148px;
+  border-radius: 50%;
+  border: 12px solid #424c43;
+  background: repeating-radial-gradient(
+    circle,
+    #3c463d 0 10px,
+    #656c60 11px 15px
+  );
+  display: grid;
+  place-items: center;
+}
+.is-heating .stove-burner {
+  box-shadow:
+    0 0 22px 8px #ef8b39,
+    inset 0 0 23px #e4893d;
+}
+.stove-pancake {
+  width: 110px;
+  height: 110px;
+  border: 7px solid #676d67;
+  border-radius: 50%;
+  background: radial-gradient(circle at 33% 27%, #f5e6ae, #d5a45c 65%);
+  box-shadow: 0 4px 0 #4d514c;
+}
+.stove-pancake.turned {
+  background: #bf843f;
+}
+.stove-pancake img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+.flip-target {
+  position: absolute;
+  bottom: 0;
+  border: 0;
+  border-radius: 8px 8px 0 0;
+  background: #e9f0db;
+  color: #234e32;
+  padding: 5px 14px;
+  font-size: 11px;
+  font-weight: 900;
+}
+.flip-target:disabled {
+  opacity: 0.55;
+}
+.counter-toolrack {
+  position: relative;
+  z-index: 2;
+  margin: 18px auto 0;
+  background: #eee6d3;
+  border: 3px solid #866448;
+  border-radius: 16px;
+  padding: 11px 14px;
+  box-shadow: 0 6px 0 #704e36;
+}
+.counter-toolrack strong {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 7px;
+}
+.counter-tools {
+  display: flex;
+  gap: 10px;
+  justify-content: space-around;
+  flex-wrap: wrap;
+}
+.counter-tools .counter-grab {
+  height: 70px;
+  min-width: 130px;
+  border: 1px solid #c4b69e;
+  border-radius: 13px;
+  background: #fffaf0;
+  color: #344937;
+  font-weight: 800;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px;
+}
+.counter-tools .counter-grab.active-tool {
+  background: #dcebd1;
+  border-color: #468051;
+  box-shadow: inset 0 0 0 2px #68a16b;
+}
+.tool-shape {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  width: 14px;
+  height: 41px;
+  transform: rotate(32deg);
+  background: #9f6644;
+  border-radius: 4px 4px 7px 7px;
+}
+.tool-shape:before {
+  content: "";
+  position: absolute;
+  left: 1px;
+  top: -16px;
+  width: 11px;
+  height: 22px;
+  background: #aab4ae;
+  border-radius: 70% 20% 0 0;
+}
+.tool-masher .tool-shape:before {
+  top: -8px;
+  left: -9px;
+  width: 32px;
+  height: 12px;
+  border-radius: 30%;
+  background: #8a9891;
+}
+.tool-whisk .tool-shape:before {
+  top: -18px;
+  left: -8px;
+  width: 30px;
+  height: 28px;
+  border: 3px solid #8a9891;
+  border-radius: 50%;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0 5px,
+    #889b90 6px 7px
+  );
+}
+.tool-spatula .tool-shape:before {
+  top: -19px;
+  left: -5px;
+  width: 24px;
+  height: 27px;
+  border-radius: 4px;
+  background: repeating-linear-gradient(90deg, #949e96 0 4px, #ccd3cc 5px 7px);
+}
+.counter-win {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: #e3efd8;
+  border: 2px solid #a9c693;
+  border-radius: 21px;
+  padding: 20px 25px;
+  margin: 22px 0;
+  color: #2b5832;
+}
+.counter-win svg {
+  flex: none;
+  color: #a87929;
+}
+.counter-win h2 {
+  font-size: 24px;
+  margin: 0 0 5px;
+}
+.counter-win p {
+  margin: 0;
+}
+.counter-win button {
+  margin-left: auto;
+  white-space: nowrap;
+}
+.counter-app .real-recipe {
+  background: #ecebdc;
+}
+.counter-app .little-footnote {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .counter-piece img,
+  .counter-bowl,
+  .counter-vessel,
+  .stove-pancake {
+    transition:
+      transform 0.22s ease,
+      filter 0.22s ease;
+  }
+  .counter-piece:active img {
+    transform: scale(0.85) rotate(-5deg);
+  }
+  .counter-grab:not(.dragging):hover img {
+    transform: translateY(-3px);
+  }
+  .counter-pieces .stage-1 img {
+    animation: ingredient-work 0.3s ease;
+  }
+  .counter-pieces .stage-2 img {
+    animation: ingredient-work 0.3s ease;
+  }
+  .counter-pieces .stage-3 img {
+    animation: ingredient-work 0.3s ease;
+  }
+  .stove-pancake.turned {
+    animation: pancake-turn 0.55s ease;
+  }
+  .is-heating .stove-pancake {
+    animation: gentle-sizzle 1s ease-in-out infinite alternate;
+  }
+  @keyframes ingredient-work {
+    0% {
+      transform: scale(1.1) rotate(-4deg);
+    }
+    50% {
+      transform: scale(0.9) rotate(4deg);
+    }
+    100% {
+      transform: scale(1) rotate(0);
+    }
+  }
+  @keyframes oven-pulse {
+    from {
+      filter: brightness(0.95);
+    }
+    to {
+      filter: brightness(1.5);
+    }
+  }
+  @keyframes dial-invite {
+    to {
+      transform: rotate(18deg);
+    }
+  }
+  @keyframes pancake-turn {
+    50% {
+      transform: rotateY(90deg);
+    }
+    to {
+      transform: rotateY(180deg);
+    }
+  }
+  @keyframes gentle-sizzle {
+    to {
+      transform: translateY(-2px);
+    }
+  }
+  @keyframes counter-stir {
+    to {
+      transform: rotate(16deg);
+    }
+  }
+}
+@media (max-width: 1050px) {
+  .counter-workarea {
+    grid-template-columns: 1.1fr 0.9fr;
+    grid-template-rows: 300px 230px 260px;
+  }
+  .counter-zone#counter-board {
+    grid-column: 1;
+    grid-row: 1/3;
+  }
+  .counter-zone#counter-bowl {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .counter-cup-zone {
+    grid-column: 2;
+    grid-row: 2;
+  }
+  .counter-zone#counter-tray {
+    grid-column: 1;
+    grid-row: 3;
+  }
+  .counter-zone#counter-appliance {
+    grid-column: 2;
+    grid-row: 3;
+  }
+  .counter-zone#counter-plate {
+    display: none;
+  }
+  .counter-heading {
+    align-items: start;
+  }
+  .counter-food-slot {
+    flex-basis: 116px;
+  }
+}
+@media (max-width: 650px) {
+  .counter-game {
+    padding: 18px 14px 45px;
+  }
+  .counter-heading {
+    display: block;
+  }
+  .counter-heading h1 {
+    font-size: 35px;
+  }
+  .counter-heading p {
+    font-size: 14px;
+  }
+  .counter-heading-actions {
+    margin-top: 13px;
+  }
+  .counter-task {
+    padding: 15px;
+    gap: 11px;
+  }
+  .counter-task-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+  }
+  .counter-task-icon svg {
+    width: 23px;
+  }
+  .counter-task h2 {
+    font-size: 20px;
+  }
+  .counter-task p {
+    font-size: 13px;
+  }
+  .counter-backsplash {
+    height: 70px;
+  }
+  .counter-window {
+    right: 8%;
+    height: 50px;
+    width: 95px;
+  }
+  .counter-shelf {
+    padding: 8px 12px 14px;
+  }
+  .counter-shelf-title {
+    display: block;
+  }
+  .counter-shelf-title span {
+    display: block;
+  }
+  .counter-food-slot {
+    flex-basis: 102px;
+  }
+  .counter-food-slot .counter-grab,
+  .counter-food-used {
+    height: 94px;
+    font-size: 11px;
+  }
+  .counter-food-slot img {
+    width: 84px;
+    height: 56px;
+  }
+  .counter-surface {
+    padding: 16px 8px 21px;
+  }
+  .counter-workarea {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: 310px 190px 224px;
+    gap: 8px;
+  }
+  .counter-zone {
+    padding: 6px;
+    border-radius: 15px;
+  }
+  .counter-zone#counter-board {
+    grid-column: 1/3;
+    grid-row: 1;
+  }
+  .counter-zone#counter-bowl {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .counter-cup-zone {
+    grid-column: 2;
+    grid-row: 2;
+  }
+  .counter-zone#counter-tray {
+    grid-column: 1;
+    grid-row: 3;
+  }
+  .counter-zone#counter-appliance {
+    grid-column: 2;
+    grid-row: 3;
+  }
+  .zone-top {
+    padding: 2px 3px 6px;
+  }
+  .zone-top h3 {
+    font-size: 12px;
+  }
+  .zone-top span {
+    font-size: 10px;
+  }
+  .counter-board {
+    border-width: 7px;
+  }
+  .counter-pieces {
+    width: 90%;
+    height: 90%;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: 1fr;
+  }
+  .counter-piece img {
+    height: 72%;
+    width: 100%;
+  }
+  .counter-piece span {
+    bottom: 13px;
+    right: 0;
+    font-size: 10px;
+  }
+  .counter-bowl {
+    width: 142px;
+    height: 123px;
+    border-width: 12px;
+  }
+  .bowl-foods img {
+    width: 38px;
+    height: 31px;
+  }
+  .bowl-stir {
+    width: 75px;
+    height: 48px;
+  }
+  .counter-prep-cup {
+    width: 116px;
+    height: 105px;
+    border-width: 9px;
+    font-size: 11px;
+  }
+  .counter-vessel {
+    width: 95%;
+    height: 112px;
+  }
+  .counter-appliance.oven {
+    border-width: 6px;
+  }
+  .oven-face {
+    height: 71%;
+    width: 91%;
+  }
+  .oven-door {
+    border-width: 4px;
+  }
+  .heat-dial {
+    height: 27px;
+    width: 27px;
+    right: 1px;
+    top: 0;
+  }
+  .stove-burner {
+    height: 111px;
+    width: 111px;
+    border-width: 8px;
+  }
+  .stove-pancake {
+    width: 88px;
+    height: 88px;
+  }
+  .counter-toolrack {
+    margin-top: 12px;
+    padding: 9px;
+  }
+  .counter-tools {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+  .counter-tools .counter-grab {
+    min-width: 0;
+    height: 61px;
+    font-size: 11px;
+  }
+  .counter-win {
+    display: block;
+    text-align: center;
+  }
+  .counter-win button {
+    width: 100%;
+    margin-left: 0;
+  }
+  .prepared-token {
+    inset: auto 6px 3px;
+    padding: 2px;
+  }
+  .prepared-token img {
+    height: 30px;
+    width: 40px;
+  }
+}
+@media (prefers-color-scheme: dark) {
+  .counter-app {
+    background: #202b23;
+    color: #edf1de;
+  }
+  .counter-task {
+    background: #2b382e;
+    border-color: #58654e;
+  }
+  .counter-task-icon {
+    background: #425638;
+    color: #f4f5dc;
+  }
+  .counter-label {
+    color: #f1c78e;
+  }
+  .counter-progress {
+    background: #526249;
+    border-color: #6f7c60;
+  }
+  .counter-task small {
+    color: #e8efdc;
+  }
+  .counter-shelf,
+  .counter-zone,
+  .counter-toolrack {
+    color: #283c31;
+  }
+  .counter-heading-actions button {
+    background: #314136;
+    color: #eef5dd;
+    border-color: #79896e;
+  }
+  .counter-app .real-recipe {
+    background: #354531;
+  }
+  .counter-win {
+    background: #354e36;
+    color: #f1f5de;
+    border-color: #769c6b;
+  }
+  .counter-app .little-footnote {
+    color: #e3e8d7;
+  }
+}
+/* Every kitchen destination stays present while the recipe changes. */
+.counter-workarea {
+  grid-template-columns: 1.15fr 0.83fr 0.9fr 1fr;
+  grid-template-rows: 248px 230px;
+}
+.counter-zone#counter-tray {
+  grid-column: 3;
+  grid-row: 1;
+}
+.counter-zone#counter-appliance {
+  grid-column: 4;
+  grid-row: 1/3;
+}
+.counter-zone#counter-plate {
+  display: flex;
+  position: relative;
+  right: auto;
+  bottom: auto;
+  width: auto;
+  height: auto;
+  grid-column: 3;
+  grid-row: 2;
+}
+.counter-plate {
+  width: 156px;
+  height: 137px;
+  border-radius: 50%;
+  border: 12px solid #fffefa;
+  background: #e7e5da;
+  box-shadow:
+    0 6px 0 #b4ad9f,
+    inset 0 0 0 4px #d3d5c9;
+  display: grid;
+  place-items: center;
+  margin: auto;
+  text-align: center;
+  color: #786b5c;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 6px;
+}
+.counter-plate img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+@media (max-width: 1050px) {
+  .counter-workarea {
+    grid-template-columns: 1.1fr 0.9fr;
+    grid-template-rows: 300px 230px 260px 210px;
+  }
+  .counter-zone#counter-tray {
+    grid-column: 1;
+    grid-row: 3;
+  }
+  .counter-zone#counter-appliance {
+    grid-column: 2;
+    grid-row: 3;
+  }
+  .counter-zone#counter-plate {
+    grid-column: 1/3;
+    grid-row: 4;
+  }
+}
+@media (max-width: 650px) {
+  .counter-workarea {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: 310px 190px 224px 158px;
+  }
+  .counter-zone#counter-plate {
+    grid-column: 1/3;
+    grid-row: 4;
+  }
+  .counter-plate {
+    height: 107px;
+    width: 132px;
+    border-width: 9px;
+  }
+}
+.counter-drag-ghost {
+  position: fixed;
+  z-index: 9999;
+  pointer-events: none;
+  transform: rotate(-5deg) scale(1.06);
+  background: #fffaf0;
+  border: 2px solid #4f824c;
+  border-radius: 14px;
+  box-shadow: 0 12px 28px #221b1766;
+  color: #284c34;
+  font-weight: 900;
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  max-width: 170px;
+  padding: 5px;
+}
+/* Objects share one wood worktop; only the objects themselves have edges. */
+.counter-zone {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: visible;
+  padding: 0;
+}
+.counter-zone.can-drop {
+  border: 0;
+  border-radius: 18px;
+  outline: 3px dashed #d5f0ae;
+  outline-offset: 4px;
+  box-shadow: none;
+}
+.zone-top {
+  position: relative;
+  z-index: 5;
+  width: auto;
+  align-self: flex-start;
+  background: #fff4dded;
+  border-radius: 9px;
+  padding: 3px 8px;
+  margin-bottom: 7px;
+  color: #283c31;
+}
+.counter-drag-ghost img {
+  max-width: 100%;
+  max-height: 90px;
+  object-fit: contain;
+}
+.counter-grab.dragging {
+  opacity: 0.4;
+}

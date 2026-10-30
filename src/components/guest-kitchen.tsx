@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import Image from 'next/image';
+import { MealPhoto } from './meal-photo';
 import { IconArrowRight, IconBasket, IconChefHat, IconClock, IconDeviceFloppy, IconHeartHandshake, IconLeaf, IconPlus, IconShoppingBag, IconUsers, IconWallet } from '@tabler/icons-react';
 import { ingredients } from '@/lib/demo-data';
 import { GUEST_STORAGE_KEY, guestKitchenSchema, guestProfile, kitchenMeals, measuredPantry, resolveKitchenFood, sampleKitchen, type KitchenFood } from '@/lib/guest-kitchen';
@@ -10,12 +11,14 @@ import { foodResources } from '@/lib/resources';
 import type { Equipment, FoodState, HouseholdProfile, Unit } from '@/lib/domain';
 import { NumberField } from './number-field';
 import { FoodPreferences } from './food-preferences';
+import { FoodAutocomplete } from './food-autocomplete';
+import type { CatalogFood } from '@/lib/food-catalog';
 
-export function GuestKitchen() {
-  const [started,setStarted]=useState(false);
+export function GuestKitchen({ storageKey = GUEST_STORAGE_KEY, initialKitchen }: { storageKey?: string; initialKitchen?: {profile:HouseholdProfile;foods:KitchenFood[]} } = {}) {
+  const [started,setStarted]=useState(!!initialKitchen);
   const [loaded,setLoaded]=useState(false);
-  const [profile,setProfile]=useState<HouseholdProfile>(guestProfile);
-  const [foods,setFoods]=useState<KitchenFood[]>([]);
+  const [profile,setProfile]=useState<HouseholdProfile>(initialKitchen?.profile??guestProfile);
+  const [foods,setFoods]=useState<KitchenFood[]>(initialKitchen?.foods??[]);
   const [view,setView]=useState<'kitchen'|'meals'|'help'>('kitchen');
   const [label,setLabel]=useState('');
   const [amount,setAmount]=useState('');
@@ -28,31 +31,33 @@ export function GuestKitchen() {
   const [saveError,setSaveError]=useState('');
   const [clearConfirm,setClearConfirm]=useState(false);
   const [checked,setChecked]=useState<string[]>([]);
+  const [picked,setPicked]=useState<CatalogFood|null>(null);
   const input=useRef<HTMLInputElement>(null);
   useEffect(()=>{
-    try { const raw=localStorage.getItem(GUEST_STORAGE_KEY);if(raw){const saved=guestKitchenSchema.safeParse(JSON.parse(raw));if(saved.success){setProfile(saved.data.profile);setFoods(saved.data.foods);setStarted(true);}else setNotice('Saved information could not be restored. You can start again.');} }
+    try { const raw=localStorage.getItem(storageKey);if(raw){const saved=guestKitchenSchema.safeParse(JSON.parse(raw));if(saved.success){setProfile(saved.data.profile);setFoods(saved.data.foods);setStarted(true);}else setNotice('Saved information could not be restored. You can start again.');} }
     catch {setSaveError('Browser saving is unavailable. You can still plan during this visit.');}
     setLoaded(true);
-  },[]);
+  },[storageKey]);
   useEffect(()=>{
     if(!loaded||!started)return;
-    try { localStorage.setItem(GUEST_STORAGE_KEY,JSON.stringify({version:1,profile,foods}));setSaveError(''); }
+    try { localStorage.setItem(storageKey,JSON.stringify({version:1,profile,foods}));setSaveError(''); }
     catch {setSaveError('Changes could not be saved in this browser. Keep this page open while planning.');}
-  },[loaded,started,profile,foods]);
+  },[loaded,started,profile,foods,storageKey]);
   const matches=started?kitchenMeals(profile,foods):[];
   const basket=started?recommendBasket(profile,measuredPantry(foods)):null;
   function go(next:typeof view){setView(next);setChecked([]);window.scrollTo({top:0,behavior:'instant'});}
-  function chooseFood(text:string){setLabel(text);const id=resolveKitchenFood(text);const food=ingredients.find(item=>item.id===id);if(food){setUnit(food.baseUnit);setFoodState(id==='oats'||id==='rice'&&text.trim().toLowerCase()==='rice'?'dry':['banana','carrot'].includes(id!)?'raw':'ready-to-eat');}}
+  function pickFood(item:CatalogFood){setPicked(item);setLabel(item.label);setUnit(item.unit);setFoodState(item.foodState);setStorage(item.storage);}
+  function chooseFood(text:string){setLabel(text);setPicked(null);const id=resolveKitchenFood(text);const food=ingredients.find(item=>item.id===id);if(food){setUnit(food.baseUnit);setFoodState(id==='oats'||id==='rice'&&text.trim().toLowerCase()==='rice'?'dry':['banana','carrot'].includes(id!)?'raw':'ready-to-eat');}}
   function submit(event:FormEvent){event.preventDefault();const name=label.trim();const quantity=amount.trim()?Number(amount):undefined;
     if(!name||name.length>80){setNotice('Enter a food name up to 80 characters.');return;}
     if(quantity!==undefined&&(!Number.isFinite(quantity)||quantity<=0||quantity>100000)){setNotice('Enter a measured amount greater than zero, or leave it blank.');return;}
     if(!editing&&foods.length>=100){setNotice('Review your pantry before adding more food.');return;}
-    const food:KitchenFood={id:editing??crypto.randomUUID(),label:name,ingredientId:resolveKitchenFood(name),quantity,unit:unit as KitchenFood['unit'],foodState,storage,...(bestBy?{bestByDate:bestBy}:{})};
-    setFoods(current=>editing?current.map(item=>item.id===editing?food:item):[...current,food]);setEditing(null);setLabel('');setAmount('');setBestBy('');setNotice(`${name} ${editing?'updated':'added'}.`);setChecked([]);input.current?.focus();
+    const food:KitchenFood={id:editing??crypto.randomUUID(),label:name,ingredientId:(picked&&picked.label===name?picked.ingredientId:undefined)??resolveKitchenFood(name),quantity,unit:unit as KitchenFood['unit'],foodState,storage,...(bestBy?{bestByDate:bestBy}:{})};
+    setFoods(current=>editing?current.map(item=>item.id===editing?food:item):[...current,food]);setEditing(null);setPicked(null);setLabel('');setAmount('');setBestBy('');setNotice(`${name} ${editing?'updated':'added'}.`);setChecked([]);input.current?.focus();
   }
-  function edit(food:KitchenFood){setLabel(food.label);setAmount(food.quantity?String(food.quantity):'');setUnit(food.unit);setFoodState(food.foodState);setStorage(food.storage);setBestBy(food.bestByDate??'');setEditing(food.id);input.current?.focus();}
+  function edit(food:KitchenFood){setPicked(null);setLabel(food.label);setAmount(food.quantity?String(food.quantity):'');setUnit(food.unit);setFoodState(food.foodState);setStorage(food.storage);setBestBy(food.bestByDate??'');setEditing(food.id);input.current?.focus();}
   function printMeals(){const details=Array.from(document.querySelectorAll<HTMLDetailsElement>('.kitchen-app details'));const states=details.map(detail=>detail.open);details.forEach(detail=>{detail.open=true;});window.addEventListener('afterprint',()=>details.forEach((detail,index)=>{detail.open=states[index];}),{once:true});window.print();}
-  function clear(){try{localStorage.removeItem(GUEST_STORAGE_KEY);}catch{setSaveError('Browser storage could not be cleared. Clear site data in your browser settings.');return;}setFoods([]);setProfile(guestProfile());setStarted(false);setView('kitchen');setEditing(null);setLabel('');setAmount('');setNotice('Your saved kitchen information was cleared.');setClearConfirm(false);setChecked([]);}
+  function clear(){try{localStorage.removeItem(storageKey);}catch{setSaveError('Browser storage could not be cleared. Clear site data in your browser settings.');return;}setFoods([]);setProfile(guestProfile());setStarted(false);setView('kitchen');setEditing(null);setLabel('');setAmount('');setNotice('Your saved kitchen information was cleared.');setClearConfirm(false);setChecked([]);}
   const budgetControls = <>
     <div className="budget-fields">
       <NumberField live label="Weekly grocery budget (USD)" decimal value={profile.weeklyBudgetCents / 100} onChange={value => setProfile(current => ({...current, weeklyBudgetCents: Math.round(value * 100)}))} />
@@ -86,23 +91,22 @@ export function GuestKitchen() {
             <div className="hero-actions"><button className="button" onClick={() => setStarted(true)}>Try Meal Planner<IconArrowRight size={20} aria-hidden="true" /></button><button className="text-button" onClick={() => {setFoods(sampleKitchen()); setStarted(true);}}>Try a sample pantry</button></div>
             <small>No account needed. Your kitchen stays in this browser.</small>
           </div>
-          <div className="hero-photo"><Image src="/images/kitchen-table.png" alt="A home kitchen table with a bean, corn and rice bowl, banana oats, and carrots" width={1536} height={1024} sizes="(max-width: 760px) 100vw, 55vw" loading="eager" fetchPriority="high" /><p>Everyday ingredients.<br /><strong>A place to start.</strong></p></div>
+          <div className="hero-photo"><Image src="/images/adult/kitchen-table.jpg" alt="A home kitchen table with a bean, corn and rice bowl, banana oats, and carrots" width={1536} height={1024} sizes="(max-width: 760px) 100vw, 55vw" loading="eager" fetchPriority="high" /><p>Everyday ingredients.<br /><strong>A place to start.</strong></p></div>
         </section>
         <section className="kitchen-how" aria-label="How meal planning works"><div><IconBasket size={26} aria-hidden="true" /><span><strong>Start in your pantry</strong><small>Add the foods you already have.</small></span></div><div><IconWallet size={26} aria-hidden="true" /><span><strong>Make room for your budget</strong><small>Choose what works for your family.</small></span></div><div><IconChefHat size={26} aria-hidden="true" /><span><strong>Find your next meal</strong><small>Get ideas and a simple grocery list.</small></span></div></section>
       </> : <>
         <div className="guest-storage-note"><span><IconDeviceFloppy size={16} aria-hidden="true" />Saved on this device. Anyone using this browser can see your kitchen settings.</span><button className="text-button" onClick={() => setClearConfirm(true)}>Clear my information</button></div>
         {clearConfirm && <section className="panel" aria-label="Clear saved information"><h2>Clear this kitchen?</h2><p>This removes the pantry, budget and food settings saved in this browser.</p><div className="actions"><button className="button danger" onClick={clear}>Clear my information now</button><button className="button secondary" onClick={() => setClearConfirm(false)}>Keep my kitchen</button></div></section>}
         {view === 'kitchen' && <>
-          <div className="kitchen-welcome"><div className="page-heading"><h1>What's in your<br />kitchen today?</h1><p>Add what you have. Find something good to make.</p></div><Image src="/images/kitchen-table.png" alt="Simple pantry ingredients made into a family meal" width={1536} height={1024} sizes="(max-width: 650px) 100vw, 360px" /></div>
+          <div className="kitchen-welcome"><div className="page-heading"><h1>What's in your<br />kitchen today?</h1><p>Add what you have. Find something good to make.</p></div><Image src="/images/adult/kitchen-table.jpg" alt="Simple pantry ingredients made into a family meal" width={1536} height={1024} sizes="(max-width: 650px) 100vw, 360px" /></div>
           <div className="kitchen-columns">
             <section className="panel pantry-panel">
               <div className="panel-heading"><span className="section-icon"><IconBasket size={24} aria-hidden="true" /></span><div><h2>{editing ? 'Edit food' : 'Add foods I have'}</h2><p>Your pantry, fridge, and freezer all count.</p></div></div>
               <form onSubmit={submit}>
-                <label>Food name<input ref={input} list="kitchen-foods" required maxLength={80} value={label} onChange={event => chooseFood(event.target.value)} placeholder="Rice, canned beans, or another food" /></label>
-                <datalist id="kitchen-foods">{ingredients.map(item => <option key={item.id} value={item.name} />)}</datalist>
+                <FoodAutocomplete label="Food name" inputRef={input} value={label} onTextChange={chooseFood} onPick={pickFood} placeholder="Rice, canned beans, or another food" />
                 <div className="form-grid pantry-amount"><label>Amount <span className="optional">Optional</span><input inputMode="decimal" value={amount} onChange={event => setAmount(event.target.value)} placeholder="Leave blank if unsure" /></label><label>Unit<select value={unit} onChange={event => setUnit(event.target.value as Unit)}>{['g', 'kg', 'oz', 'lb', 'each'].map(value => <option key={value}>{value}</option>)}</select></label></div>
                 <details className="kitchen-disclosure"><summary>Storage and preparation</summary><label>Preparation<select value={foodState} onChange={event => setFoodState(event.target.value as FoodState)}><option value="ready-to-eat">Ready to eat / canned / rice pouch</option><option value="dry">Dry / uncooked</option><option value="raw">Raw / fresh</option><option value="cooked">Cooked</option></select></label><label>Stored in<select value={storage} onChange={event => setStorage(event.target.value as KitchenFood['storage'])}><option value="pantry">Pantry</option><option value="fridge">Fridge</option><option value="freezer">Freezer</option></select></label><label>Use soon / best-by date<input type="date" value={bestBy} onChange={event => setBestBy(event.target.value)} /></label><small>Dates do not establish food safety. Canned quantities are measured after draining. Dry rice and ready-to-eat rice are counted separately.</small></details>
-                <div className="actions"><button className="button" type="submit"><IconPlus size={19} aria-hidden="true" />{editing ? 'Save food' : 'Add food'}</button>{editing && <button type="button" className="text-button" onClick={() => {setEditing(null); setLabel(''); setAmount('');}}>Cancel edit</button>}</div>
+                <div className="actions"><button className="button" type="submit"><IconPlus size={19} aria-hidden="true" />{editing ? 'Save food' : 'Add food'}</button>{editing && <button type="button" className="text-button" onClick={() => {setEditing(null); setPicked(null); setLabel(''); setAmount('');}}>Cancel edit</button>}</div>
               </form>
               <div className="pantry-summary"><div className="pantry-summary-heading"><h3>Your pantry</h3><span className="count-pill">{foods.length} {foods.length === 1 ? 'food' : 'foods'}</span></div>
                 {foods.length ? <ul className="pantry-list">{foods.map(food => <li key={food.id}><div><strong>{food.label}</strong><small>{food.quantity ? `${food.quantity} ${food.unit}` : 'Amount not entered'} · {food.storage}{food.bestByDate ? ` · Use soon: ${food.bestByDate}` : ''}</small>{(!food.ingredientId || !food.quantity) && <small>Saved for your reference. Matching needs a catalog food and measured amount.</small>}</div><div className="pantry-item-actions"><button className="text-button" aria-label={`Edit ${food.label}`} onClick={() => edit(food)}>Edit</button><button className="text-button" aria-label={`Remove ${food.label}`} onClick={() => setFoods(current => current.filter(item => item.id !== food.id))}>Remove</button></div></li>)}</ul> : <div className="pantry-empty"><IconLeaf size={30} aria-hidden="true" /><p>A good meal starts with what you have.</p><small>Add your first food, or explore with our sample pantry.</small></div>}
@@ -122,7 +126,7 @@ export function GuestKitchen() {
           {!matches.length && <section className="panel"><h2>Let's check your food settings.</h2><p>No current recipe fits all your restrictions and equipment. Keep your restrictions, clarify any pending allergy entries, or explore food support.</p><button className="button secondary" onClick={() => go('help')}>Find food support</button></section>}
           {([['now', 'Make it now'], ['extras', 'Just 1–2 extra items'], ['later', 'Plan for later']] as const).map(([group, title]) => <section className={`kitchen-meal-group meal-group-${group}`} key={group}><div className="meal-group-heading"><h2>{title}</h2><span className="count-pill">{matches.filter(item => item.group === group).length} {matches.filter(item => item.group === group).length === 1 ? 'idea' : 'ideas'}</span></div>
             {matches.some(item => item.group === group) ? <div className="recipe-grid">{matches.filter(item => item.group === group).map(({match, plan}) => <article className="recipe-card" key={match.recipe.id}>
-              <Image className="recipe-photo" src={`/images/${match.recipe.id}.png`} alt={`Illustrative serving of ${match.recipe.title.toLowerCase()}`} width={1254} height={1254} sizes="(max-width: 650px) 100vw, (max-width: 1100px) 50vw, 33vw" />
+              <MealPhoto id={match.recipe.id} title={match.recipe.title} />
               <div className="recipe-body"><div className="recipe-topline"><span>{match.recipe.mealTypes.join(' / ')}</span><span><IconClock size={15} aria-hidden="true" />{match.recipe.prepMinutes + match.recipe.cookMinutes} min</span></div>
               <h3>{match.recipe.title}</h3><p>{match.recipe.equipment.join(', ') || 'No cooking equipment'}</p><div className="recipe-facts"><span>{profile.householdSize} servings</span><span>{match.recipe.ingredients.length - plan.shoppingItems.length} pantry ingredients</span></div>
               <strong className="recipe-cost">{!plan.shoppingItems.length ? 'No new grocery cost' : plan.budget.missingPriceCount || plan.budget.stalePriceCount ? 'Price not verified' : `${formatMoney(plan.budget.totalCents)} estimated additions`}</strong>{plan.budget.totalCents > profile.weeklyBudgetCents && <small>Above your current budget.</small>}

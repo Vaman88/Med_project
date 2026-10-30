@@ -1,0 +1,208 @@
+/* Keep the full cooking task readable even on short screens. */
+.counter-app:not(.assembly-app) .counter-game {
+  display: block;
+  height: auto;
+  min-height: calc(100dvh - 66px);
+  overflow: visible;
+  padding: 20px clamp(12px, 2.5vw, 32px) 60px;
+}
+.counter-app:not(.assembly-app) .counter-heading,
+.counter-app:not(.assembly-app) .counter-stages,
+.counter-app:not(.assembly-app) .counter-task {
+  margin-bottom: 16px;
+}
+.counter-app:not(.assembly-app) .counter-heading p,
+.counter-app:not(.assembly-app) .counter-heading-actions span {
+  display: block;
+}
+.counter-app:not(.assembly-app) .counter-task {
+  min-height: 110px;
+  color: #263c30;
+}
+.counter-app:not(.assembly-app) .counter-task p {
+  font-size: 15px;
+  line-height: 1.4;
+}
+.counter-app:not(.assembly-app) .counter-task small {
+  display: block;
+  line-height: 1.3;
+}
+.counter-app:not(.assembly-app) .counter-scene {
+  height: auto;
+  overflow: visible;
+}
+.counter-app:not(.assembly-app) .counter-shelf {
+  order: 1;
+  padding: 14px 18px;
+  border-top: 0;
+  border-bottom: 6px solid #9d704b;
+}
+.counter-app:not(.assembly-app) .counter-food-slot {
+  flex-basis: 122px;
+}
+.counter-app:not(.assembly-app) .counter-food-slot .counter-grab,
+.counter-app:not(.assembly-app) .counter-food-used {
+  min-height: 106px;
+  height: auto;
+  padding: 7px;
+  font-size: 13px;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+  opacity: 1;
+}
+.counter-app:not(.assembly-app) .counter-food-used {
+  background: #f4f1e7;
+  color: #3d5241;
+}
+.counter-app:not(.assembly-app) .counter-food-used small {
+  color: #4d5c4d;
+  line-height: 1.2;
+}
+.counter-app:not(.assembly-app) .counter-surface {
+  order: 2;
+  flex: none;
+  min-height: 0;
+  padding: 20px;
+}
+.counter-app:not(.assembly-app) .counter-workarea {
+  display: grid;
+  grid-template-columns: 1.15fr .85fr 1fr 1fr !important;
+  grid-template-rows: 260px 230px;
+  min-height: 0;
+  overflow: visible;
+  gap: 12px;
+}
+.counter-app:not(.assembly-app) .counter-zone#counter-tray.active-zone {
+  grid-row: 1 !important;
+}
+.counter-app:not(.assembly-app) .counter-workarea #counter-plate,
+.counter-app:not(.assembly-app) .counter-workarea .counter-cup-zone {
+  display: flex !important;
+}
+.counter-app:not(.assembly-app) .counter-zone.active-zone {
+  z-index: 5;
+}
+.counter-app:not(.assembly-app) .counter-toolrack {
+  margin-top: 16px;
+  padding: 10px;
+}
+.counter-app:not(.assembly-app) .counter-toolrack strong {
+  display: block;
+  font-size: 14px;
+}
+.counter-app:not(.assembly-app) .counter-tools .counter-grab {
+  min-height: 66px;
+  height: auto;
+  font-size: 13px;
+}
+.counter-selected-action {
+  position: fixed;
+  z-index: 50;
+  left: 50%;
+  bottom: max(12px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: max-content;
+  max-width: calc(100vw - 24px);
+  padding: 8px 10px 8px 16px;
+  border: 3px solid #285d46;
+  border-radius: 18px;
+  background: #fffaf0;
+  color: #263c30;
+  box-shadow: 0 8px 24px #1b332580;
+  font-size: 14px;
+  font-weight: 800;
+}
+.counter-selected-action button {
+  min-height: 44px;
+  border: 0;
+  border-radius: 11px;
+  padding: 8px 12px;
+  background: #f5cf67;
+  color: #263c30;
+  font: inherit;
+  cursor: pointer;
+}
+.counter-selected-action button:last-child {
+  width: 44px;
+  padding: 0;
+  background: #e5eadf;
+  font-size: 24px;
+}
+.little-app .little-recipe small {
+  display: block;
+  color: #344839;
+  font-size: 14px;
+  line-height: 1.35;
+}
+@media (max-width: 1050px) and (min-width: 651px) {
+  .counter-app:not(.assembly-app) .counter-workarea {
+    grid-template-columns: 1.1fr .9fr !important;
+    grid-template-rows: 270px 220px 250px 180px;
+  }
+  .counter-app:not(.assembly-app) #counter-board { grid-column: 1; grid-row: 1/3; }
+  .counter-app:not(.assembly-app) #counter-bowl { grid-column: 2; grid-row: 1; }
+  .counter-app:not(.assembly-app) #counter-prep-cup { grid-column: 2; grid-row: 2; }
+  .counter-app:not(.assembly-app) #counter-tray { grid-column: 1; grid-row: 3 !important; }
+  .counter-app:not(.assembly-app) #counter-appliance { grid-column: 2; grid-row: 3; }
+  .counter-app:not(.assembly-app) #counter-plate { grid-column: 1/3; grid-row: 4; }
+}
+@media (max-width: 650px) {
+  .counter-app:not(.assembly-app) .counter-game {
+    min-height: calc(100dvh - 60px);
+    padding: 12px 8px 45px;
+  }
+  .counter-app:not(.assembly-app) .counter-heading h1 { font-size: 26px; }
+  .counter-app:not(.assembly-app) .counter-heading p { font-size: 14px; }
+  .counter-app:not(.assembly-app) .counter-task {
+    min-height: 125px;
+    padding: 12px;
+  }
+  .counter-app:not(.assembly-app) .counter-task h2 { font-size: 19px; }
+  .counter-app:not(.assembly-app) .counter-task p { font-size: 14px; }
+  .counter-app:not(.assembly-app) .counter-shelf { padding: 12px; }
+  .counter-app:not(.assembly-app) .counter-shelf-title span { display: block; font-size: 12px; }
+  .counter-app:not(.assembly-app) .counter-food-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    overflow: visible;
+  }
+  .counter-app:not(.assembly-app) .counter-food-slot { min-width: 0; }
+  .counter-app:not(.assembly-app) .counter-food-slot img { width: 84px; height: 60px; }
+  .counter-app:not(.assembly-app) .counter-surface { padding: 12px; }
+  .counter-app:not(.assembly-app) .counter-workarea {
+    display: flex;
+    height: 300px;
+    min-height: 300px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    gap: 10px;
+  }
+  .counter-app:not(.assembly-app) .counter-zone {
+    flex: 0 0 min(86vw, 350px);
+    height: 285px;
+  }
+  .counter-app:not(.assembly-app) .counter-tools {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .counter-app:not(.assembly-app) .counter-tools .counter-grab { min-height: 74px; }
+  .counter-selected-action {
+    width: calc(100vw - 24px);
+    justify-content: space-between;
+    font-size: 12px;
+  }
+  .counter-selected-action button { font-size: 13px; }
+  .little-app .little-recipe { min-height: 235px; height: auto; }
+  .little-app .little-recipe > div { gap: 4px; }
+  .little-app .little-recipe small { font-size: 12px; }
+}
+@media (prefers-color-scheme: dark) {
+  .counter-app:not(.assembly-app) .counter-task { color: #edf1de; }
+  .little-app .little-recipe small { color: #d2dcc5; }
+}

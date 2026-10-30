@@ -1,6 +1,7 @@
+import { catalogIngredients, catalogRecipes } from './food-catalog';
 import type { HouseholdProfile, Ingredient, PantryItem, PriceObservation, Recipe } from './domain';
 
-export const ingredients: Ingredient[] = [
+const baseIngredients: Ingredient[] = [
   ['oats', 'Rolled oats', 'g', [], true, true],
   ['banana', 'Banana', 'each', [], true, true],
   ['beans', 'Canned beans, drained', 'g', [], true, true],
@@ -17,9 +18,11 @@ export const ingredients: Ingredient[] = [
   foodTags: id === 'yogurt' ? ['dairy'] : id === 'bread' ? ['gluten'] : [],
   glutenStatus: id === 'bread' ? 'contains' as const : 'unknown' as const,
 })) as Ingredient[];
+// Extra planner ingredients come from the food catalog. They carry their own allergen and diet tags.
+export const ingredients: Ingredient[] = [...baseIngredients, ...catalogIngredients()];
 
 const provenance = 'Original synthetic prototype recipe. Not professionally reviewed; check product labels and follow package directions. Not production recipe content.';
-export const recipes: Recipe[] = [
+const baseRecipes: Recipe[] = [
   { id: 'banana-oats', title: 'Banana overnight oats', yieldServings: 2, equipment: ['refrigerator'], prepMinutes: 5, cookMinutes: 0, mealTypes: ['breakfast'], ingredients: [
     { ingredientId: 'oats', quantity: 100, unit: 'g', foodState: 'dry' }, { ingredientId: 'banana', quantity: 2, unit: 'each', foodState: 'raw' },
   ], steps: ['Divide 100 g rolled oats between two clean covered containers. Add 150 ml drinking water to each and stir.', 'Cover and refrigerate overnight. Before eating, peel and slice one banana over each portion.'], reviewStatus: 'synthetic-demo', provenance },
@@ -55,9 +58,11 @@ const recipePreferences: Record<string, { flavorTags: string[]; textureTags: str
   'hummus-carrot-sandwich': { flavorTags: ['savory','mild'], textureTags: ['crunchy','smooth'], cuisineTags: ['sandwich'] },
   'bean-corn-rice': { flavorTags: ['savory','mild'], textureTags: ['soft'], cuisineTags: ['rice bowl'] },
 };
-for (const recipe of recipes) Object.assign(recipe, recipePreferences[recipe.id]);
+for (const recipe of baseRecipes) Object.assign(recipe, recipePreferences[recipe.id]);
+export const recipes: Recipe[] = [...baseRecipes, ...catalogRecipes()];
 
-export const prices: PriceObservation[] = ingredients.map((ingredient, index) => ({
+// Illustrative demo prices exist only for the original ingredients; catalog ingredients have no price and degrade to "price missing".
+export const prices: PriceObservation[] = baseIngredients.map((ingredient, index) => ({
   id: `demo-price-${ingredient.id}`, ingredientId: ingredient.id, storeId: 'demo-store',
   productName: ingredient.name, packageQuantity: [1000, 1, 240, 250, 400, 200, 20, 450, 680, 900, 200][index],
   packageUnit: ingredient.baseUnit, priceCents: [299, 30, 89, 149, 119, 99, 199, 249, 349, 179, 249][index],

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Bowl of black beans, corn and tomato">
+  <rect width="640" height="640" fill="#e7eee5"/><ellipse cx="320" cy="532" rx="219" ry="43" fill="#9aa99b" opacity=".35"/>
+  <ellipse cx="320" cy="318" rx="253" ry="210" fill="#fff8e9" stroke="#395e4b" stroke-width="16"/><ellipse cx="320" cy="318" rx="216" ry="176" fill="#b3d1ab"/>
+  <path d="M130 234c62-96 162-96 210-17 23 36 11 122-50 157-69 39-179-53-160-140z" fill="#55534e"/>
+  <path d="M352 194c120-54 181 24 166 119-12 75-100 120-170 58-59-54-63-145 4-177z" fill="#f0c94d"/>
+  <path d="M211 383c21-53 107-72 167-27 52 38 41 111-19 144-78 42-182-39-148-117z" fill="#dd624e"/>
+  <g fill="#333d38"><ellipse cx="162" cy="249" rx="29" ry="18" transform="rotate(-26 162 249)"/><ellipse cx="232" cy="210" rx="31" ry="18" transform="rotate(20 232 210)"/><ellipse cx="276" cy="284" rx="28" ry="17" transform="rotate(-30 276 284)"/><ellipse cx="184" cy="329" rx="29" ry="18" transform="rotate(14 184 329)"/><ellipse cx="291" cy="366" rx="28" ry="17" transform="rotate(-19 291 366)"/></g>
+  <g fill="#ffe581"><circle cx="383" cy="241" r="19"/><circle cx="436" cy="226" r="18"/><circle cx="473" cy="264" r="18"/><circle cx="387" cy="297" r="18"/><circle cx="452" cy="321" r="19"/><circle cx="500" cy="316" r="17"/><circle cx="400" cy="356" r="17"/></g>
+  <g fill="#f28566"><circle cx="259" cy="414" r="22"/><circle cx="319" cy="401" r="21"/><circle cx="355" cy="455" r="20"/><circle cx="216" cy="450" r="19"/></g>
+</svg>

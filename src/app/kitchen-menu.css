@@ -1,0 +1,81 @@
+/* Meal picker: a quiet header, one row of filters and evenly cropped dish cards. */
+.little-app .km {
+  max-width: 1180px;
+  padding: 28px 40px 40px;
+  margin: 0 auto;
+}
+.km-hello { display: flex; align-items: center; gap: 18px; }
+.km-hello .chef-avatar { flex: none; }
+.little-app .km h1 {
+  color: #25402f;
+  font-size: clamp(28px, 4vw, 44px);
+  line-height: 1.1;
+  text-wrap: balance;
+}
+.km-sub { margin-top: 6px; color: #4f6354; font-size: 18px; }
+.km-filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 22px 0 24px; }
+.little-app .km-filters button {
+  min-height: 44px;
+  padding: 8px 18px;
+  border: 2px solid #d9dcc6;
+  border-radius: 999px;
+  background: #fffdf7;
+  color: #25402f;
+  font-weight: 700;
+}
+.little-app .km-filters button[aria-pressed="true"] { border-color: #2f6b4f; background: #2f6b4f; color: #fff; }
+.km-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 22px; }
+.km-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 22px;
+  background: #fffdf7;
+  box-shadow: 0 8px 26px rgb(86 66 36 / 13%);
+}
+.km-photo, .km-card .ck-preview { aspect-ratio: 4 / 3; width: 100%; overflow: hidden; background: #efe6d3; }
+.km-photo img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.km-card-body { display: flex; flex: 1; flex-direction: column; gap: 8px; padding: 16px 18px 18px; }
+.little-app .km-card h2 { color: #25402f; font-size: 22px; line-height: 1.2; }
+.km-meta { display: flex; align-items: center; gap: 6px; color: #4f6354; font-size: 14px; }
+.km-card .little-primary { margin-top: auto; }
+.km-pantry { color: #6b715e; font-size: 13px; line-height: 1.35; }
+.km-section > h1 + .km-sub { margin-bottom: 22px; }
+
+@media (max-width: 640px) {
+  .little-app .km { padding: 18px 14px 30px; }
+  .km-hello { gap: 12px; }
+  .km-sub { font-size: 16px; }
+  .km-grid { grid-template-columns: 1fr; gap: 16px; }
+}
+
+.little-app .km-card .little-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  border: 0;
+  border-radius: 999px;
+  background: #2f6b4f;
+  box-shadow: 0 4px 0 #245640;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 800;
+}
+.little-app .km-card .little-primary:hover { background: #245640; }
+
+@media (prefers-color-scheme: dark) {
+  .little-app { background: #202b23; color: #edf1de; }
+  .little-app .little-header { background: #1a231d; border-color: #35443a; }
+  .little-app .little-footnote { color: #b3bdad; }
+  .little-app .km-empty button, .little-app .little-empty button, .little-app section button:not([class]) { color: #f3efe3; border-color: #86c7a0; }
+  .little-app .km h1, .little-app .km-card h2 { color: #f3efe3; }
+  .km-sub, .km-meta { color: #c4cdbf; }
+  .km-pantry { color: #b3bdad; }
+  .little-app .km-filters button { border-color: #46564b; background: #2a342d; color: #f3efe3; }
+  .little-app .km-filters button[aria-pressed="true"] { border-color: #86c7a0; background: #dff0d8; color: #1f3a2a; }
+  .km-card { background: #2a342d; box-shadow: 0 8px 26px rgb(0 0 0 / 35%); }
+  .km-photo, .km-card .ck-preview { background: #33403a; }
+  .little-app .km-card .little-primary { background: #3d8560; box-shadow: 0 4px 0 #2b6246; }
+}
