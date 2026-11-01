@@ -2,6 +2,9 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import Image from 'next/image';
 import { MealPhoto } from './meal-photo';
+import { CloudAccount } from './cloud-account';
+import { browserCloud, cloudConfigured } from '@/lib/cloud';
+import type { User } from '@supabase/supabase-js';
 import { IconArrowRight, IconBasket, IconChefHat, IconClock, IconDeviceFloppy, IconHeartHandshake, IconLeaf, IconPlus, IconShoppingBag, IconUsers, IconWallet } from '@tabler/icons-react';
 import { ingredients } from '@/lib/demo-data';
 import { GUEST_STORAGE_KEY, guestKitchenSchema, guestProfile, kitchenMeals, measuredPantry, resolveKitchenFood, sampleKitchen, type KitchenFood } from '@/lib/guest-kitchen';
@@ -14,8 +17,30 @@ import { FoodPreferences } from './food-preferences';
 import { FoodAutocomplete } from './food-autocomplete';
 import type { CatalogFood } from '@/lib/food-catalog';
 
-export function GuestKitchen({ storageKey = GUEST_STORAGE_KEY, initialKitchen }: { storageKey?: string; initialKitchen?: {profile:HouseholdProfile;foods:KitchenFood[]} } = {}) {
-  const [started,setStarted]=useState(!!initialKitchen);
+type GuestKitchenProps = { storageKey?: string; initialKitchen?: {profile:HouseholdProfile;foods:KitchenFood[]} };
+export function GuestKitchen(props: GuestKitchenProps = {}) {
+  const allowCloud = cloudConfigured && !props.initialKitchen;
+  const [user, setUser] = useState<User | null | undefined>(allowCloud ? undefined : null);
+  useEffect(() => {
+    if (!allowCloud) return;
+    const client = browserCloud();
+    let active = true;
+    let authEventReceived = false;
+    const { data: { subscription } } = client.auth.onAuthStateChange((_event, session) => {
+      authEventReceived = true;
+      if (active) setUser(session?.user ?? null);
+    });
+    void client.auth.getSession().then(({ data }) => {
+      if (active && !authEventReceived) setUser(data.session?.user ?? null);
+    }).catch(() => { if (active && !authEventReceived) setUser(null); });
+    return () => { active = false; subscription.unsubscribe(); };
+  }, [allowCloud]);
+  if (user === undefined) return <div className="cloud-account-loading" role="status">Opening your kitchen…</div>;
+  return <GuestKitchenView key={user?.id ?? 'guest'} {...props} initialKitchen={user ? undefined : props.initialKitchen} user={user} />;
+}
+
+function GuestKitchenView({ storageKey = GUEST_STORAGE_KEY, initialKitchen, user }: GuestKitchenProps & { user: User | null }) {
+  const [started,setStarted]=useState(!!initialKitchen || !!user);
   const [loaded,setLoaded]=useState(false);
   const [profile,setProfile]=useState<HouseholdProfile>(initialKitchen?.profile??guestProfile);
   const [foods,setFoods]=useState<KitchenFood[]>(initialKitchen?.foods??[]);
@@ -34,15 +59,16 @@ export function GuestKitchen({ storageKey = GUEST_STORAGE_KEY, initialKitchen }:
   const [picked,setPicked]=useState<CatalogFood|null>(null);
   const input=useRef<HTMLInputElement>(null);
   useEffect(()=>{
+    if(user){setLoaded(true);return;}
     try { const raw=localStorage.getItem(storageKey);if(raw){const saved=guestKitchenSchema.safeParse(JSON.parse(raw));if(saved.success){setProfile(saved.data.profile);setFoods(saved.data.foods);setStarted(true);}else setNotice('Saved information could not be restored. You can start again.');} }
     catch {setSaveError('Browser saving is unavailable. You can still plan during this visit.');}
     setLoaded(true);
-  },[storageKey]);
+  },[storageKey,user]);
   useEffect(()=>{
-    if(!loaded||!started)return;
+    if(user||!loaded||!started)return;
     try { localStorage.setItem(storageKey,JSON.stringify({version:1,profile,foods}));setSaveError(''); }
     catch {setSaveError('Changes could not be saved in this browser. Keep this page open while planning.');}
-  },[loaded,started,profile,foods,storageKey]);
+  },[loaded,started,profile,foods,storageKey,user]);
   const matches=started?kitchenMeals(profile,foods):[];
   const basket=started?recommendBasket(profile,measuredPantry(foods)):null;
   function go(next:typeof view){setView(next);setChecked([]);window.scrollTo({top:0,behavior:'instant'});}
@@ -57,7 +83,7 @@ export function GuestKitchen({ storageKey = GUEST_STORAGE_KEY, initialKitchen }:
   }
   function edit(food:KitchenFood){setPicked(null);setLabel(food.label);setAmount(food.quantity?String(food.quantity):'');setUnit(food.unit);setFoodState(food.foodState);setStorage(food.storage);setBestBy(food.bestByDate??'');setEditing(food.id);input.current?.focus();}
   function printMeals(){const details=Array.from(document.querySelectorAll<HTMLDetailsElement>('.kitchen-app details'));const states=details.map(detail=>detail.open);details.forEach(detail=>{detail.open=true;});window.addEventListener('afterprint',()=>details.forEach((detail,index)=>{detail.open=states[index];}),{once:true});window.print();}
-  function clear(){try{localStorage.removeItem(storageKey);}catch{setSaveError('Browser storage could not be cleared. Clear site data in your browser settings.');return;}setFoods([]);setProfile(guestProfile());setStarted(false);setView('kitchen');setEditing(null);setLabel('');setAmount('');setNotice('Your saved kitchen information was cleared.');setClearConfirm(false);setChecked([]);}
+  function clear(){try{if(!user)localStorage.removeItem(storageKey);}catch{setSaveError('Browser storage could not be cleared. Clear site data in your browser settings.');return;}setFoods([]);setProfile(guestProfile());setStarted(!!user);setView('kitchen');setEditing(null);setLabel('');setAmount('');setNotice(user ? 'Current kitchen cleared. Your online save is unchanged until you choose Save online.' : 'Your saved kitchen information was cleared.');setClearConfirm(false);setChecked([]);}
   const budgetControls = <>
     <div className="budget-fields">
       <NumberField live label="Weekly grocery budget (USD)" decimal value={profile.weeklyBudgetCents / 100} onChange={value => setProfile(current => ({...current, weeklyBudgetCents: Math.round(value * 100)}))} />
@@ -82,6 +108,7 @@ export function GuestKitchen({ storageKey = GUEST_STORAGE_KEY, initialKitchen }:
       </nav> : <span className="header-note">Made for everyday family meals</span>}
     </header>
     <main id="main-content" tabIndex={-1}>
+      {!initialKitchen && <CloudAccount user={user} kitchen={{version:1,profile,foods}} storageKey={storageKey} onLoad={saved => {setProfile(saved.profile);setFoods(saved.foods);setStarted(true);setEditing(null);setPicked(null);setLabel('');setAmount('');setChecked([]);setView('kitchen');}} />}
       {!started ? <>
         <section className="guest-hero">
           <div className="hero-copy">
@@ -95,8 +122,8 @@ export function GuestKitchen({ storageKey = GUEST_STORAGE_KEY, initialKitchen }:
         </section>
         <section className="kitchen-how" aria-label="How meal planning works"><div><IconBasket size={26} aria-hidden="true" /><span><strong>Start in your pantry</strong><small>Add the foods you already have.</small></span></div><div><IconWallet size={26} aria-hidden="true" /><span><strong>Make room for your budget</strong><small>Choose what works for your family.</small></span></div><div><IconChefHat size={26} aria-hidden="true" /><span><strong>Find your next meal</strong><small>Get ideas and a simple grocery list.</small></span></div></section>
       </> : <>
-        <div className="guest-storage-note"><span><IconDeviceFloppy size={16} aria-hidden="true" />Saved on this device. Anyone using this browser can see your kitchen settings.</span><button className="text-button" onClick={() => setClearConfirm(true)}>Clear my information</button></div>
-        {clearConfirm && <section className="panel" aria-label="Clear saved information"><h2>Clear this kitchen?</h2><p>This removes the pantry, budget and food settings saved in this browser.</p><div className="actions"><button className="button danger" onClick={clear}>Clear my information now</button><button className="button secondary" onClick={() => setClearConfirm(false)}>Keep my kitchen</button></div></section>}
+        <div className="guest-storage-note"><span><IconDeviceFloppy size={16} aria-hidden="true" />{user ? 'Account kitchen: choose Save online to keep changes. Unsaved changes are cleared when you leave or sign out.' : 'Saved on this device. Anyone using this browser can see your kitchen settings.'}</span><button className="text-button" onClick={() => setClearConfirm(true)}>{user ? 'Clear current kitchen' : 'Clear my information'}</button></div>
+        {clearConfirm && <section className="panel" aria-label="Clear saved information"><h2>Clear this kitchen?</h2><p>{user ? 'This clears the current pantry and settings. Your online save stays unchanged until you choose Save online.' : 'This removes the pantry, budget and food settings saved in this browser.'}</p><div className="actions"><button className="button danger" onClick={clear}>Clear my information now</button><button className="button secondary" onClick={() => setClearConfirm(false)}>Keep my kitchen</button></div></section>}
         {view === 'kitchen' && <>
           <div className="kitchen-welcome"><div className="page-heading"><h1>What's in your<br />kitchen today?</h1><p>Add what you have. Find something good to make.</p></div><Image src="/images/adult/kitchen-table.jpg" alt="Simple pantry ingredients made into a family meal" width={1536} height={1024} sizes="(max-width: 650px) 100vw, 360px" /></div>
           <div className="kitchen-columns">

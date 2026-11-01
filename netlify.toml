@@ -6,3 +6,8 @@
   for = "/_next/static/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+# These are public browser credentials; RLS controls private data access.
+[build.environment]
+  NEXT_PUBLIC_SUPABASE_URL = "https://isvxgxztiayqzkbvrkia.supabase.co"
+  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY = "sb_publishable_PrKFVBiKeT154OdS4o7Dhw_62m_K1LE"

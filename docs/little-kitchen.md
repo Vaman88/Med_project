@@ -20,7 +20,7 @@ The home page offers **Parent sign-up / Set up a child’s kitchen**. A four-ste
 
 Run `npm run build`, `npm run typecheck`, `npm test`, and `npm run test:e2e`. The state-machine tests cover all three recipes, required tools, repeated food work, cooking rounds, and serving. Browser tests cover all three complete games, pointer drag, tap placement, wrong-tool behavior, parent setup and deletion, pantry and allergy edits, age 10, dark mode, and reduced motion on desktop and mobile.
 
-`node scripts/verify-little-kitchen.mjs` captures the menu and parent setup at 360, 390 (mobile emulation), 768, and 1440 pixels against a production server on port 3197. It checks image decoding, failed requests, and horizontal overflow. Captures live in `docs/little-kitchen-audit/`.
+`node tests/scripts/verify-little-kitchen.mjs` captures the menu and parent setup at 360, 390 (mobile emulation), 768, and 1440 pixels against a production server on port 3197. It checks image decoding, failed requests, and horizontal overflow. Captures live in `docs/little-kitchen-audit/`.
 
 Verified October 15, 2026: production build and type checking passed; 47 unit tests passed; 15 browser tests passed, with one desktop-only drag test skipped on mobile. Browser coverage includes complete paths for the three dishes, wizard setup, PIN entry, quiz completion, and cookbook persistence. The audit directory contains earlier captures; current test runs produce new captures under `test-results/`.
 

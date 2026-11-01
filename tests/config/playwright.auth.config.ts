@@ -1,11 +1,13 @@
+import { resolve } from "node:path";
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
-  testDir: './tests/auth-e2e',
+  testDir: '../auth-e2e',
   fullyParallel: false,
+  outputDir: "../../test-results",
   use: { baseURL: 'http://127.0.0.1:3198', trace: 'retain-on-failure' },
   projects: [{ name: 'desktop-auth-simulation', use: { ...devices['Desktop Chrome'] } }],
-  webServer: {
+  webServer: { cwd: resolve(__dirname, "../.."),
     command: 'npm run dev -- --hostname 127.0.0.1 --port 3198',
     url: 'http://127.0.0.1:3198',
     reuseExistingServer: false,

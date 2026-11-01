@@ -1,5 +1,8 @@
+import { fileURLToPath } from "node:url";
 import { chromium, devices } from "@playwright/test";
 import { mkdir } from "node:fs/promises";
+
+process.chdir(fileURLToPath(new URL("../..", import.meta.url)));
 
 const folder = "docs/little-kitchen-audit";
 await mkdir(folder, { recursive: true });

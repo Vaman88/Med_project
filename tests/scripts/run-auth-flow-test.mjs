@@ -1,8 +1,11 @@
+import { fileURLToPath } from "node:url";
 import { spawn } from 'node:child_process';
 import { readFile, writeFile } from 'node:fs/promises';
 
 // Next generates these tracked files for whichever distDir starts last. Keep
 // the normal development server's declarations after the isolated auth test.
+process.chdir(fileURLToPath(new URL("../..", import.meta.url)));
+
 const originalEnv = await readFile('next-env.d.ts', 'utf8');
 const originalConfig = await readFile('tsconfig.json', 'utf8');
 
@@ -23,7 +26,7 @@ async function restoreNextDeclarations() {
   }
 }
 
-const child = spawn(process.execPath, ['node_modules/@playwright/test/cli.js', 'test', '--config', 'playwright.auth.config.ts'], {
+const child = spawn(process.execPath, ['node_modules/@playwright/test/cli.js', 'test', '--config', 'tests/config/playwright.auth.config.ts'], {
   stdio: 'inherit', windowsHide: true,
 });
 const exitCode = await new Promise((resolve, reject) => {
