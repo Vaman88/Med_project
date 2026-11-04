@@ -192,7 +192,9 @@ export interface LittleRecipe {
   minutes: number;
   ingredients: { food: string; amount: string }[];
   game?: "assembly";
-  category?: "breakfast" | "lunch" | "sweet";
+  category?: "breakfast" | "lunch" | "snack" | "sweet";
+  /** Recently added dishes are shown first with a "New!" badge. */
+  isNew?: boolean;
   icon?: string;
   prepIngredient?: string;
   /** The real-kitchen heat source a grown-up needs. Defaults: pancakes Stove, other cooked dishes Oven. */
@@ -264,7 +266,7 @@ export const littleRecipes: LittleRecipe[] = [
     category: "lunch",
     title: "Rainbow mini pizzas",
     subtitle: "Your own colorful pizza party",
-    image: "/images/child/pizza.jpg",
+    image: "/images/adult/veggie-pizza-flatbread.jpg",
     minutes: 18,
     benefit:
       "Whole wheat pita, vegetables and mozzarella make a colorful meal.",
@@ -358,7 +360,7 @@ export const littleRecipes: LittleRecipe[] = [
     id: "parfait",
     title: "Banana berry yogurt parfait",
     subtitle: "Build a bright breakfast cup",
-    image: "/images/child/parfait.jpg",
+    image: "/images/adult/greek-yogurt-parfait.jpg",
     icon: "🍓",
     game: "assembly",
     prepIngredient: "Banana",
@@ -382,11 +384,11 @@ export const littleRecipes: LittleRecipe[] = [
     id: "veggie-dippers",
     title: "Rainbow veggie dippers",
     subtitle: "Crunchy colors with hummus",
-    image: "/images/child/veggies.jpg",
+    image: "/images/adult/veggie-sticks-ranch.jpg",
     icon: "🥕",
     game: "assembly",
     prepIngredient: "Carrots",
-    category: "lunch",
+    category: "snack",
     minutes: 10,
     benefit: "Different vegetables bring different colors and textures.",
     ingredients: [
@@ -429,7 +431,7 @@ export const littleRecipes: LittleRecipe[] = [
     id: "fruit-salad",
     title: "Rainbow fruit salad",
     subtitle: "Toss a bowl of bright fruit",
-    image: "/images/meals/fruit.jpg",
+    image: "/images/adult/fruit-salad.jpg",
     icon: "🍇",
     game: "assembly",
     prepIngredient: "Banana",
@@ -456,7 +458,7 @@ export const littleRecipes: LittleRecipe[] = [
     id: "avocado-toast",
     title: "Avocado tomato toast",
     subtitle: "Creamy green on crunchy toast",
-    image: "/images/meals/avocado.jpg",
+    image: "/images/adult/avocado-toast-egg.jpg",
     icon: "🥑",
     heat: "Oven",
     category: "breakfast",
@@ -682,6 +684,91 @@ export const littleRecipes: LittleRecipe[] = [
       "Grown-up: add the rice and soy sauce and stir-fry for 3 to 4 minutes until hot. Let it cool before serving. Most soy sauce contains wheat, so check the label or use tamari.",
     ],
   },
+  {
+    id: "smoothie-bowl",
+    isNew: true,
+    title: "Pink power smoothie bowl",
+    subtitle: "Blend it pink, then top it",
+    image: "/images/child/smoothie-bowl.jpg",
+    icon: "🍓",
+    game: "assembly",
+    prepIngredient: "Banana",
+    category: "breakfast",
+    minutes: 10,
+    servings: "Makes 2 bowls",
+    benefit: "Yogurt brings protein and calcium, and the fruit adds vitamin C and fiber.",
+    ingredients: [
+      { food: "Plain yogurt", amount: "1 cup" },
+      { food: "Strawberries", amount: "1 cup, hulled" },
+      { food: "Banana", amount: "1 ripe" },
+      { food: "Blueberries", amount: "¼ cup" },
+      { food: "Oats", amount: "2 tablespoons" },
+    ],
+    allergens: ["Milk", "Strawberries", "Banana", "Blueberries", "Oats"],
+    steps: [],
+    adultSteps: [
+      "Makes 2 bowls. Wash and hull the strawberries. Slice half the banana into coins for the topping.",
+      "Blend the yogurt, strawberries and the other half of the banana until smooth and thick. Grown-up: handle the blender and keep the lid on.",
+      "Pour into 2 bowls and top with banana coins, blueberries and a sprinkle of oats. Cut blueberries in half for children under 4. Serve right away.",
+    ],
+  },
+  {
+    id: "taco-bowl",
+    isNew: true,
+    title: "Rainbow taco bowl",
+    subtitle: "Build a colorful fiesta bowl",
+    image: "/images/child/taco-bowl.jpg",
+    icon: "🌮",
+    game: "assembly",
+    prepIngredient: "Tomato",
+    category: "lunch",
+    minutes: 12,
+    servings: "Serves 4",
+    benefit: "Beans and rice together make a filling meal, and the veggies add a rainbow of colors.",
+    ingredients: [
+      { food: "Brown rice", amount: "2 cups cooked" },
+      { food: "Canned black beans", amount: "1 can, drained and rinsed" },
+      { food: "Canned corn", amount: "1 cup, drained" },
+      { food: "Tomato", amount: "1, diced" },
+      { food: "Bell pepper", amount: "½, diced" },
+      { food: "Cheddar cheese", amount: "½ cup shredded" },
+    ],
+    allergens: ["Rice", "Beans", "Corn", "Tomato", "Bell pepper", "Milk"],
+    steps: [],
+    adultSteps: [
+      "Serves 4. Use cooked rice that was cooled and refrigerated within 1 hour, or a ready-to-eat rice pouch. Warm the rice and beans if you like, until steaming hot.",
+      "Drain and rinse the beans and corn. Grown-up: dice the tomato and bell pepper into small pieces.",
+      "Spoon rice into each bowl, then add beans, corn, tomato, pepper and cheese in colorful stripes. Refrigerate leftovers within 2 hours.",
+    ],
+  },
+  {
+    id: "hummus-toast",
+    isNew: true,
+    title: "Crunchy garden hummus toast",
+    subtitle: "Make a veggie face on toast",
+    image: "/images/child/hummus-toast.jpg",
+    icon: "🥒",
+    heat: "Oven",
+    prepIngredient: "Cucumber",
+    category: "snack",
+    minutes: 8,
+    servings: "Makes 2 toasts",
+    benefit: "Hummus brings plant protein, whole wheat adds fiber, and crunchy veggies add color.",
+    ingredients: [
+      { food: "Whole wheat bread", amount: "2 slices" },
+      { food: "Hummus", amount: "4 tablespoons" },
+      { food: "Cucumber", amount: "½, thinly sliced" },
+      { food: "Carrots", amount: "1 small, in thin coins" },
+      { food: "Tomato", amount: "½, diced" },
+    ],
+    allergens: ["Wheat", "Sesame", "Beans", "Cucumber", "Carrots", "Tomato"],
+    steps: [],
+    adultSteps: [
+      "Makes 2 toasts. Grown-up: toast the bread for 2 to 3 minutes until golden and let it cool a little. Toasters get hot.",
+      "Wash the vegetables. Grown-up: slice the cucumber and carrot into thin coins (very thin or grated for children under 4) and dice the tomato.",
+      "Spread 2 tablespoons hummus on each toast and let your chef decorate it with the veggies. Check the hummus and bread labels for sesame and other allergens.",
+    ],
+  },
 ];
 /** The heat source a real-kitchen version of this dish needs. */
 const neededHeat = (recipe: LittleRecipe): "Oven" | "Stove" =>
@@ -717,6 +804,7 @@ export function recipeChoices(family: Family) {
     }))
     .sort(
       (a, b) =>
+        Number(!!b.recipe.isNew) - Number(!!a.recipe.isNew) ||
         a.missing.length - b.missing.length ||
         b.recipe.ingredients.filter((item) =>
           family.favorites?.includes(item.food),

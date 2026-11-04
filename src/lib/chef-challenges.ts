@@ -105,6 +105,48 @@ const challenges: Record<string, [ChefChallenge, ChefChallenge]> = {
       explanation: "Blueberries are small and blue, and they grow on bushes.",
     },
   ],
+  "smoothie-bowl": [
+    {
+      question: "Which fruits did you slice for your smoothie bowl?",
+      answers: ["Banana and strawberry", "Carrot and cucumber", "Tomato and pepper"],
+      correct: 0,
+      explanation: "You sliced a banana and a strawberry. The strawberries make the smoothie pink!",
+    },
+    {
+      question: "What does blending do to the yogurt and berries?",
+      answers: ["Makes them hot", "Mixes them smooth", "Turns them blue"],
+      correct: 1,
+      explanation: "A blender spins very fast and mixes everything into a smooth, creamy smoothie.",
+    },
+  ],
+  "taco-bowl": [
+    {
+      question: "Which two veggies did you dice for your taco bowl?",
+      answers: ["Banana and grapes", "Tomato and bell pepper", "Bread and cheese"],
+      correct: 1,
+      explanation: "You diced a red tomato and a bell pepper to add color and crunch.",
+    },
+    {
+      question: "Which food in your bowl comes from a cob?",
+      answers: ["Corn", "Beans", "Rice"],
+      correct: 0,
+      explanation: "Corn kernels grow in rows on a cob. Beans grow in pods, and rice grows on tall grass.",
+    },
+  ],
+  "hummus-toast": [
+    {
+      question: "Which orange veggie did you cut into coins?",
+      answers: ["Cucumber", "Carrot", "Tomato"],
+      correct: 1,
+      explanation: "Carrots are orange and crunchy. They grow under the ground!",
+    },
+    {
+      question: "Hummus is made mostly from which food?",
+      answers: ["Chickpeas", "Strawberries", "Rice"],
+      correct: 0,
+      explanation: "Hummus is made from mashed chickpeas, a kind of bean full of plant protein.",
+    },
+  ],
   "fruit-kabobs": [
     {
       question: "Which two fruits did you slice for your kabobs?",

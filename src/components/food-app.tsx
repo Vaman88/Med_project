@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { LittleKitchen } from "./little-kitchen";
 import { ParentWizard } from "./parent-wizard";
 import { RoleChooser } from "./role-chooser";
-import { verifyParentPin } from "@/lib/parent-lock";
 import { CHILD_PROGRESS_KEY } from "@/lib/child-progress";
 import {
   FAMILY_KEY,
@@ -18,10 +17,7 @@ import { guestKitchenSchema } from "@/lib/guest-kitchen";
 export function FoodApp() {
   const [family, setFamily] = useState<Family | null>(null);
   const [setup, setSetup] = useState(false);
-  const [unlock, setUnlock] = useState(false);
   const [parentArea, setParentArea] = useState(false);
-  const [pinAttempt, setPinAttempt] = useState("");
-  const [pinError, setPinError] = useState("");
   const [loaded, setLoaded] = useState(false);
   const [role, setRole] = useState<"child" | "adult" | null>(null);
   const [notice, setNotice] = useState("");
@@ -86,7 +82,6 @@ export function FoodApp() {
     }
     setFamily(value);
     setSetup(false);
-    setUnlock(false);
     setParentArea(false);
   }
   function chooseChild() {
@@ -95,34 +90,17 @@ export function FoodApp() {
   }
   function chooseAdult() {
     setRole("adult");
-    if (family && family.age < 13) {
-      if (family.pinHash && family.pinSalt) setUnlock(true);
-      else setParentArea(true);
-    }
+    // No Parent PIN for now: a grown-up goes straight to the parent area.
+    if (family && family.age < 13) setParentArea(true);
   }
   function switchProfile() {
     setRole(null);
     setSetup(false);
-    setUnlock(false);
     setParentArea(false);
-    setPinAttempt("");
-    setPinError("");
   }
   function openSettings() {
-    if (family?.pinHash && family.pinSalt) setUnlock(true);
+    if (family) { setRole("adult"); setParentArea(true); }
     else setSetup(true);
-  }
-  async function checkPin() {
-    if (
-      family?.pinHash &&
-      family.pinSalt &&
-      (await verifyParentPin(pinAttempt, family.pinSalt, family.pinHash))
-    ) {
-      setUnlock(false);
-      setParentArea(true);
-      setPinAttempt("");
-      setPinError("");
-    } else setPinError("That PIN did not match. Try again.");
   }
   function forget() {
     try {
@@ -154,45 +132,12 @@ export function FoodApp() {
           {notice}
         </p>
       )}
-      {!role && !unlock && !setup ? (
+      {!role && !setup ? (
         <RoleChooser
           hasChildProfile={!!family}
           onChild={chooseChild}
           onAdult={chooseAdult}
         />
-      ) : unlock ? (
-        <main className="little-app parent-gate">
-          <form
-            onSubmit={(event) => {
-              event.preventDefault();
-              void checkPin();
-            }}
-          >
-            <span className="little-kicker">Parent area</span>
-            <h1>Grown-ups only</h1>
-            <p>Enter your Parent PIN to open the meal planner and family settings.</p>
-            <label>
-              Parent PIN
-              <input
-                type="password"
-                inputMode="numeric"
-                value={pinAttempt}
-                onChange={(event) => setPinAttempt(event.target.value)}
-                autoFocus
-              />
-            </label>
-            {pinError && <p role="alert">{pinError}</p>}
-            <button className="little-primary" type="submit">
-              Open parent area
-            </button>
-            <button
-              type="button"
-              onClick={switchProfile}
-            >
-              Back
-            </button>
-          </form>
-        </main>
       ) : setup ? (
         <>
           <ParentWizard

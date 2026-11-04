@@ -80,9 +80,9 @@ function play(r: LittleRecipe): { plan: Step[]; dish: DishState } {
 }
 
 test("there are sixteen recipes with the new ids, unique ids and photo paths", () => {
-  assert.equal(littleRecipes.length, 16);
-  assert.equal(new Set(littleRecipes.map((r) => r.id)).size, 16);
-  assert.equal(new Set(littleRecipes.map((r) => r.title)).size, 16);
+  assert.equal(littleRecipes.length, 19);
+  assert.equal(new Set(littleRecipes.map((r) => r.id)).size, 19);
+  assert.equal(new Set(littleRecipes.map((r) => r.title)).size, 19);
   for (const id of NEW_IDS) {
     const r = recipe(id);
     assert.ok(r, id);

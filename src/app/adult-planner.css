@@ -102,36 +102,6 @@
   .kitchen-app .meal-heading .meal-context { width: 100%; }
 }
 
-@media (prefers-color-scheme: dark) {
-  .kitchen-app {
-    --ink: #e8efe6; --muted: #aebdb1; --green: #9fd3ac; --blue: #2e6b52;
-    --cream: #131c17; --light: #1f2c24; --line: #2f4136;
-    --surface: #1a251f; --surface-soft: #172019; --surface-sage: #21322a; --field: #111a15; --field-line: #4d6455;
-    --peach: #5a3d2b; --peach-ink: #f4cfb4; --focus: #f0b968; --pill: #28392f; --shadow: 0 6px 22px #00000040;
-    color-scheme: dark;
-  }
-  .kitchen-app .button { color: #fff; border-color: var(--blue); background: var(--blue); }
-  .kitchen-app .button:hover { background: #3a7f63; border-color: #3a7f63; }
-  .kitchen-app .button.secondary { background: transparent; color: var(--green); border-color: var(--field-line); }
-  .kitchen-app .button.secondary:hover { background: var(--surface-sage); color: var(--green); }
-  .kitchen-app .button.danger { background: #b23a34; border-color: #b23a34; }
-  .kitchen-app .simple-nav button:hover:not(.active) { background: var(--surface-sage); }
-  .kitchen-app .kitchen-welcome { background: linear-gradient(135deg, #1f2f26, #2d2620); }
-  .kitchen-app .hero-photo, .kitchen-app footer { background: var(--surface-soft); }
-  .kitchen-app input::placeholder { color: #8da093; }
-  .kitchen-app .kitchen-budget .check-chip:has(input:checked) { background: #2a4636; border-color: var(--green); }
-  .kitchen-app .form-feedback { background: #3a3220; color: #f1dfb2; border-color: #5a4a26; }
-  .kitchen-app .basket-summary { background: var(--surface-sage); color: var(--ink); }
-  .kitchen-app .kitchen-disclosure[open] { border-top-color: var(--line); }
-  .kitchen-app .saved-chip { background: var(--surface-sage); }
-  .kitchen-app .preference.selected { background: var(--blue); color: #fff; }
-  .autocomplete-list { box-shadow: 0 14px 34px #00000066; }
-  .autocomplete-list li.active, .autocomplete-list li:hover { background: var(--surface-sage); }
-  .kitchen-app .section-icon { color: var(--green); }
-  .kitchen-app .pantry-panel .section-icon { color: var(--peach-ink); }
-  .kitchen-app .recipe-photo, .kitchen-app .kitchen-welcome img, .kitchen-app .hero-photo img { filter: brightness(.92); }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .kitchen-app .recipe-card, .kitchen-app input, .kitchen-app select { transition: none; }
   .kitchen-app .recipe-card:hover { transform: none; }
@@ -141,17 +111,9 @@
   .kitchen-app .recipe-card:hover { transform: none; }
 }
 
-@media (prefers-color-scheme: dark) {
-  .family-entry { background: #1f2c24; color: #dfe9dc; border-bottom: 1px solid #2f4136; }
-  .family-entry button { background: #2e6b52; }
-}
-
 .recipe-photo-fallback {
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
   width: 100%; padding: 12px; text-align: center;
   background: linear-gradient(135deg, #eef3e6, #f8ebdc); color: #4b5b43;
 }
 .recipe-photo-fallback span { font-size: 2.4rem; }
-@media (prefers-color-scheme: dark) {
-  .recipe-photo-fallback { background: linear-gradient(135deg, #2b3328, #332c25); color: #e3e8da; }
-}

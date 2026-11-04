@@ -15,6 +15,7 @@ import type { Fx, SceneProps } from "./cooking-scene";
 export const EXTRA_RECIPES: ReadonlySet<string> = new Set([
   "fruit-salad", "fruit-kabobs", "avocado-toast", "quesadilla", "veggie-wrap",
   "oatmeal-bowl", "banana-oat-cookies", "tomato-pasta", "egg-muffins", "veggie-fried-rice",
+  "smoothie-bowl", "taco-bowl", "hummus-toast",
 ]);
 
 type P = SceneProps & { fx: Fx };
@@ -101,9 +102,12 @@ function BowlShell({ children }: { children: ReactNode }) {
 function ExtraBowl({ recipe, plan, dish, step, fx, presenting }: P) {
   const id = recipe.id;
   const oatmeal = id === "oatmeal-bowl";
+  const smoothie = id === "smoothie-bowl";
   const stir = plan.find((s) => s.kind === "stir");
+  // The smoothie blends its first ingredients into a pink base; toppings stay where they are placed.
+  const blend = smoothie ? ease(stirAmount(dish, plan)) : 0;
   // The oatmeal was already stirred in the pot; only the other bowls mix here.
-  const f = oatmeal ? 0 : ease(stirAmount(dish, plan));
+  const f = oatmeal || smoothie ? 0 : ease(stirAmount(dish, plan));
   const angle = fx.stirAngle ?? (stir ? dish.stir[stir.id] ?? 0 : 0);
   const base = id === "banana-oat-cookies" ? "url(#fx-dough)" : id === "egg-muffins" ? "url(#fx-eggmix)" : null;
   const items = dish.drops.filter((d) => d.zone === "bowl");
@@ -124,6 +128,15 @@ function ExtraBowl({ recipe, plan, dish, step, fx, presenting }: P) {
             <path d="M 280 190 A 130 120 0 0 1 380 150" stroke="#fff" strokeWidth="8" fill="none" opacity=".35" strokeLinecap="round" />
           </g>
         )}
+        {smoothie && blend > 0.02 && (
+          <g opacity={Math.min(1, blend * 1.2)}>
+            <circle cx={BOWL.cx} cy={BOWL.cy} r={BOWL.rx - 14} fill="#f08aa6" />
+            <circle cx={BOWL.cx} cy={BOWL.cy - 3} r={BOWL.rx - 22} fill="#f6a9bd" />
+            <g transform={`rotate(${angle} ${BOWL.cx} ${BOWL.cy})`} fill="none" stroke="#fff" strokeWidth="5" strokeLinecap="round" opacity=".35">
+              <path d={`M ${BOWL.cx - 80} ${BOWL.cy} A 80 80 0 0 1 ${BOWL.cx} ${BOWL.cy - 80}`} />
+            </g>
+          </g>
+        )}
         {base && f > 0.02 && (
           <g opacity={Math.min(1, f * 1.3)}>
             <circle cx={BOWL.cx} cy={BOWL.cy} r={96 + f * 44} fill={base} />
@@ -137,7 +150,7 @@ function ExtraBowl({ recipe, plan, dish, step, fx, presenting }: P) {
         {items.map((d) => {
           const melt = MELT.has(d.asset);
           const at = melt ? { x: d.x, y: d.y } : mixed(d.id, f, d, 96, center);
-          const opacity = melt ? 1 - f * 0.92 : 1;
+          const opacity = smoothie && d.step === "blend-in" ? 1 - blend : melt ? 1 - f * 0.92 : 1;
           return (
             <g key={d.id}>
               {opacity > 0.5 && <FlatShadow x={at.x} y={at.y} r={22} />}
@@ -254,13 +267,14 @@ function RoundPlate({ r = 192 }: { r?: number }) {
 }
 
 function ExtraBread({ recipe, dish, step, fx, presenting }: P) {
-  const toast = recipe.id === "avocado-toast";
+  const toast = recipe.id === "avocado-toast" || recipe.id === "hummus-toast";
+  const avocado = recipe.id === "avocado-toast";
   const placed = dish.drops.some((d) => d.step === (toast ? "place-bread" : "place-tortilla"));
   const heat = heatOf(dish, "toast");
-  const cells = dish.paint[toast ? "spread-avocado" : "spread-hummus"] ?? [];
+  const cells = dish.paint[avocado ? "spread-avocado" : "spread-hummus"] ?? [];
   const cell = PAINT_AREA.size / PAINT_GRID;
-  const dark = toast ? "#7f9f3a" : "#d1ac72";
-  const light = toast ? "#b7d16c" : "#f3e0b4";
+  const dark = avocado ? "#7f9f3a" : "#d1ac72";
+  const light = avocado ? "#b7d16c" : "#f3e0b4";
   const toppings = dish.drops.filter((d) => d.zone === "pita" && !d.step.startsWith("place-"));
   const medium = step?.kind === "spread" ? step.medium : null;
   const glow = fx.cooking && !presenting;

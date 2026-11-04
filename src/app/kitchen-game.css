@@ -1480,51 +1480,7 @@
     width: 40px;
   }
 }
-@media (prefers-color-scheme: dark) {
-  .counter-app {
-    background: #202b23;
-    color: #edf1de;
-  }
-  .counter-task {
-    background: #2b382e;
-    border-color: #58654e;
-  }
-  .counter-task-icon {
-    background: #425638;
-    color: #f4f5dc;
-  }
-  .counter-label {
-    color: #f1c78e;
-  }
-  .counter-progress {
-    background: #526249;
-    border-color: #6f7c60;
-  }
-  .counter-task small {
-    color: #e8efdc;
-  }
-  .counter-shelf,
-  .counter-zone,
-  .counter-toolrack {
-    color: #283c31;
-  }
-  .counter-heading-actions button {
-    background: #314136;
-    color: #eef5dd;
-    border-color: #79896e;
-  }
-  .counter-app .real-recipe {
-    background: #354531;
-  }
-  .counter-win {
-    background: #354e36;
-    color: #f1f5de;
-    border-color: #769c6b;
-  }
-  .counter-app .little-footnote {
-    color: #e3e8d7;
-  }
-}
+
 /* Every kitchen destination stays present while the recipe changes. */
 .counter-workarea {
   grid-template-columns: 1.15fr 0.83fr 0.9fr 1fr;

@@ -1,0 +1,555 @@
+/*
+ * Theme — two looks chosen from docs/templates/template-sheet.html.
+ *
+ *  Child side  = K1 "Fruit Stand": warm cream page, a sun shape, chunky brown
+ *                outlines, and every dish on its own teal / orange / berry card
+ *                with the food served on a round white plate.
+ *  Adult side  = A1 "Editorial Cookbook": ivory paper, Fraunces serif headlines,
+ *                DM Sans body, a wine-red accent and hairline rules, like a food
+ *                magazine. It stays light in both light and dark system modes.
+ *
+ * Loaded last in layout.tsx so it layers over the older sheets.
+ */
+@import "@fontsource/fredoka/700.css";
+@import "@fontsource/fraunces/500.css";
+@import "@fontsource/fraunces/600.css";
+@import "@fontsource/fraunces/500-italic.css";
+@import "@fontsource/dm-sans/400.css";
+@import "@fontsource/dm-sans/500.css";
+@import "@fontsource/dm-sans/700.css";
+
+/* ============================== Role chooser ============================== */
+.rc-app {
+  gap: 36px;
+  background: linear-gradient(90deg, #fff6e5 0 50%, #fbf8f2 50% 100%);
+  color: #2d1b0f;
+}
+.rc-head {
+  padding: 10px 26px 14px; border-radius: 22px;
+  background: #fffaf0; border: 3px solid #2d1b0f; box-shadow: 5px 5px 0 #2d1b0f;
+}
+.rc-head h1 {
+  font-family: "Fredoka", var(--font-kitchen), sans-serif;
+  font-weight: 700; font-size: clamp(2rem, 4.4vw, 3rem); letter-spacing: -0.01em; line-height: 1.05;
+}
+.rc-head p { color: #6a4c38; opacity: 1; }
+.rc-kicker { color: #c9431f; letter-spacing: .14em; }
+.rc-grid { gap: 30px; width: min(860px, 100%); }
+.rc-card { min-height: 300px; padding: 28px; gap: 12px; transition: transform .18s ease, box-shadow .18s ease; }
+.rc-art { display: grid; place-items: center; width: 76px; height: 76px; border-radius: 50%; font-size: 2.4rem; }
+.rc-text { opacity: 1; }
+.rc-go { padding: 12px 20px; font-size: 1rem; }
+
+.rc-child {
+  background: #0b7f8a; color: #fff;
+  border: 3px solid #2d1b0f; border-radius: 28px; box-shadow: 0 8px 0 #2d1b0f;
+}
+.rc-child .rc-art { background: #fff; border: 5px solid #ffd23f; }
+.rc-child .rc-title { font-family: "Fredoka", sans-serif; font-weight: 700; font-size: 1.6rem; }
+.rc-child .rc-go { background: #fff; color: #2d1b0f; border-radius: 16px; font-weight: 800; box-shadow: 0 4px 0 #00000040; }
+.rc-child:hover { transform: translateY(-4px); box-shadow: 0 12px 0 #2d1b0f; }
+
+.rc-adult {
+  background: #fffdf9; color: #1f1a17;
+  border: 1px solid #e8e1d5; border-radius: 6px; box-shadow: 0 18px 40px #1f1a171a;
+}
+.rc-adult .rc-art { border-radius: 50%; background: #f5e6e3; border: 0; }
+.rc-adult .rc-title { font-family: "Fraunces", Georgia, serif; font-weight: 500; font-size: 1.8rem; letter-spacing: -.02em; }
+.rc-adult .rc-text { color: #6b625a; }
+.rc-adult .rc-go { background: #7a1f2b; color: #fff; border-radius: 999px; font-family: "DM Sans", sans-serif; font-weight: 700; font-size: .95rem; }
+.rc-adult:hover { transform: translateY(-4px); border-color: #7a1f2b; }
+
+.role-switch {
+  padding: 9px 16px; font-weight: 800;
+  border: 3px solid #2d1b0f; border-radius: 14px; box-shadow: 3px 3px 0 #2d1b0f;
+  background: #fff; color: #2d1b0f;
+}
+.role-switch:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #2d1b0f; }
+
+@media (max-width: 640px) {
+  .rc-app { background: #fff6e5; }
+}
+
+/* ========================= CHILD — Fruit Stand ============================ */
+.little-app {
+  --fs-cream: #fffaf2;
+  --fs-ink: #2d1b0f;
+  --fs-muted: #6a4c38;
+  --fs-sun: #ffd23f;
+  --fs-tomato: #c9431f;
+  --fs-tomato-edge: #8f2e14;
+  --fs-teal: #0b7f8a;
+  --fs-orange: #c4501a;
+  --fs-berry: #a61e6f;
+  --fs-plum: #5b3fa0;
+  --fs-card: #fffdf8;
+  position: relative;
+  overflow-x: clip;
+  color-scheme: light;
+  background: var(--fs-cream);
+  color: var(--fs-ink);
+}
+.little-app::before {
+  content: ""; position: absolute; z-index: 0; pointer-events: none;
+  right: -90px; top: -110px; width: 280px; height: 280px; border-radius: 50%;
+  background: var(--fs-sun);
+}
+.little-app > :is(header, main, form, section) { position: relative; z-index: 1; }
+.little-app h1, .little-app h2, .little-app h3, .little-brand { font-family: "Fredoka", var(--font-kitchen), sans-serif; font-weight: 700; }
+
+/* Header */
+.little-app .little-header { background: transparent; border-bottom: 0; min-height: 76px; }
+.little-app .little-brand { color: var(--fs-ink); font-size: 1.3rem; }
+.little-app .little-brand svg { color: var(--fs-tomato); }
+.little-app .little-brand b { background: var(--fs-tomato); color: #fff; border-radius: 9px; padding: 3px 9px; font-size: .72rem; }
+.little-app .child-nav { gap: 8px; }
+.little-app .child-nav button {
+  border: 3px solid var(--fs-ink); border-radius: 999px; background: #fff; color: var(--fs-ink);
+  font-weight: 800; box-shadow: none;
+}
+.little-app .child-nav button:hover { background: #fff1cf; }
+.little-app .child-nav button[aria-current="page"] { background: var(--fs-ink); color: var(--fs-sun); border-color: var(--fs-ink); box-shadow: none; }
+.little-app .little-header > button {
+  border: 3px solid var(--fs-ink) !important; border-radius: 999px !important;
+  background: #fff !important; color: var(--fs-ink) !important; font-weight: 800; box-shadow: none !important;
+}
+
+/* Greeting */
+.little-app .km { padding-top: 18px; }
+.little-app .km-hello h1 { color: var(--fs-ink) !important; font-size: clamp(30px, 4.4vw, 48px); line-height: 1.04; }
+.little-app .km-hello .km-sub { color: var(--fs-muted) !important; font-weight: 700; font-size: 18px; }
+.little-app .km h1 { color: var(--fs-ink); }
+.little-app .km-sub { color: var(--fs-muted); }
+
+/* Filter chips */
+.little-app .km-filters { gap: 10px; margin: 24px 0 26px; }
+.little-app .km-filters button,
+.little-app section .km-filters button {
+  border: 3px solid var(--fs-ink); border-radius: 999px; background: #fff; color: var(--fs-ink); font-weight: 800;
+}
+.little-app .km-filters button:hover { background: #fff1cf; }
+.little-app .km-filters button[aria-pressed="true"],
+.little-app section .km-filters button[aria-pressed="true"] { background: var(--fs-ink); border-color: var(--fs-ink); color: var(--fs-sun); }
+
+/* Dish cards: colored stall cards with a round plate */
+.little-app .km-grid { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 22px; }
+.little-app .km-card {
+  --stall: var(--fs-teal);
+  background: var(--stall); color: #fff;
+  border-radius: 28px; padding: 18px 16px 16px; box-shadow: 0 8px 0 #2d1b0f26;
+  overflow: visible; text-align: center;
+  transition: transform .16s ease, box-shadow .16s ease;
+}
+.little-app .km-card:nth-child(4n+2) { --stall: var(--fs-orange); }
+.little-app .km-card:nth-child(4n+3) { --stall: var(--fs-berry); }
+.little-app .km-card:nth-child(4n+4) { --stall: var(--fs-plum); }
+.little-app .km-card:hover { transform: translateY(-4px) rotate(-.4deg); box-shadow: 0 12px 0 #2d1b0f2e; }
+.little-app .km-photo,
+.little-app .km-card .ck-preview {
+  width: 72%; aspect-ratio: 1; margin: 0 auto; border-radius: 50%;
+  border: 7px solid #fff; box-shadow: 0 8px 0 #00000026; background: #fff; overflow: hidden;
+}
+.little-app .km-photo img { width: 100%; height: 100%; object-fit: cover; }
+.little-app .km-card .ck-preview img, .little-app .km-card .ck-preview svg { width: 100%; height: 100%; object-fit: cover; }
+.little-app .km-card-body { padding: 14px 4px 0; align-items: stretch; }
+.little-app .km-card h2 { color: #fff !important; font-size: 1.45rem; line-height: 1.1; }
+.little-app .km-meta { color: #fff; opacity: .95; justify-content: center; font-weight: 700; }
+.little-app .km-pantry { color: #fff; opacity: .92; }
+.little-app .km-card .little-primary {
+  background: #fff !important; color: var(--fs-ink) !important;
+  border: 0 !important; border-radius: 16px !important; box-shadow: 0 4px 0 #00000038 !important;
+  font-weight: 800; font-size: 1.05rem;
+}
+.little-app .km-card .little-primary:hover { background: #fff6dc !important; }
+.little-app .km-card .little-primary:active:not(:disabled) { transform: translateY(4px) !important; box-shadow: none !important; }
+.little-app .km-card button:focus-visible { outline: 3px solid var(--fs-sun); outline-offset: 3px; }
+
+/* Primary buttons everywhere else in the child side */
+.little-app .little-primary {
+  background: var(--fs-tomato) !important; color: #fff !important;
+  border: 0 !important; border-radius: 16px !important; box-shadow: 0 5px 0 var(--fs-tomato-edge) !important;
+  font-weight: 800;
+}
+.little-app .little-primary:hover { background: #b33a1a !important; }
+
+/* Empty states, My Chef, footnote */
+.little-app .little-empty { background: var(--fs-card); border: 3px dashed #d9c3a0; border-radius: 26px; color: var(--fs-ink); }
+.little-app .little-empty svg { color: var(--fs-tomato); }
+.little-app .little-kicker { color: var(--fs-tomato) !important; }
+.little-app .chef-stars { display: inline-flex; padding: 6px 14px; border-radius: 999px; background: var(--fs-sun); color: var(--fs-ink); font-weight: 800; }
+.little-app .chef-badges span { border: 3px solid var(--fs-ink) !important; border-radius: 999px !important; background: #fff !important; color: var(--fs-ink) !important; font-weight: 800; }
+.little-app .little-footnote { color: var(--fs-muted); }
+.little-app section button:not([class]) { border-color: var(--fs-ink); color: var(--fs-ink); }
+
+/* Parent setup wizard and PIN gate: same warm stall look */
+.little-app input:not([type=checkbox]):not([type=radio]),
+.little-app select {
+  border: 3px solid #e3cfae !important; border-radius: 14px !important; background: #fff !important; color: var(--fs-ink) !important;
+}
+.little-app input:focus-visible, .little-app select:focus-visible { outline: 3px solid var(--fs-teal) !important; outline-offset: 2px; border-color: var(--fs-teal) !important; }
+
+/* Cooking studio: cream + sun, tomato primary, outlined pills */
+.ck-app {
+  color-scheme: light;
+  --ck-bg: #fffaf2;
+  --ck-sage: #fff0c9;
+  --ck-ink: #2d1b0f;
+  --ck-muted: #6a4c38;
+  --ck-green: #c9431f;
+  --ck-green-dark: #8f2e14;
+  --ck-card: #fffdf8;
+  --ck-shadow: 0 8px 0 #2d1b0f1f;
+}
+.ck-app h1, .ck-app h2, .ck-app .ck-step-title, .ck-app .ck-title { font-family: "Fredoka", var(--font-kitchen), sans-serif; font-weight: 700; }
+.ck-app .ck-primary { border-radius: 16px; font-weight: 800; }
+.ck-app .ck-primary:disabled { background: #e8dccb; color: #7d6a58; box-shadow: none; }
+.ck-app .ck-secondary, .ck-app .ck-pill, .ck-app .ck-icon-btn { border: 3px solid #2d1b0f; background: #fff; box-shadow: none; }
+.ck-app .ck-progress li { height: 10px; border-radius: 99px; background: #ead9bd; }
+.ck-app .ck-progress li.done { background: #0b7f8a; }
+.ck-app .ck-progress li.current { background: #c9431f; }
+.ck-app .ck-frame, .ck-app .ck-card, .ck-app .ck-tool { border-radius: 24px; }
+
+/* ======================= ADULT — Editorial Cookbook ======================= */
+.kitchen-app {
+  --ink: #1f1a17;
+  --muted: #6b625a;
+  --green: #7a1f2b;          /* accent text (links, eyebrows, icons) */
+  --blue: #7a1f2b;           /* primary button fill */
+  --cream: #fbf8f2;          /* page */
+  --light: #f4eee4;
+  --line: #e8e1d5;
+  --white: #fffdf9;
+  --surface: #fffdf9;
+  --surface-soft: #f6f1e8;
+  --surface-sage: #f4eee4;
+  --field: #fffdf9;
+  --field-line: #d8cfc1;
+  --peach: #f5e6e3;
+  --peach-ink: #7a1f2b;
+  --pill: #f1ebe1;
+  --focus: #7a1f2b;
+  --shadow: none;
+  --serif: "Fraunces", Georgia, "Times New Roman", serif;
+  --sans: "DM Sans", var(--font-kitchen), system-ui, sans-serif;
+  color-scheme: light;
+  max-width: none;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--sans);
+}
+.kitchen-app > * { max-width: 1360px; margin-inline: auto; }
+.kitchen-app > .header, .kitchen-app > footer { max-width: none; }
+
+/* Utility strip above the planner */
+.family-entry {
+  background: #f4eee4 !important; color: #6b625a !important;
+  border: 0 !important; border-bottom: 1px solid #e8e1d5 !important;
+  min-height: 46px; padding: 6px 4.5% !important; font-size: 12px; font-family: "DM Sans", sans-serif;
+}
+.family-entry span { color: #6b625a !important; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+.family-entry button {
+  min-height: 32px !important; padding: 5px 14px !important;
+  border-radius: 999px !important; border: 1px solid #d8cfc1 !important;
+  background: #fffdf9 !important; color: #1f1a17 !important;
+  font-size: 12px !important; font-weight: 700 !important; box-shadow: none !important;
+}
+.family-entry button:hover { border-color: #7a1f2b !important; color: #7a1f2b !important; }
+.family-delete { background: #fbf8f2; }
+.family-delete button { color: #7a1f2b; }
+
+/* Header and navigation: masthead with underlined tabs */
+.kitchen-app .header { background: color-mix(in srgb, #fbf8f2 94%, transparent); border-bottom: 1px solid var(--line); }
+.kitchen-app .brand, .kitchen-app .brand-button { color: var(--ink); font-family: var(--serif); font-weight: 600; letter-spacing: -.02em; }
+.kitchen-app .brand svg { color: var(--green); }
+.kitchen-app .brand-tagline { font-family: var(--sans); color: var(--muted); }
+.kitchen-app .header-note { color: var(--muted); }
+.kitchen-app .simple-nav { background: transparent; border: 0; padding: 0; gap: 10px; }
+.kitchen-app .simple-nav button {
+  background: transparent; color: var(--muted); border-radius: 0; border-bottom: 2px solid transparent;
+  font-family: var(--sans); font-size: 14px; font-weight: 500;
+}
+.kitchen-app .simple-nav button.active { background: transparent; color: var(--ink); border-bottom-color: #7a1f2b; box-shadow: none; font-weight: 700; }
+.kitchen-app .simple-nav button:hover:not(.active) { background: transparent; color: var(--ink); }
+
+/* Type: magazine serif headlines, wine italics */
+.kitchen-app h1, .kitchen-app h2 { font-family: var(--serif); font-weight: 500; color: var(--ink); letter-spacing: -.02em; }
+.kitchen-app h1 { font-size: clamp(36px, 4.4vw, 58px); line-height: 1.02; }
+.kitchen-app h1 em { color: #7a1f2b; font-style: italic; }
+.kitchen-app h3 { color: var(--ink); }
+.kitchen-app .eyebrow { color: #7a1f2b; letter-spacing: .16em; font-weight: 700; }
+.kitchen-app p, .kitchen-app small, .kitchen-app .muted { color: var(--muted); }
+.kitchen-app a { color: #7a1f2b; }
+.kitchen-app label, .kitchen-app legend { color: var(--ink); }
+
+/* Buttons: wine pills and quiet outlines */
+.kitchen-app .button {
+  border-radius: 999px; background: var(--blue); border: 1px solid var(--blue); color: #fff;
+  font-family: var(--sans); font-weight: 700; font-size: 14px; box-shadow: none;
+}
+.kitchen-app .button:hover { background: #63182a; border-color: #63182a; }
+.kitchen-app .button.secondary { background: transparent; color: var(--ink); border-color: #cfc5b6; }
+.kitchen-app .button.secondary:hover { background: #f4eee4; color: #7a1f2b; border-color: #7a1f2b; }
+.kitchen-app .button.danger { background: #a3322b; border-color: #a3322b; }
+.kitchen-app .text-button { color: #7a1f2b; text-decoration-color: #d4b3b8; }
+.kitchen-app .text-button:hover { text-decoration-color: #7a1f2b; }
+.kitchen-app :focus-visible { outline-color: var(--focus) !important; }
+
+/* Surfaces: paper with hairlines, no heavy shadows */
+.kitchen-app .panel, .kitchen-app .resource-card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 6px; box-shadow: none; color: var(--ink);
+}
+.kitchen-app .guest-storage-note { background: transparent; border: 1px solid var(--line); border-radius: 4px; color: var(--muted); }
+.kitchen-app .kitchen-welcome, .kitchen-app .hero-photo { border-radius: 4px; border: 1px solid var(--line); background: var(--surface); box-shadow: none; }
+.kitchen-app .kitchen-welcome { background: #fffdf9; }
+.kitchen-app .kitchen-welcome h1 { font-size: clamp(32px, 3.6vw, 46px); }
+.kitchen-app .hero-photo p { color: var(--ink); background: var(--surface); }
+.kitchen-app .kitchen-how { border-top: 1px solid var(--line); }
+.kitchen-app .kitchen-how svg { color: #7a1f2b; }
+.kitchen-app .panel-heading { border-bottom-color: var(--line); }
+.kitchen-app .section-icon { border-radius: 50%; background: #f5e6e3; color: #7a1f2b; }
+.kitchen-app .pantry-panel .section-icon { background: #f5e6e3; color: #7a1f2b; }
+.kitchen-app .pantry-summary { background: var(--surface-soft); }
+.kitchen-app .pantry-list li { background: #fffdf9; border-color: var(--line); border-radius: 4px; }
+.kitchen-app .pantry-empty, .kitchen-app .empty-note { background: var(--surface-soft); border-color: #d8cfc1; color: var(--muted); }
+.kitchen-app .count-pill { background: #f1ebe1; color: #1f1a17; border-radius: 999px; }
+.kitchen-app .kitchen-budget { background: var(--surface); }
+.kitchen-app .basket-summary { background: #f4eee4; color: var(--ink); border-radius: 4px; }
+.kitchen-app .food-help-link { background: var(--surface); border-color: var(--line); color: #7a1f2b; border-radius: 4px; }
+.kitchen-app .food-help-link:hover { background: #f4eee4; }
+.kitchen-app .form-feedback { background: #fbf1dc; color: #5c4210; border: 1px solid #ead7a6; }
+.kitchen-app .field-error { color: #a3322b; }
+.kitchen-app .preview-note, .kitchen-app .price-note, .kitchen-app .account-setup-note, .kitchen-app .saved-chip { background: #f4eee4; color: var(--ink); }
+.kitchen-app details summary { color: #7a1f2b; }
+.kitchen-app footer { background: #f4eee4; border-top: 1px solid var(--line); color: var(--muted); }
+.kitchen-app footer .brand { color: var(--ink); }
+
+/* Fields */
+.kitchen-app input:not([type=checkbox]), .kitchen-app select, .kitchen-app textarea {
+  background: var(--field); color: var(--ink); border: 1px solid var(--field-line); border-radius: 4px; font-family: var(--sans);
+}
+.kitchen-app input::placeholder, .kitchen-app textarea::placeholder { color: #8a8077; }
+.kitchen-app input:not([type=checkbox]):hover, .kitchen-app select:hover { border-color: #a99d8d; }
+.kitchen-app input[type=checkbox] { accent-color: #7a1f2b; }
+.kitchen-app .check-chip, .kitchen-app .preference { background: #fffdf9; border-color: #d8cfc1; color: var(--ink); border-radius: 999px; }
+.kitchen-app .kitchen-budget .check-chip { background: #fffdf9; border-color: #d8cfc1; }
+.kitchen-app .kitchen-budget .check-chip:has(input:checked) { background: #f5e6e3; border-color: #7a1f2b; }
+.kitchen-app .preference.selected { background: #7a1f2b; border-color: #7a1f2b; color: #fff; }
+.kitchen-app .access-tabs, .kitchen-app .account-sections { background: #f1ebe1; }
+.kitchen-app .access-tabs .selected, .kitchen-app .account-sections .selected { background: #fffdf9; color: #1f1a17; }
+.kitchen-app .terms-scroll { background: #f6f1e8; border-color: var(--line); }
+
+/* Autocomplete dropdown and allergy menu */
+.kitchen-app .autocomplete-list, .kitchen-app .allergy-menu { background: #fffdf9; border-color: #d8cfc1; box-shadow: 0 14px 34px #1f1a1726; }
+.kitchen-app .autocomplete-list li { color: var(--ink); }
+.kitchen-app .autocomplete-list li.active, .kitchen-app .autocomplete-list li:hover,
+.kitchen-app .allergy-menu li:hover, .kitchen-app .allergy-menu .highlighted { background: #f4eee4; }
+.kitchen-app .autocomplete-list mark { background: #f5e6e3; color: #7a1f2b; }
+.kitchen-app .autocomplete-list .typed-row { color: #7a1f2b; border-top-color: var(--line); }
+
+/* Meal cards: big photo, serif title, small-caps meta — like a magazine index */
+.kitchen-app .recipe-card {
+  overflow: hidden; background: transparent; border: 0; border-top: 1px solid var(--line);
+  border-radius: 0; box-shadow: none; color: var(--ink); padding-top: 14px;
+}
+.kitchen-app .recipe-card:hover { transform: translateY(-2px); box-shadow: none; }
+.kitchen-app .recipe-card:hover h3 { color: #7a1f2b; }
+.kitchen-app .recipe-photo { border-radius: 3px; }
+.kitchen-app .recipe-card h3 { font-family: var(--serif); font-weight: 600; font-size: 22px; letter-spacing: -.01em; line-height: 1.15; }
+.kitchen-app .recipe-card ul, .kitchen-app .recipe-card ol, .kitchen-app .recipe-card li { color: var(--ink); }
+.kitchen-app .recipe-topline > span:first-child { background: transparent; border: 0; padding-inline: 0; color: #7a1f2b; letter-spacing: .12em; text-transform: uppercase; font-size: 11px; font-weight: 700; }
+.kitchen-app .recipe-facts span { background: transparent; color: #8a8077; border-radius: 0; padding-inline: 0; letter-spacing: .05em; text-transform: uppercase; font-size: 12px; }
+.kitchen-app .meal-heading .meal-context { background: var(--surface); border-color: var(--line); }
+.kitchen-app .recipe-photo-fallback { background: linear-gradient(135deg, #f4eee4, #f5e6e3); color: #6b625a; }
+
+/* Chat helper */
+.kitchen-app .chat-message { background: #f4eee4; color: var(--ink); }
+.kitchen-app .chat-message.user { background: #f5e6e3; }
+.kitchen-app .chat-prompts button { background: #fffdf9; border-color: #d8cfc1; color: #7a1f2b; }
+
+/* Account card */
+.kitchen-app .cloud-account {
+  --ink: #1f1a17; --muted: #6b625a;
+  background: var(--surface); color: #1f1a17; border: 1px solid var(--line); border-radius: 6px;
+}
+.kitchen-app .cloud-account p { color: #6b625a; }
+.kitchen-app .cloud-account label { color: #1f1a17; }
+.kitchen-app .cloud-account input:not([type=checkbox]) { background: #fffdf9; color: #1f1a17; border-color: #d8cfc1; }
+.kitchen-app .cloud-account .button { background: #7a1f2b; border-color: #7a1f2b; color: #fff; }
+.kitchen-app .cloud-account .button.secondary,
+.kitchen-app .cloud-account .button.secondary:hover { background: transparent; color: #1f1a17; border-color: #cfc5b6; }
+.kitchen-app .cloud-account .text-button { color: #7a1f2b; }
+.kitchen-app .cloud-account-confirm { background: #fbf8f2; border-color: var(--line); }
+.kitchen-app .cloud-account .cloud-account-error { color: #a3322b; }
+.kitchen-app .cloud-account .cloud-account-success { color: #2e6b44; }
+.cloud-account-loading { background: #fbf8f2; color: #6b625a; }
+
+/* ================ ADULT — Welcome Home layout (parent dashboard) ================ */
+.kitchen-app .header-settings {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 6px 14px;
+  border: 1px solid #d8cfc1; border-radius: 999px; background: #fffdf9; color: #1f1a17; font-weight: 600; font-size: 13.5px;
+}
+.kitchen-app .header-settings:hover, .kitchen-app .header-settings[aria-expanded="true"] { border-color: #7a1f2b; color: #7a1f2b; }
+.kitchen-app #kitchen-account { max-width: 980px; margin: 0 auto 24px; }
+
+.kitchen-app .welcome-hero { max-width: 860px; margin: 8px auto 0; text-align: center; }
+.kitchen-app .welcome-hero h1 { font-size: clamp(38px, 5vw, 62px); line-height: 1.02; margin: 4px 0 10px; }
+.kitchen-app .welcome-hero > p { font-size: 17px; margin-bottom: 26px; }
+.kitchen-app .welcome-add {
+  display: grid; grid-template-columns: minmax(0, 1fr) 104px 78px auto; align-items: center; gap: 4px;
+  max-width: 760px; margin: 0 auto; padding: 6px; text-align: left;
+  background: #fffdf9; border: 1px solid #d8cfc1; border-radius: 999px; box-shadow: 0 10px 30px #1f1a170f;
+}
+.kitchen-app .welcome-add:focus-within { border-color: #7a1f2b; box-shadow: 0 0 0 3px #7a1f2b1f, 0 10px 30px #1f1a170f; }
+.kitchen-app .welcome-add .food-autocomplete { margin: 0; }
+.kitchen-app .welcome-add .food-autocomplete > label,
+.kitchen-app .welcome-amount > :not(input) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.kitchen-app .welcome-add label { margin: 0; }
+.kitchen-app .welcome-add input:not([type=checkbox]), .kitchen-app .welcome-add select {
+  margin: 0; min-height: 46px; border: 0; background: transparent; border-radius: 999px; font-size: 16px; box-shadow: none;
+}
+.kitchen-app .welcome-add .food-autocomplete input { padding-left: 18px; }
+.kitchen-app .welcome-add .welcome-amount input, .kitchen-app .welcome-add select { border-left: 1px solid #e8e1d5; border-radius: 0; font-size: 14px; }
+.kitchen-app .welcome-add input:focus-visible, .kitchen-app .welcome-add select:focus-visible { outline: none !important; }
+.kitchen-app .welcome-add .button { min-height: 46px; padding: 10px 20px; gap: 6px; }
+.kitchen-app .welcome-add .autocomplete-list { min-width: min(420px, 90vw); }
+.kitchen-app .welcome-more { margin: 10px auto 0; font-size: 13px; }
+.kitchen-app .welcome-more summary { display: inline-block; min-height: 36px; color: #6b625a; font-weight: 500; }
+.kitchen-app .welcome-more[open] { max-width: 760px; padding: 4px 18px 14px; text-align: left; background: #fffdf9; border: 1px solid #e8e1d5; border-radius: 8px; }
+.kitchen-app .welcome-more-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.kitchen-app .welcome-more-grid label { margin: 6px 0 8px; font-size: 13px; }
+
+/* Pantry as removable chips */
+.kitchen-app .welcome-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 18px auto 0; max-width: 820px; }
+.kitchen-app .welcome-chips li {
+  display: inline-flex; align-items: center; gap: 0; padding: 0; border: 1px solid #d8cfc1; border-radius: 999px; background: #fffdf9;
+}
+.kitchen-app .welcome-chips li:hover { border-color: #7a1f2b; }
+.kitchen-app .welcome-chips .chip-main {
+  display: inline-flex; align-items: baseline; gap: 6px; min-height: 36px; padding: 5px 4px 5px 14px;
+  border: 0; background: transparent; color: #1f1a17; font-size: 14px; font-weight: 600; text-transform: capitalize;
+}
+.kitchen-app .welcome-chips .chip-main small { display: inline; font-size: 12px; font-weight: 400; color: #8a8077; text-transform: none; }
+.kitchen-app .welcome-chips .chip-remove {
+  display: grid; place-items: center; width: 32px; height: 32px; margin-right: 2px; border: 0; border-radius: 50%; background: transparent; color: #8a8077;
+}
+.kitchen-app .welcome-chips .chip-remove:hover { background: #f5e6e3; color: #7a1f2b; }
+.kitchen-app .welcome-chips li.unknown { border-style: dashed; opacity: .7; }
+.kitchen-app .welcome-empty { margin: 18px 0 0; color: #8a8077; font-size: 14px; }
+.kitchen-app .welcome-unknown { margin-top: 8px; color: #8a8077; }
+.kitchen-app .welcome-stat { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 4px 10px; margin: 14px 0 0; font-size: 14px; color: #6b625a; }
+.kitchen-app .welcome-stat strong { color: #1f1a17; }
+.kitchen-app .welcome-stat .text-button { min-height: 32px; padding: 0; font-size: 14px; }
+.kitchen-app .welcome-settings { max-width: 760px; margin: 16px auto 0; text-align: left; }
+
+/* Meal picks and recipe library rows */
+.kitchen-app .welcome-picks, .kitchen-app .recipe-library.compact { max-width: 1120px; margin: 44px auto 0; }
+.kitchen-app .welcome-rowhead { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding-bottom: 12px; margin-bottom: 18px; border-bottom: 1px solid #e8e1d5; }
+.kitchen-app .welcome-rowhead h2 { margin: 0; font-size: clamp(22px, 2.4vw, 28px); }
+.kitchen-app .welcome-rowhead .text-button { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; font-weight: 700; text-decoration: none; }
+.kitchen-app .welcome-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.kitchen-app .welcome-card, .kitchen-app .library-card {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 0; border: 0; background: transparent; color: #1f1a17; text-align: left; min-width: 0;
+}
+.kitchen-app .welcome-card .recipe-photo { width: 100%; aspect-ratio: 4 / 3; height: auto; object-fit: cover; border-radius: 3px; margin: 0 0 8px; }
+.kitchen-app .welcome-card strong, .kitchen-app .library-card strong { font: 600 19px/1.2 var(--serif); letter-spacing: -.01em; }
+.kitchen-app .welcome-card:hover strong, .kitchen-app .library-card:hover strong { color: #7a1f2b; }
+.kitchen-app .welcome-card-meta, .kitchen-app .library-card-meta { font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: #8a8077; }
+.kitchen-app .welcome-card small { color: #7a1f2b; font-size: 13px; }
+.kitchen-app .guest-storage-note.welcome-footnote { max-width: 1120px; margin: 56px auto 0; border: 0; border-top: 1px solid #e8e1d5; border-radius: 0; padding: 14px 0 0; background: transparent; font-size: 12.5px; }
+.kitchen-app .kitchen-toast {
+  position: fixed; left: 50%; bottom: 22px; z-index: 70; transform: translateX(-50%); width: max-content; max-width: calc(100vw - 32px);
+  margin: 0; padding: 10px 18px; border-radius: 999px; border: 0; background: #1f1a17; color: #fbf8f2; font-size: 14px; box-shadow: 0 12px 30px #1f1a1740;
+}
+
+/* Recipe library (TheMealDB) */
+.kitchen-app .library-search {
+  display: flex; align-items: center; gap: 8px; max-width: 760px; padding: 6px 6px 6px 18px;
+  background: #fffdf9; border: 1px solid #d8cfc1; border-radius: 999px; color: #8a8077;
+}
+.kitchen-app .library-search:focus-within { border-color: #7a1f2b; box-shadow: 0 0 0 3px #7a1f2b1f; }
+.kitchen-app .library-search input { flex: 1; margin: 0; min-height: 44px; border: 0 !important; background: transparent !important; font-size: 16px; }
+.kitchen-app .library-search input:focus-visible { outline: none; }
+.kitchen-app .library-search .button { min-height: 44px; }
+.kitchen-app .library-suggest { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 14px 0 0; font-size: 13px; color: #6b625a; }
+.kitchen-app .chip-button { min-height: 34px; padding: 4px 14px; border: 1px solid #d8cfc1; border-radius: 999px; background: #fffdf9; color: #1f1a17; font-size: 13px; text-transform: capitalize; }
+.kitchen-app .chip-button:hover, .kitchen-app .chip-button.on { border-color: #7a1f2b; color: #7a1f2b; background: #f5e6e3; }
+.kitchen-app .library-status { margin: 18px 0; color: #6b625a; font-size: 14px; }
+.kitchen-app .library-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 26px 22px; }
+.kitchen-app .recipe-library.compact .library-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.kitchen-app .library-card img { width: 100%; aspect-ratio: 1; height: auto; object-fit: cover; border-radius: 3px; margin-bottom: 8px; background: #f1ebe1; transition: transform .2s ease; }
+.kitchen-app .library-card:hover img { transform: scale(1.015); }
+.kitchen-app .library-card strong { font-size: 17px; }
+
+.kitchen-app .library-dialog { width: min(1040px, calc(100vw - 32px)); max-height: calc(100dvh - 40px); padding: 0; border: 0; border-radius: 8px; background: #fbf8f2; color: #1f1a17; box-shadow: 0 30px 80px #1f1a1759; }
+.kitchen-app .library-dialog::backdrop { background: #1f1a1773; }
+.kitchen-app .library-dialog-inner { position: relative; display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); }
+.kitchen-app .library-dialog-photo img { position: sticky; top: 0; display: block; width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; }
+.kitchen-app .library-dialog-body { padding: 30px 34px 30px; min-width: 0; }
+.kitchen-app .library-dialog-body h2 { font-size: clamp(28px, 3vw, 38px); line-height: 1.05; margin: 2px 0 12px; }
+.kitchen-app .library-dialog-body h3 { font: 600 18px var(--serif); margin: 22px 0 8px; padding-top: 14px; border-top: 1px solid #e8e1d5; }
+.kitchen-app .library-close { position: absolute; top: 12px; right: 12px; z-index: 2; display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid #d8cfc1; border-radius: 50%; background: #fffdf9; color: #1f1a17; }
+.kitchen-app .library-close:hover { border-color: #7a1f2b; color: #7a1f2b; }
+.kitchen-app .library-have { display: inline-block; margin: 0; padding: 5px 12px; border-radius: 999px; background: #f5e6e3; color: #7a1f2b; font-weight: 700; font-size: 13px; }
+.kitchen-app .library-ingredients { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 18px; }
+.kitchen-app .library-ingredients li { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #efe7da; font-size: 14px; margin: 0; }
+.kitchen-app .library-ingredients li svg { flex: none; color: #a99d8d; }
+.kitchen-app .library-ingredients li.owned svg { color: #2e6b44; }
+.kitchen-app .library-ingredients li span { flex: 1; min-width: 0; }
+.kitchen-app .library-ingredients li small { color: #8a8077; text-align: right; }
+.kitchen-app .library-steps { padding-left: 22px; margin: 0; }
+.kitchen-app .library-steps li { margin-bottom: 10px; font-size: 15px; line-height: 1.6; color: #1f1a17; }
+.kitchen-app .library-steps li::marker { color: #7a1f2b; font-weight: 700; }
+.kitchen-app .library-dialog .actions { margin-top: 18px; align-items: center; }
+.kitchen-app .library-dialog .actions .button { gap: 6px; }
+.kitchen-app .library-dialog .actions .text-button { display: inline-flex; align-items: center; gap: 4px; }
+.kitchen-app .library-dialog-body > small { margin-top: 14px; }
+
+@media (max-width: 900px) {
+  .kitchen-app .recipe-library.compact .library-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kitchen-app .library-dialog-inner { grid-template-columns: 1fr; }
+  .kitchen-app .library-dialog-photo img { position: static; aspect-ratio: 16 / 10; }
+}
+@media (max-width: 680px) {
+  .kitchen-app .welcome-add .food-autocomplete { grid-column: 1 / -1; }
+  .kitchen-app .welcome-add .welcome-amount input { border-left: 0; }
+  .kitchen-app .welcome-add .button { grid-column: 3; padding: 10px 12px; }
+  .kitchen-app .welcome-add { grid-template-columns: minmax(0, 1fr) 86px auto; border-radius: 18px; }
+  .kitchen-app .welcome-more-grid { grid-template-columns: 1fr; }
+  .kitchen-app .welcome-grid { grid-template-columns: 1fr; }
+  .kitchen-app .library-ingredients { grid-template-columns: 1fr; }
+  .kitchen-app .library-dialog-body { padding: 22px 18px; }
+  .kitchen-app .header-settings span { display: none; }
+}
+
+/* Amount-aware meal cards and recipe checks */
+.kitchen-app .recipe-amounts { margin: 10px 0 4px; padding: 10px 12px; border-left: 3px solid #7a1f2b; background: #f6f1e8; border-radius: 0 4px 4px 0; }
+.kitchen-app .recipe-amounts > strong { display: block; font-size: 13.5px; color: #1f1a17; margin-bottom: 4px; }
+.kitchen-app .recipe-amounts ul { list-style: none; margin: 0; padding: 0; }
+.kitchen-app .recipe-amounts li { display: flex; justify-content: space-between; gap: 10px; margin: 0; padding: 2px 0; font-size: 13px; color: #1f1a17; }
+.kitchen-app .recipe-amounts li small { display: inline; font-size: 12.5px; color: #6b625a; text-align: right; }
+.kitchen-app .recipe-amounts li.short small { color: #a3322b; }
+.kitchen-app .recipe-amounts > small { margin-top: 4px; font-size: 11.5px; }
+.kitchen-app .library-amount-note { margin: 10px 0 0; font-size: 13.5px; color: #6b625a; }
+.kitchen-app .library-ingredients li span em { display: block; font-style: normal; font-size: 11.5px; color: #2e6b44; }
+.kitchen-app .library-ingredients li.short span em { color: #a3322b; }
+.kitchen-app .library-ingredients li.short svg { color: #c07a2c; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rc-card, .little-app .km-card, .kitchen-app .recipe-card { transition: none; }
+  .rc-card:hover, .little-app .km-card:hover, .kitchen-app .recipe-card:hover { transform: none; }
+}
+@media print {
+  .kitchen-app, .kitchen-app .panel, .kitchen-app .recipe-card { background: #fff !important; color: #000 !important; box-shadow: none !important; }
+}
+
+/* Kids menu: which dishes the food settings hide, and why (one quiet line, opens for details) */
+.little-app .km-hidden { margin: -8px 0 18px; color: #6a4c38; font-size: 14px; font-weight: 600; }
+.little-app .km-hidden summary { display: inline-block; min-height: 32px; padding: 4px 0; cursor: pointer; text-decoration: underline dotted; }
+.little-app .km-hidden p { margin: 4px 0 8px; font-weight: 500; }
+.little-app .km-hidden button { padding: 4px 12px; border: 3px solid #2d1b0f; border-radius: 999px; background: #fff; color: #2d1b0f; font-weight: 800; }
+.little-app .km-card { position: relative; }
+.little-app .km-new {
+  position: absolute; top: 12px; left: 12px; z-index: 2; padding: 4px 12px; border-radius: 999px;
+  background: #ffd23f; color: #2d1b0f; border: 3px solid #2d1b0f; font-family: "Fredoka", sans-serif; font-weight: 700; font-size: 15px;
+  transform: rotate(-6deg); box-shadow: 0 3px 0 #2d1b0f;
+}

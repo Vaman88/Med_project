@@ -58,8 +58,11 @@ export function FoodAutocomplete({ label, value, onTextChange, onPick, inputRef,
 
   useEffect(() => {
     function outside(event: PointerEvent) { if (wrap.current && !wrap.current.contains(event.target as Node)) setOpen(false); }
+    // Focus moving elsewhere (Tab, a screen reader, or a script) closes the list too, so it never covers the next field.
+    function focusOutside(event: FocusEvent) { if (wrap.current && !wrap.current.contains(event.target as Node)) setOpen(false); }
     document.addEventListener('pointerdown', outside);
-    return () => document.removeEventListener('pointerdown', outside);
+    document.addEventListener('focusin', focusOutside);
+    return () => { document.removeEventListener('pointerdown', outside); document.removeEventListener('focusin', focusOutside); };
   }, []);
 
   const fresh = searchedFor === query && !!query;

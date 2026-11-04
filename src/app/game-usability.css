@@ -202,7 +202,4 @@
   .little-app .little-recipe > div { gap: 4px; }
   .little-app .little-recipe small { font-size: 12px; }
 }
-@media (prefers-color-scheme: dark) {
-  .counter-app:not(.assembly-app) .counter-task { color: #edf1de; }
-  .little-app .little-recipe small { color: #d2dcc5; }
-}
+

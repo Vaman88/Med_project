@@ -65,17 +65,4 @@
 }
 .little-app .km-card .little-primary:hover { background: #245640; }
 
-@media (prefers-color-scheme: dark) {
-  .little-app { background: #202b23; color: #edf1de; }
-  .little-app .little-header { background: #1a231d; border-color: #35443a; }
-  .little-app .little-footnote { color: #b3bdad; }
-  .little-app .km-empty button, .little-app .little-empty button, .little-app section button:not([class]) { color: #f3efe3; border-color: #86c7a0; }
-  .little-app .km h1, .little-app .km-card h2 { color: #f3efe3; }
-  .km-sub, .km-meta { color: #c4cdbf; }
-  .km-pantry { color: #b3bdad; }
-  .little-app .km-filters button { border-color: #46564b; background: #2a342d; color: #f3efe3; }
-  .little-app .km-filters button[aria-pressed="true"] { border-color: #86c7a0; background: #dff0d8; color: #1f3a2a; }
-  .km-card { background: #2a342d; box-shadow: 0 8px 26px rgb(0 0 0 / 35%); }
-  .km-photo, .km-card .ck-preview { background: #33403a; }
-  .little-app .km-card .little-primary { background: #3d8560; box-shadow: 0 4px 0 #2b6246; }
-}
+

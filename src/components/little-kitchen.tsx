@@ -25,6 +25,7 @@ import type { DishState } from "@/lib/cooking";
 import {
   recipeChoices,
   type Family,
+  littleRecipes,
   type LittleRecipe,
 } from "@/lib/little-kitchen";
 
@@ -44,7 +45,7 @@ export function LittleKitchen({
   const [recipe, setRecipe] = useState<LittleRecipe | null>(null);
   const [justSaved, setJustSaved] = useState<string | null>(null);
   const [category, setCategory] = useState<
-    "all" | "breakfast" | "lunch" | "sweet"
+    "all" | "breakfast" | "lunch" | "snack" | "sweet"
   >("all");
   const [destination, setDestination] = useState<"cook" | "recipes" | "chef">(
     "cook",
@@ -80,6 +81,14 @@ export function LittleKitchen({
     setJustSaved(id);
   };
   const choices = recipeChoices(family);
+  // Dishes the food settings hide, so a grown-up can see why a dish is missing.
+  const hidden = family.otherAllergies.trim() ? [] : littleRecipes.filter((item) => !choices.some((c) => c.recipe.id === item.id));
+  // The settings doing the hiding: allergies a hidden dish contains, plus Dairy-free / Gluten-free.
+  const hiddenBecause = [...new Set(hidden.flatMap((item) => [
+    ...item.allergens.filter((allergen) => family.allergies.includes(allergen as Family["allergies"][number])).map((allergen) => `${allergen} allergy`),
+    ...(family.dietary?.includes("Dairy-free") && item.allergens.includes("Milk") ? ["Dairy-free"] : []),
+    ...(family.dietary?.includes("Gluten-free") && item.allergens.some((allergen) => ["Wheat", "Oats"].includes(allergen)) ? ["Gluten-free"] : []),
+  ]))];
   const title = chefTitle(family.nickname);
   const visibleChoices = choices.filter(
     ({ recipe: item }) => category === "all" || item.category === category,
@@ -209,9 +218,9 @@ export function LittleKitchen({
               </div>
             </div>
             <div className="km-filters" role="group" aria-label="Kinds of dishes">
-              {(["all", "breakfast", "lunch", "sweet"] as const).map((item) => (
+              {(["all", "breakfast", "lunch", "snack", "sweet"] as const).map((item) => (
                 <button key={item} aria-pressed={category === item} onClick={() => setCategory(item)}>
-                  {item === "all" ? "All dishes" : item === "breakfast" ? "Breakfast" : item === "lunch" ? "Lunch & dinner" : "Sweet treats"}
+                  {item === "all" ? "All dishes" : item === "breakfast" ? "Breakfast" : item === "lunch" ? "Lunch & dinner" : item === "snack" ? "Snacks" : "Sweet treats"}
                 </button>
               ))}
             </div>
@@ -221,9 +230,19 @@ export function LittleKitchen({
                 settings before we can show recipes.
               </p>
             )}
+            {hidden.length > 0 && (
+              <details className="km-hidden">
+                <summary>
+                  {hidden.length} {hidden.length === 1 ? "dish is" : "dishes are"} hidden by food settings: {hiddenBecause.join(", ")}
+                </summary>
+                <p>{hidden.map((item) => item.title).join(", ")}.</p>
+                <button type="button" onClick={onSettings}>Change food settings</button>
+              </details>
+            )}
             <div className="km-grid">
               {visibleChoices.map(({ recipe: r, missing }) => (
                 <article className="km-card" key={r.id}>
+                  {r.isNew && <span className="km-new">New!</span>}
                   <div className="km-photo">
                     <FoodImage
                       src={r.image}

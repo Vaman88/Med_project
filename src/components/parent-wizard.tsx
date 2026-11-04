@@ -12,7 +12,6 @@ import {
   skinChoices,
   type Family,
 } from "@/lib/little-kitchen";
-import { createParentPin } from "@/lib/parent-lock";
 import { ChefAvatar } from "./chef-avatar";
 
 const steps = [
@@ -164,7 +163,7 @@ export function ParentWizard({
     initial?.allergyConfirmed ?? false,
   );
   const [parent, setParent] = useState(
-    Boolean(initial?.pinHash && initial?.pinSalt && initial.parentConfirmed),
+    Boolean(initial?.parentConfirmed),
   );
   const [budget, setBudget] = useState(initial?.weeklyBudget?.toString() ?? "");
   const [household, setHousehold] = useState(
@@ -180,7 +179,6 @@ export function ParentWizard({
   const [favorites, setFavorites] = useState<NonNullable<Family["favorites"]>>(
     initial?.favorites ?? [],
   );
-  const [pin, setPin] = useState("");
   const [error, setError] = useState("");
 
   function advance() {
@@ -225,15 +223,6 @@ export function ParentWizard({
       setError("Confirm you are a parent or guardian before saving.");
       return;
     }
-    if (!initial?.pinHash && !/^\d{4,8}$/.test(pin)) {
-      setStep(3);
-      setError("Create a 4–8 digit Parent PIN before saving.");
-      return;
-    }
-    const lock =
-      initial?.pinHash && initial.pinSalt
-        ? { pinSalt: initial.pinSalt, pinHash: initial.pinHash }
-        : await createParentPin(pin);
     const parsed = familySchema.safeParse({
       version: 1,
       age: Number(age),
@@ -250,7 +239,6 @@ export function ParentWizard({
       store,
       dietary,
       favorites: favorites.filter((food) => pantry.includes(food)),
-      ...lock,
     });
     if (!parsed.success) {
       setError(
@@ -317,8 +305,7 @@ export function ParentWizard({
           </div>
           <p className="wizard-privacy">
             Saved on this device. Food settings and budget stay in the parent
-            area. A Parent PIN keeps children out of ordinary settings; device
-            storage itself is not encrypted.
+            area. Device storage is not encrypted.
           </p>
         </aside>
         <form className="wizard-card" onSubmit={submit}>
@@ -560,19 +547,6 @@ export function ParentWizard({
                   ))}
                 </div>
               </fieldset>
-              {!initial?.pinHash && (
-                <label>
-                  Parent PIN (4–8 digits)
-                  <input
-                    type="password"
-                    inputMode="numeric"
-                    pattern="[0-9]{4,8}"
-                    value={pin}
-                    onChange={(e) => setPin(e.target.value)}
-                    autoComplete="new-password"
-                  />
-                </label>
-              )}
               <label className="wizard-confirm">
                 <input
                   type="checkbox"
@@ -601,14 +575,14 @@ export function ParentWizard({
                 Previous
               </button>
             )}
-            <button className={initial?.pinHash && step < 3 ? undefined : "little-primary"} type="submit">
+            <button className={initial && step < 3 ? undefined : "little-primary"} type="submit">
               {step === 3
                 ? initial
                   ? "Save kitchen"
                   : "Create kitchen"
                 : "Continue →"}
             </button>
-            {initial?.pinHash && step < 3 && (
+            {initial && step < 3 && (
               <button className="little-primary" type="button" onClick={() => void saveChanges()}>
                 Save changes
               </button>

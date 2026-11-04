@@ -21,7 +21,7 @@ const family: Family = {
 test("pantry controls readiness; no recipe is ready with missing ingredients", () => {
   assert.equal(
     recipeChoices(family).filter((c) => !c.missing.length).length,
-    16,
+    19,
   );
   assert.ok(
     recipeChoices({ ...family, pantry: [] }).every((c) => c.missing.length),

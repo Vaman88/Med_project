@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Healthy Steps — Template sheet</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=DM+Sans:wght@400;500;700&family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Fredoka:wght@500;600;700&family=Inter:wght@400;600;800&family=Lilita+One&family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+<style>
+  :root { --img: "../../public/images"; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: Inter, system-ui, sans-serif; background: #f2f1ee; color: #1b1b1b; }
+  .wrap { max-width: 1320px; margin: 0 auto; padding: 48px 32px 80px; }
+  .top h1 { font: 800 44px/1.05 "Bricolage Grotesque", Inter, sans-serif; letter-spacing: -.03em; margin: 0 0 10px; }
+  .top p { margin: 0; color: #555; max-width: 760px; font-size: 17px; line-height: 1.55; }
+  .side { margin-top: 56px; }
+  .side-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 22px; }
+  .side-head h2 { font: 800 30px "Bricolage Grotesque", sans-serif; margin: 0; letter-spacing: -.02em; }
+  .side-head span { color: #666; }
+  .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; }
+  .opt { background: #fff; border-radius: 22px; padding: 18px; box-shadow: 0 1px 2px #0000000d, 0 10px 30px #0000000f; }
+  .opt-head { display: flex; align-items: center; gap: 12px; padding: 4px 4px 14px; }
+  .code { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: #1b1b1b; color: #fff; font-weight: 800; }
+  .opt-head h3 { margin: 0; font-size: 19px; }
+  .opt-head small { display: block; color: #666; font-size: 13px; margin-top: 2px; }
+  .swatches { margin-left: auto; display: flex; gap: 5px; }
+  .swatches i { width: 20px; height: 20px; border-radius: 50%; border: 1px solid #0000001a; }
+  .frame { position: relative; height: 430px; border-radius: 14px; overflow: hidden; border: 1px solid #e3e3e3; }
+  .meta { padding: 14px 4px 2px; font-size: 13.5px; color: #444; line-height: 1.55; }
+  .meta b { color: #111; }
+  .meta a { color: #3355cc; }
+  .img { background-size: cover; background-position: center; }
+
+  /* ---------------- K1 Fruit Stand ---------------- */
+  .k1 { background: #fff6e5; font-family: Fredoka, sans-serif; color: #2d1b0f; }
+  .k1 .bar { position: relative; z-index: 1; display: flex; align-items: center; gap: 10px; padding: 14px 18px; }
+  .k1 .logo { font-weight: 700; font-size: 18px; }
+  .k1 .logo b { background: #ff5a36; color: #fff; padding: 2px 8px; border-radius: 8px; margin-left: 4px; font-size: 12px; }
+  .k1 .tabs { margin-left: auto; display: flex; gap: 6px; }
+  .k1 .tabs span { padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 600; background: #fff; border: 2px solid #2d1b0f; }
+  .k1 .tabs span.on { background: #2d1b0f; color: #ffd23f; }
+  .k1 .hello { margin: 4px 18px 0; display: flex; align-items: center; gap: 14px; }
+  .k1 .hello h4 { margin: 0; font-size: 26px; line-height: 1.05; }
+  .k1 .hello h4 em { font-style: normal; color: #ff5a36; }
+  .k1 .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 16px 18px; }
+  .k1 .card { border-radius: 22px; padding: 12px; color: #fff; position: relative; height: 270px; display: flex; flex-direction: column; }
+  .k1 .card .plate { width: 118px; height: 118px; border-radius: 50%; margin: 2px auto 10px; border: 6px solid #fff; box-shadow: 0 8px 0 #00000022; }
+  .k1 .card h5 { margin: 0; font-size: 17px; text-align: center; line-height: 1.1; }
+  .k1 .card p { margin: 4px 0 0; text-align: center; font-size: 12px; opacity: .9; }
+  .k1 .card button { margin-top: auto; font: 700 14px Fredoka; border: 0; border-radius: 14px; padding: 9px; background: #fff; color: #2d1b0f; box-shadow: 0 4px 0 #00000030; }
+  .k1 .c1 { background: #0e9aa7; } .k1 .c2 { background: #ff7b2e; } .k1 .c3 { background: #b4237a; }
+  .k1 .sun { position: absolute; right: -50px; bottom: -60px; width: 160px; height: 160px; border-radius: 50%; background: #ffd23f; }
+
+  /* ---------------- K2 Night Kitchen ---------------- */
+  .k2 { background: radial-gradient(circle at 80% 0%, #4b2a9b 0, transparent 50%), #1a1240; color: #fff; font-family: "Baloo 2", sans-serif; }
+  .k2 .bar { display: flex; align-items: center; padding: 14px 18px; gap: 10px; }
+  .k2 .logo { font-weight: 800; font-size: 19px; }
+  .k2 .logo span { color: #ffd84a; }
+  .k2 .stats { margin-left: auto; display: flex; gap: 8px; font-weight: 800; font-size: 14px; }
+  .k2 .stats span { background: #2a1f63; padding: 4px 10px; border-radius: 999px; }
+  .k2 .banner { margin: 2px 18px; padding: 14px 18px; border-radius: 18px; background: linear-gradient(100deg, #ff4fa3, #ff8a3d); box-shadow: 0 5px 0 #b02d6c; }
+  .k2 .banner small { font-weight: 800; letter-spacing: .1em; font-size: 11px; opacity: .9; }
+  .k2 .banner h4 { margin: 0; font-size: 22px; line-height: 1.1; }
+  .k2 .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 16px 18px; }
+  .k2 .card { background: #2a1f63; border-radius: 18px; overflow: hidden; border: 2px solid #3d3191; }
+  .k2 .card .ph { height: 116px; }
+  .k2 .card div.b { padding: 10px 12px 12px; }
+  .k2 .card h5 { margin: 0; font-size: 16px; line-height: 1.1; }
+  .k2 .stars { color: #ffd84a; font-size: 13px; margin: 3px 0 8px; }
+  .k2 .lvl { height: 6px; border-radius: 6px; background: #3d3191; overflow: hidden; margin-bottom: 9px; }
+  .k2 .lvl i { display: block; height: 100%; width: 60%; background: #5ef2c2; }
+  .k2 .card button { width: 100%; border: 0; border-radius: 12px; padding: 7px; font: 800 14px "Baloo 2"; background: #ffd84a; color: #1a1240; box-shadow: 0 4px 0 #c29a10; }
+
+  /* ---------------- K3 Sticker Book ---------------- */
+  .k3 { background: #fffdf6; background-image: linear-gradient(#efe9d8 1px, transparent 1px), linear-gradient(90deg, #efe9d8 1px, transparent 1px); background-size: 26px 26px; font-family: "Lilita One", sans-serif; color: #111; }
+  .k3 .bar { display: flex; align-items: center; gap: 10px; padding: 14px 18px; }
+  .k3 .logo { font-size: 20px; background: #ffe14d; border: 3px solid #111; padding: 2px 10px; border-radius: 10px; box-shadow: 3px 3px 0 #111; transform: rotate(-2deg); }
+  .k3 .tabs { margin-left: auto; display: flex; gap: 8px; font-family: Nunito, sans-serif; font-weight: 900; font-size: 12px; }
+  .k3 .tabs span { border: 3px solid #111; border-radius: 10px; padding: 4px 10px; background: #fff; box-shadow: 3px 3px 0 #111; }
+  .k3 .tabs .on { background: #6ec6ff; }
+  .k3 h4 { margin: 8px 18px 0; font-size: 28px; font-weight: 400; }
+  .k3 h4 span { background: #ff7eb6; padding: 0 8px; border: 3px solid #111; border-radius: 10px; }
+  .k3 .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 18px; }
+  .k3 .card { background: #fff; border: 3px solid #111; border-radius: 18px; box-shadow: 6px 6px 0 #111; padding: 10px; position: relative; }
+  .k3 .card:nth-child(2) { transform: rotate(1.2deg); } .k3 .card:nth-child(3) { transform: rotate(-1deg); }
+  .k3 .card .ph { height: 120px; border-radius: 10px; border: 3px solid #111; }
+  .k3 .card h5 { margin: 8px 0 2px; font-size: 18px; font-weight: 400; line-height: 1.05; }
+  .k3 .card p { margin: 0 0 8px; font: 800 12px Nunito; color: #444; }
+  .k3 .card button { width: 100%; font: 400 15px "Lilita One"; border: 3px solid #111; border-radius: 12px; padding: 6px; background: #7ee081; box-shadow: 3px 3px 0 #111; }
+  .k3 .badge { position: absolute; top: -12px; right: -10px; background: #ffe14d; border: 3px solid #111; border-radius: 50%; width: 44px; height: 44px; display: grid; place-items: center; font-size: 12px; transform: rotate(12deg); }
+
+  /* ---------------- K4 Sky Map ---------------- */
+  .k4 { background: linear-gradient(180deg, #7cc8ff 0%, #bfe6ff 55%, #fff1d6 100%); font-family: Fredoka, sans-serif; color: #12355b; }
+  .k4 .bar { display: flex; align-items: center; padding: 14px 18px; }
+  .k4 .logo { font-weight: 700; font-size: 18px; color: #fff; text-shadow: 0 2px 0 #3c8ed0; }
+  .k4 .stats { margin-left: auto; background: #fff; border-radius: 999px; padding: 5px 12px; font-weight: 700; font-size: 13px; box-shadow: 0 3px 0 #9fc9ea; }
+  .k4 .cloud { position: absolute; background: #fff; border-radius: 999px; opacity: .85; }
+  .k4 .map { position: relative; height: 360px; }
+  .k4 .path { position: absolute; inset: 0; }
+  .k4 .node { position: absolute; width: 96px; text-align: center; font-weight: 600; font-size: 13px; }
+  .k4 .node .disc { width: 84px; height: 84px; border-radius: 50%; margin: 0 auto 4px; border: 6px solid #fff; box-shadow: 0 6px 0 #5ea6dd; }
+  .k4 .node.done .disc { box-shadow: 0 6px 0 #f2a700, 0 0 0 4px #ffc533; }
+  .k4 .node.lock .disc { filter: grayscale(1) brightness(1.1); opacity: .7; }
+  .k4 .pop { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); background: #fff; border-radius: 18px; padding: 10px 16px; display: flex; gap: 12px; align-items: center; box-shadow: 0 5px 0 #9fc9ea; white-space: nowrap; }
+  .k4 .pop button { border: 0; border-radius: 12px; background: #ff7a45; color: #fff; font: 700 14px Fredoka; padding: 8px 16px; box-shadow: 0 4px 0 #c94f22; }
+
+  /* ---------------- A1 Editorial ---------------- */
+  .a1 { background: #fbf8f2; font-family: "DM Sans", sans-serif; color: #1f1a17; }
+  .a1 .bar { display: flex; align-items: center; padding: 14px 22px; border-bottom: 1px solid #e8e1d5; }
+  .a1 .logo { font: 700 22px Fraunces, serif; letter-spacing: -.02em; }
+  .a1 .nav { margin-left: auto; display: flex; gap: 18px; font-size: 13px; color: #6b625a; }
+  .a1 .nav .on { color: #1f1a17; border-bottom: 2px solid #7a1f2b; padding-bottom: 2px; }
+  .a1 .hero { display: grid; grid-template-columns: 1.1fr 1fr; gap: 18px; padding: 18px 22px 10px; align-items: center; }
+  .a1 .hero small { letter-spacing: .14em; font-size: 10.5px; color: #7a1f2b; font-weight: 700; }
+  .a1 .hero h4 { font: 500 34px/1.02 Fraunces, serif; margin: 6px 0 8px; letter-spacing: -.02em; }
+  .a1 .hero h4 em { color: #7a1f2b; }
+  .a1 .hero p { margin: 0 0 12px; color: #6b625a; font-size: 13px; }
+  .a1 .hero button { border: 0; background: #7a1f2b; color: #fff; border-radius: 999px; padding: 9px 18px; font: 700 13px "DM Sans"; }
+  .a1 .hero .ph { height: 168px; border-radius: 4px; }
+  .a1 .row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 10px 22px; border-top: 1px solid #e8e1d5; margin: 0 22px; padding-left: 0; padding-right: 0; }
+  .a1 .rc .ph { height: 92px; border-radius: 3px; }
+  .a1 .rc h5 { font: 600 15px/1.15 Fraunces, serif; margin: 7px 0 2px; }
+  .a1 .rc p { margin: 0; font-size: 11.5px; color: #8a8077; letter-spacing: .04em; text-transform: uppercase; }
+
+  /* ---------------- A2 Market Fresh ---------------- */
+  .a2 { background: #fff; font-family: "Bricolage Grotesque", sans-serif; color: #3a0f2e; }
+  .a2 .bar { display: flex; align-items: center; padding: 14px 20px; gap: 10px; }
+  .a2 .logo { font-weight: 800; font-size: 21px; color: #9c1f5f; }
+  .a2 .chips { margin-left: auto; display: flex; gap: 6px; }
+  .a2 .chips span { border: 1.5px solid #9c1f5f; color: #9c1f5f; border-radius: 999px; padding: 5px 11px; font-size: 12px; font-weight: 500; }
+  .a2 .chips span.on { background: #9c1f5f; color: #fff; }
+  .a2 h4 { margin: 4px 20px 2px; font-size: 28px; font-weight: 800; color: #0f4d3a; letter-spacing: -.02em; }
+  .a2 .sub { margin: 0 20px; color: #7a5a6c; font-size: 13px; }
+  .a2 .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 14px 20px; }
+  .a2 .card { border-radius: 20px; padding: 10px; }
+  .a2 .card .ph { height: 132px; border-radius: 14px; position: relative; }
+  .a2 .card .tag { position: absolute; top: 8px; right: 8px; background: #b9f0c8; color: #0f4d3a; border-radius: 999px; padding: 2px 8px; font-size: 11px; font-weight: 800; }
+  .a2 .card h5 { margin: 8px 2px 2px; font-size: 16px; font-weight: 800; line-height: 1.1; color: #9c1f5f; }
+  .a2 .card p { margin: 0 2px 8px; font-size: 12px; color: #6a4a5c; }
+  .a2 .card button { width: 100%; border: 0; border-radius: 999px; background: #9c1f5f; color: #fff; padding: 8px; font: 700 13px "Bricolage Grotesque"; }
+  .a2 .p1 { background: #ffd9c2; } .a2 .p2 { background: #ffe9a8; } .a2 .p3 { background: #f6d2f0; }
+
+  /* ---------------- A3 Bistro Dark ---------------- */
+  .a3 { background: #1c1410; color: #f3e7da; font-family: "DM Sans", sans-serif; }
+  .a3 .bar { display: flex; align-items: center; padding: 14px 22px; }
+  .a3 .logo { font: 500 22px Fraunces, serif; }
+  .a3 .nav { margin-left: auto; display: flex; gap: 16px; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: #b9a690; }
+  .a3 .hero { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 10px 22px; align-items: center; }
+  .a3 .hero small { color: #d98a4e; letter-spacing: .2em; font-size: 10px; }
+  .a3 .hero h4 { font: 500 36px/1 Fraunces, serif; margin: 8px 0 10px; }
+  .a3 .hero h4 em { color: #d98a4e; }
+  .a3 .hero button { background: #c8662f; color: #fff; border: 0; padding: 9px 16px; font: 700 12px "DM Sans"; letter-spacing: .06em; }
+  .a3 .hero button + button { background: transparent; border: 1px solid #6b5546; margin-left: 6px; }
+  .a3 .hero .ph { height: 170px; }
+  .a3 .row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 14px 22px; }
+  .a3 .tile { height: 128px; border-radius: 12px; position: relative; overflow: hidden; }
+  .a3 .tile::after { content: ""; position: absolute; inset: 0; background: linear-gradient(transparent 40%, #000000cc); }
+  .a3 .tile span { position: absolute; left: 10px; bottom: 8px; z-index: 1; font-weight: 700; font-size: 13px; }
+  .a3 .tile span small { display: block; font-weight: 400; color: #d9c5b0; font-size: 11px; }
+
+  /* ---------------- A4 Clean Grocery ---------------- */
+  .a4 { background: #f5f7fb; font-family: Inter, sans-serif; color: #0f1b2d; }
+  .a4 .bar { display: flex; align-items: center; gap: 12px; padding: 12px 20px; background: #fff; border-bottom: 1px solid #e3e8f0; }
+  .a4 .logo { font-weight: 800; font-size: 18px; color: #1f4fd8; }
+  .a4 .search { flex: 1; background: #f1f4f9; border-radius: 999px; padding: 8px 14px; font-size: 12px; color: #8592a6; }
+  .a4 .cart { background: #1f4fd8; color: #fff; border-radius: 999px; padding: 6px 12px; font-size: 12px; font-weight: 600; }
+  .a4 .layout { display: grid; grid-template-columns: 150px 1fr; gap: 16px; padding: 16px 20px; align-items: start; }
+  .a4 .sb { background: #fff; border: 1px solid #e3e8f0; border-radius: 14px; padding: 12px; font-size: 12px; }
+  .a4 .sb b { display: block; margin-bottom: 8px; font-size: 13px; }
+  .a4 .sb div { padding: 6px 8px; border-radius: 8px; color: #50607a; }
+  .a4 .sb .on { background: #e8eefc; color: #1f4fd8; font-weight: 700; }
+  .a4 .sb .budget { margin-top: 10px; background: #0f1b2d; color: #fff; border-radius: 10px; padding: 10px; }
+  .a4 .sb .budget strong { display: block; font-size: 20px; }
+  .a4 .sb .budget i { display: block; height: 6px; border-radius: 6px; background: #2b3b55; margin-top: 6px; overflow: hidden; }
+  .a4 .sb .budget i::before { content: ""; display: block; width: 62%; height: 100%; background: #3ddc97; }
+  .a4 .filters { display: flex; gap: 6px; margin-bottom: 10px; }
+  .a4 .filters span { background: #fff; border: 1px solid #d5dce8; border-radius: 999px; padding: 4px 10px; font-size: 11.5px; }
+  .a4 .filters span.on { background: #0f1b2d; color: #fff; border-color: #0f1b2d; }
+  .a4 .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .a4 .card { background: #fff; border: 1px solid #e3e8f0; border-radius: 14px; overflow: hidden; }
+  .a4 .card .ph { height: 104px; }
+  .a4 .card div.b { padding: 8px 10px 10px; }
+  .a4 .card h5 { margin: 0 0 4px; font-size: 13px; line-height: 1.2; }
+  .a4 .card p { margin: 0; font-size: 11px; color: #6b7a90; }
+  .a4 .card p b { color: #0f1b2d; font-size: 13px; }
+  .a4 .card button { margin-top: 8px; width: 100%; border: 1.5px solid #1f4fd8; color: #1f4fd8; background: #fff; border-radius: 999px; padding: 5px; font: 600 12px Inter; }
+
+  .note { margin-top: 48px; background: #1b1b1b; color: #eee; border-radius: 18px; padding: 22px 26px; font-size: 15px; line-height: 1.6; }
+  .note b { color: #fff; }
+  @media (max-width: 1100px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>Healthy Steps: template sheet</h1>
+    <p>Four directions for the <b>child side</b> and four for the <b>adult side</b>, each built from real apps on Mobbin and shown with your own food photos. Pick one from each side (for example, <b>K1 + A2</b>), or mix parts ("K3 cards with K1 colors"). Nothing will be built until you choose.</p>
+  </header>
+
+  <!-- ============================ KIDS ============================ -->
+  <section class="side">
+    <div class="side-head"><h2>Child side</h2><span>The cooking game and recipe menu</span></div>
+    <div class="grid">
+
+      <article class="opt">
+        <div class="opt-head"><span class="code">K1</span><div><h3>Fruit Stand</h3><small>Bright, warm and friendly. Each dish gets its own colored card.</small></div>
+          <div class="swatches"><i style="background:#fff6e5"></i><i style="background:#0e9aa7"></i><i style="background:#ff7b2e"></i><i style="background:#b4237a"></i><i style="background:#ffd23f"></i></div></div>
+        <div class="frame k1">
+          <div class="sun"></div>
+          <div class="bar"><span class="logo">Healthy Steps <b>little kitchen</b></span><div class="tabs"><span class="on">Cook</span><span>Cookbook</span><span>My Chef</span></div></div>
+          <div class="hello"><h4>Hey Chef Sunny!<br><em>What’s cooking?</em></h4></div>
+          <div class="cards">
+            <div class="card c1"><div class="plate img" style="background-image:url(../../public/images/child/pancakes.jpg)"></div><h5>Banana oat pancakes</h5><p>15 min · breakfast</p><button>Cook this →</button></div>
+            <div class="card c2"><div class="plate img" style="background-image:url(../../public/images/child/pizza.jpg)"></div><h5>Rainbow mini pizzas</h5><p>18 min · lunch</p><button>Cook this →</button></div>
+            <div class="card c3"><div class="plate img" style="background-image:url(../../public/images/child/parfait.jpg)"></div><h5>Berry yogurt parfait</h5><p>5 min · treat</p><button>Cook this →</button></div>
+          </div>
+        </div>
+        <p class="meta"><b>Feel:</b> a cheerful farmers-market stall. Teal, orange and berry cards, dishes shown as round plates, white 3D buttons. <b>Inspired by</b> <a href="https://mobbin.com/screens/8657a6b0-df00-4ce2-a3fe-c16987c3b8a8">Postmates recipes</a>, <a href="https://mobbin.com/screens/de3f7d7f-5d0c-4603-b313-84bcbe110833">Duolingo ABC library</a>, <a href="https://mobbin.com/screens/fc6d22e9-1024-46c1-8ee7-8a0422616fe0">Bears Gratitude</a>.</p>
+      </article>
+
+      <article class="opt">
+        <div class="opt-head"><span class="code">K2</span><div><h3>Night Kitchen Arcade</h3><small>A deep purple game world with stars, levels and glowing buttons.</small></div>
+          <div class="swatches"><i style="background:#1a1240"></i><i style="background:#2a1f63"></i><i style="background:#ff4fa3"></i><i style="background:#ffd84a"></i><i style="background:#5ef2c2"></i></div></div>
+        <div class="frame k2">
+          <div class="bar"><span class="logo">Healthy <span>Steps</span></span><div class="stats"><span>⭐ 24</span><span>🔥 3 days</span></div></div>
+          <div class="banner"><small>TODAY’S CHALLENGE</small><h4>Cook a breakfast dish for +10 stars</h4></div>
+          <div class="cards">
+            <div class="card"><div class="ph img" style="background-image:url(../../public/images/child/pancakes.jpg)"></div><div class="b"><h5>Banana pancakes</h5><div class="stars">★★★</div><div class="lvl"><i></i></div><button>PLAY</button></div></div>
+            <div class="card"><div class="ph img" style="background-image:url(../../public/images/child/bean-bowl.jpg)"></div><div class="b"><h5>Rainbow bean bowl</h5><div class="stars">★★☆</div><div class="lvl"><i style="width:35%"></i></div><button>PLAY</button></div></div>
+            <div class="card"><div class="ph img" style="background-image:url(../../public/images/child/brownies.jpg)"></div><div class="b"><h5>Bean brownies</h5><div class="stars">☆☆☆</div><div class="lvl"><i style="width:0"></i></div><button>PLAY</button></div></div>
+          </div>
+        </div>
+        <p class="meta"><b>Feel:</b> a real video game. Daily challenge banner, star ratings and progress bars on every dish. Best for ages 8–12. <b>Inspired by</b> <a href="https://mobbin.com/screens/bf5be757-1d6a-4dd8-9391-cee17bdfc1b3">Spotify Kids</a>, <a href="https://mobbin.com/screens/da76e869-826a-4636-a2b8-cc2cffb1bd75">Quizlet games</a>, <a href="https://mobbin.com/screens/5bcc0539-8d41-4cc1-b7fd-ef6e85129c34">Nibble</a>.</p>
+      </article>
+
+      <article class="opt">
+        <div class="opt-head"><span class="code">K3</span><div><h3>Sticker Book</h3><small>Thick black outlines and stickers on graph paper. Bold and crafty.</small></div>
+          <div class="swatches"><i style="background:#fffdf6"></i><i style="background:#111"></i><i style="background:#ffe14d"></i><i style="background:#6ec6ff"></i><i style="background:#ff7eb6"></i><i style="background:#7ee081"></i></div></div>
+        <div class="frame k3">
+          <div class="bar"><span class="logo">Healthy Steps</span><div class="tabs"><span class="on">COOK</span><span>COOKBOOK</span><span>MY CHEF</span></div></div>
+          <h4>Hey Chef <span>Sunny!</span></h4>
+          <div class="cards">
+            <div class="card"><div class="badge">NEW</div><div class="ph img" style="background-image:url(../../public/images/child/pizza.jpg)"></div><h5>Rainbow mini pizzas</h5><p>⏱ 18 min</p><button>Cook this!</button></div>
+            <div class="card"><div class="ph img" style="background-image:url(../../public/images/child/veggies.jpg)"></div><h5>Veggie dippers</h5><p>⏱ 10 min</p><button>Cook this!</button></div>
+            <div class="card"><div class="ph img" style="background-image:url(../../public/images/child/parfait.jpg)"></div><h5>Yogurt parfait</h5><p>⏱ 5 min</p><button>Cook this!</button></div>
+          </div>
+        </div>
+        <p class="meta"><b>Feel:</b> a scrapbook or sticker album. Hard offset shadows, slightly tilted cards, playful headline font. Very distinctive. <b>Inspired by</b> <a href="https://mobbin.com/screens/5cb0d729-fc77-417a-8509-9c110e9c9d54">timespent</a>, <a href="https://mobbin.com/screens/a01507b1-1677-4f3e-9a23-50cdf6807b44">Duolingo games</a>.</p>
+      </article>
+
+      <article class="opt">
+        <div class="opt-head"><span class="code">K4</span><div><h3>Sky Adventure Map</h3><small>Recipes become stops on a journey across the sky.</small></div>
+          <div class="swatches"><i style="background:#7cc8ff"></i><i style="background:#bfe6ff"></i><i style="background:#fff1d6"></i><i style="background:#ffc533"></i><i style="background:#ff7a45"></i></div></div>
+        <div class="frame k4">
+          <div class="bar"><span class="logo">Healthy Steps</span><span class="stats">⭐ 12 · 3 of 16 cooked</span></div>
+          <div class="map">
+            <div class="cloud" style="width:120px;height:34px;left:30px;top:30px"></div>
+            <div class="cloud" style="width:90px;height:28px;right:40px;top:110px"></div>
+            <svg class="path" viewBox="0 0 600 360" preserveAspectRatio="none"><path d="M70 60 C 200 40, 230 160, 300 150 S 470 70, 520 170 S 330 300, 200 260" fill="none" stroke="#fff" stroke-width="8" stroke-dasharray="2 16" stroke-linecap="round"/></svg>
+            <div class="node done" style="left:22px;top:14px"><div class="disc img" style="background-image:url(../../public/images/child/pancakes.jpg)"></div>Pancakes ★★★</div>
+            <div class="node done" style="left:250px;top:92px"><div class="disc img" style="background-image:url(../../public/images/child/parfait.jpg)"></div>Parfait ★★</div>
+            <div class="node" style="left:470px;top:118px"><div class="disc img" style="background-image:url(../../public/images/child/pizza.jpg)"></div>Mini pizzas</div>
+            <div class="node lock" style="left:150px;top:200px"><div class="disc img" style="background-image:url(../../public/images/child/brownies.jpg)"></div>🔒 Brownies</div>
+            <div class="pop"><span><b>Next stop:</b> Rainbow mini pizzas</span><button>Let’s cook!</button></div>
+          </div>
+        </div>
+        <p class="meta"><b>Feel:</b> an adventure. The recipe list becomes a map with a path you move along, so kids see their progress. This is the biggest change of the four because it changes the menu layout. <b>Inspired by</b> <a href="https://mobbin.com/screens/5bda2262-6340-4c2b-88ed-9bf108be1774">Ahead journey</a>, <a href="https://mobbin.com/screens/c9474d08-3ce5-4dad-b3b1-76bc6649c518">Duolingo path</a>.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============================ ADULT ============================ -->
+  <section class="side">
+    <div class="side-head"><h2>Adult side</h2><span>The meal planner, pantry and budget</span></div>
+    <div class="grid">
+
+      <article class="opt">
+        <div class="opt-head"><span class="code">A1</span><div><h3>Editorial Cookbook</h3><small>Ivory paper, serif headlines and a wine-red accent, like a food magazine.</small></div>
+          <div class="swatches"><i style="background:#fbf8f2"></i><i style="background:#1f1a17"></i><i style="background:#7a1f2b"></i><i style="background:#e8e1d5"></i></div></div>
+        <div class="frame a1">
+          <div class="bar"><span class="logo">Healthy Steps</span><div class="nav"><span class="on">My Kitchen</span><span>Meal Ideas</span><span>Food Help</span></div></div>
+          <div class="hero"><div><small>THIS WEEK’S PICK</small><h4>Good meals from <em>what you have.</em></h4><p>Three dinners from your pantry for $25.</p><button>Find meals →</button></div><div class="ph img" style="background-image:url(../../public/images/adult/black-bean-rice-bowls.jpg)"></div></div>
+          <div class="row">
+            <div class="rc"><div class="ph img" style="background-image:url(../../public/images/adult/chickpea-curry.jpg)"></div><h5>Chickpea curry</h5><p>30 min · $1.40/serving</p></div>
+            <div class="rc"><div class="ph img" style="background-image:url(../../public/images/adult/minestrone.jpg)"></div><h5>Minestrone</h5><p>40 min · $1.10/serving</p></div>
+            <div class="rc"><div class="ph img" style="background-image:url(../../public/images/adult/greek-chickpea-salad.jpg)"></div><h5>Greek chickpea salad</h5><p>15 min · no cooking</p></div>
+          </div>
+        </div>
+        <p class="meta"><b>Feel:</b> calm, trustworthy and grown-up, like NYT Cooking. Big photos, serif type, plenty of space. <b>Inspired by</b> <a href="https://mobbin.com/screens/72ae34fe-5c45-4bcb-9482-42aa4a7cd7d4">NYT Cooking</a>, <a href="https://mobbin.com/screens/73404785-5a9b-4e6f-8e2f-0121e8105b5d">Julienne</a>, <a href="https://mobbin.com/screens/e5ceb8e2-c846-43d4-ad45-44cde8c0aa7f">Blue Apron</a>.</p>
+      </article>
+
+      <article class="opt">
+        <div class="opt-head"><span class="code">A2</span><div><h3>Market Fresh</h3><small>Soft peach, butter and lilac cards with a plum accent. Friendly but grown-up.</small></div>
+          <div class="swatches"><i style="background:#ffd9c2"></i><i style="background:#ffe9a8"></i><i style="background:#f6d2f0"></i><i style="background:#9c1f5f"></i><i style="background:#0f4d3a"></i></div></div>
+        <div class="frame a2">
+          <div class="bar"><span class="logo">healthy steps</span><div class="chips"><span class="on">Plan</span><span>Pantry</span><span>Shop</span><span>Help</span></div></div>
+          <h4>Dinner, sorted.</h4><p class="sub">Ideas from your pantry · $25 left this week · 4 people</p>
+          <div class="cards">
+            <div class="card p1"><div class="ph img" style="background-image:url(../../public/images/adult/black-bean-rice-bowls.jpg)"><span class="tag">$0 extra</span></div><h5>Black bean rice bowls</h5><p>★ 4.8 · 20 min</p><button>Add to plan</button></div>
+            <div class="card p2"><div class="ph img" style="background-image:url(../../public/images/adult/french-toast.jpg)"><span class="tag">$3.20</span></div><h5>French toast & berries</h5><p>★ 4.6 · 15 min</p><button>Add to plan</button></div>
+            <div class="card p3"><div class="ph img" style="background-image:url(../../public/images/adult/lemon-herb-cod.jpg)"><span class="tag">$7.80</span></div><h5>Lemon herb cod</h5><p>★ 4.7 · 25 min</p><button>Add to plan</button></div>
+          </div>
+        </div>
+        <p class="meta"><b>Feel:</b> modern and appetizing, like a meal-kit app. Each card has a pastel color and the price tag sits on the photo. <b>Inspired by</b> <a href="https://mobbin.com/screens/80727abe-4e15-4961-b5d7-68ec004c7504">Cherrypick</a>, <a href="https://mobbin.com/screens/f64c026e-cadf-4f4d-a6c1-5bf4286c462c">Variant bakery</a>.</p>
+      </article>
+
+      <article class="opt">
+        <div class="opt-head"><span class="code">A3</span><div><h3>Dark Bistro</h3><small>Espresso brown with copper accents and full-photo tiles. Moody and premium.</small></div>
+          <div class="swatches"><i style="background:#1c1410"></i><i style="background:#3a2a20"></i><i style="background:#c8662f"></i><i style="background:#d98a4e"></i><i style="background:#f3e7da"></i></div></div>
+        <div class="frame a3">
+          <div class="bar"><span class="logo">Healthy Steps</span><div class="nav"><span>Kitchen</span><span>Meals</span><span>Help</span></div></div>
+          <div class="hero"><div><small>— YOUR PANTRY · YOUR BUDGET</small><h4>Where dinner <em>begins.</em></h4><button>FIND MEALS</button><button>ADD FOODS</button></div><div class="ph img" style="background-image:url(../../public/images/adult/chickpea-curry.jpg)"></div></div>
+          <div class="row">
+            <div class="tile img" style="background-image:url(../../public/images/adult/minestrone.jpg)"><span>Minestrone<small>40 min · $1.10</small></span></div>
+            <div class="tile img" style="background-image:url(../../public/images/adult/lemon-herb-cod.jpg)"><span>Lemon herb cod<small>25 min · $1.95</small></span></div>
+            <div class="tile img" style="background-image:url(../../public/images/adult/french-toast.jpg)"><span>French toast<small>15 min · $0.80</small></span></div>
+          </div>
+        </div>
+        <p class="meta"><b>Feel:</b> a restaurant at night. The food photos really stand out. Easy on the eyes, but different from the bright kids side. <b>Inspired by</b> <a href="https://mobbin.com/screens/715a96fa-90bc-4180-b8ba-1342b060bd0f">CREME</a>, <a href="https://mobbin.com/screens/42bf0271-a04b-4d02-b3b6-8b59f981ceb0">Spice &amp; Crumb</a>.</p>
+      </article>
+
+      <article class="opt">
+        <div class="opt-head"><span class="code">A4</span><div><h3>Clean Grocery</h3><small>Crisp white with cobalt blue, a sidebar and a budget tracker. Practical and quick.</small></div>
+          <div class="swatches"><i style="background:#f5f7fb"></i><i style="background:#ffffff"></i><i style="background:#1f4fd8"></i><i style="background:#0f1b2d"></i><i style="background:#3ddc97"></i></div></div>
+        <div class="frame a4">
+          <div class="bar"><span class="logo">Healthy Steps</span><span class="search">🔍 Search 350 foods and 90 meals</span><span class="cart">🛒 Basket · $15.50</span></div>
+          <div class="layout">
+            <div class="sb"><b>Planner</b><div>My pantry</div><div class="on">Meal ideas</div><div>Grocery list</div><div>Food help</div><div class="budget">Weekly budget<strong>$9.50 left</strong><i></i></div></div>
+            <div><div class="filters"><span class="on">Make it now</span><span>Under $2</span><span>No cooking</span><span>Vegetarian</span></div>
+              <div class="cards">
+                <div class="card"><div class="ph img" style="background-image:url(../../public/images/adult/black-bean-rice-bowls.jpg)"></div><div class="b"><h5>Black bean rice bowls</h5><p>20 min · <b>$0.95</b>/serving</p><button>+ Add to plan</button></div></div>
+                <div class="card"><div class="ph img" style="background-image:url(../../public/images/adult/greek-chickpea-salad.jpg)"></div><div class="b"><h5>Greek chickpea salad</h5><p>15 min · <b>$1.30</b>/serving</p><button>+ Add to plan</button></div></div>
+                <div class="card"><div class="ph img" style="background-image:url(../../public/images/adult/chickpea-curry.jpg)"></div><div class="b"><h5>Chickpea curry</h5><p>30 min · <b>$1.40</b>/serving</p><button>+ Add to plan</button></div></div>
+              </div></div>
+          </div>
+        </div>
+        <p class="meta"><b>Feel:</b> a shopping tool that helps you get things done. Budget is always visible, filters sit up top, and price per serving is the headline. <b>Inspired by</b> <a href="https://mobbin.com/screens/f2d92f38-9d95-4d17-bacd-c7dc18101440">Walmart recipes</a>, <a href="https://mobbin.com/screens/d791070c-0b67-4d8c-b211-cd244cd6018b">Instacart</a>, <a href="https://mobbin.com/screens/605d36eb-111f-4afb-a160-c68de1b1eacb">HelloFresh</a>.</p>
+      </article>
+    </div>
+  </section>
+
+  <div class="note"><b>How to choose:</b> reply with one child code and one adult code, for example <b>“K1 + A1”</b>. You can also mix, for example <b>“K2 but with K1’s colors”</b> or <b>“A4 layout with A1 fonts”</b>. Whatever you pick will also cover the cooking game, the parent setup, the PIN screen, the “Who is cooking today?” screen and dark mode. Prices and stats shown here are placeholders for layout only.</div>
+</div>
+</body>
+</html>

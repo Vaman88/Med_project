@@ -50,7 +50,7 @@ async function setup(page: Page, age = 7, allergy?: string, info?: TestInfo) {
     })
     .check();
   await page.getByRole("button", { name: /Continue/ }).click();
-  await page.getByRole("textbox", { name: "Parent PIN" }).fill("1234");
+  await expect(page.getByRole("textbox", { name: /Parent PIN/ })).toHaveCount(0);
   await page
     .getByRole("checkbox", { name: "I am a parent or guardian", exact: false })
     .check();
@@ -75,21 +75,15 @@ async function start(page: Page, title: string) {
 }
 async function openSettings(page: Page) {
   await page.getByRole("button", { name: "Parent settings" }).click();
-  await page.getByRole("textbox", { name: "Parent PIN" }).fill("1234");
-  await page.getByRole("button", { name: "Open parent area" }).click();
   await page.getByRole("button", { name: "Edit child profile" }).click();
 }
 
-test("parent PIN opens the original planner and keeps its changes", async ({ page }) => {
+test("parent settings open the original planner without a PIN and keep its changes", async ({ page }) => {
   await setup(page);
   await page.getByRole("button", { name: "Parent settings" }).click();
-  await page.getByRole("textbox", { name: "Parent PIN" }).fill("0000");
-  await page.getByRole("button", { name: "Open parent area" }).click();
-  await expect(page.getByText("That PIN did not match. Try again.")).toBeVisible();
-  await page.getByRole("textbox", { name: "Parent PIN" }).fill("1234");
-  await page.getByRole("button", { name: "Open parent area" }).click();
   await expect(page.getByRole("heading", { name: "What's in your kitchen today?" })).toBeVisible();
   await expect(page.getByText("Black beans", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Change budget and family" }).click();
   await page.getByRole("textbox", { name: "Weekly grocery budget (USD)" }).fill("72");
   await page.getByRole("textbox", { name: "Weekly grocery budget (USD)" }).blur();
   await page.getByRole("combobox", { name: "Food name" }).fill("Carrots");
@@ -104,9 +98,8 @@ test("parent PIN opens the original planner and keeps its changes", async ({ pag
   await asChild(page);
   await expect(page.getByRole("heading", { name: /Hey, Chef Sunny/ })).toBeVisible();
   await page.getByRole("button", { name: "Parent settings" }).click();
-  await page.getByRole("textbox", { name: "Parent PIN" }).fill("1234");
-  await page.getByRole("button", { name: "Open parent area" }).click();
   await expect(page.locator(".pantry-list").getByText("Carrots", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Change budget and family" }).click();
   await expect(page.getByRole("textbox", { name: "Weekly grocery budget (USD)" })).toHaveValue("72");
 });
 
@@ -183,7 +176,7 @@ async function finishRecipe(page: Page) {
 }
 
 test("every dish plays through the cooking game to a finished dish", async ({ page }, info) => {
-  // Sixteen dishes, each played step by step with buttons only.
+  // Every dish, each played step by step with buttons only.
   test.setTimeout(900000);
   await page.emulateMedia({ reducedMotion: "reduce" });
   await seedAllRecipes(page);
@@ -404,24 +397,19 @@ test("the role chooser sends a child and an adult to the right place", async ({ 
   await asChild(page);
   await expect(page.getByRole("heading", { name: /Hey, Chef Sunny/ })).toBeVisible();
   await page.getByRole("button", { name: "Switch profile" }).click();
-  // A child profile exists, so the adult choice asks for the Parent PIN.
+  // A child profile exists; with no Parent PIN the adult choice opens the parent area directly.
   await page.getByRole("button", { name: /Continue as an adult/ }).click();
-  await expect(page.getByRole("heading", { name: "Grown-ups only" })).toBeVisible();
-  await page.getByRole("textbox", { name: "Parent PIN" }).fill("0000");
-  await page.getByRole("button", { name: "Open parent area" }).click();
-  await expect(page.getByText("That PIN did not match. Try again.")).toBeVisible();
-  await page.getByRole("textbox", { name: "Parent PIN" }).fill("1234");
-  await page.getByRole("button", { name: "Open parent area" }).click();
+  await expect(page.getByRole("heading", { name: "Grown-ups only" })).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "What's in your kitchen today?" })).toBeVisible();
   await page.getByRole("button", { name: "Switch profile" }).click();
   await expect(page.getByRole("heading", { name: "Who is cooking today?" })).toBeVisible();
 });
 
-test("the menu shows all sixteen dishes and filters them by kind", async ({ page }) => {
+test("the menu shows all nineteen dishes and filters them by kind", async ({ page }) => {
   await seedAllRecipes(page);
-  expect(kidsCount).toBe(16);
-  const labels = { breakfast: "Breakfast", lunch: "Lunch & dinner", sweet: "Sweet treats" } as const;
-  for (const kind of ["breakfast", "lunch", "sweet"] as const) {
+  expect(kidsCount).toBe(19);
+  const labels = { breakfast: "Breakfast", lunch: "Lunch & dinner", snack: "Snacks", sweet: "Sweet treats" } as const;
+  for (const kind of ["breakfast", "lunch", "snack", "sweet"] as const) {
     await page.getByRole("button", { name: labels[kind] }).click();
     await expect(page.locator(".km-card")).toHaveCount(littleRecipes.filter((r) => r.category === kind).length);
   }
@@ -429,7 +417,7 @@ test("the menu shows all sixteen dishes and filters them by kind", async ({ page
   await expect(page.locator(".km-card")).toHaveCount(kidsCount);
   for (const title of ["Rainbow fruit salad", "Avocado tomato toast", "Cheesy bean quesadilla", "Crunchy veggie wraps",
     "Berry banana oatmeal bowl", "Banana oat cookies", "Cozy tomato pasta", "Mini veggie egg muffins",
-    "Rainbow fruit kabobs", "Veggie fried rice"])
+    "Rainbow fruit kabobs", "Veggie fried rice", "Pink power smoothie bowl", "Rainbow taco bowl", "Crunchy garden hummus toast"])
     await expect(page.locator(".km-card h2", { hasText: title })).toHaveCount(1);
 });
 

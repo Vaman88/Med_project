@@ -734,7 +734,7 @@ export function CookingScene(props: SceneProps) {
     : <PanScene {...props} fx={fx} />);
   return (
     <svg className="ck-scene" viewBox={`${view.x} ${view.y} ${view.w} ${view.h}`} preserveAspectRatio="xMidYMid meet"
-      role="img" aria-label={`${props.recipe.title}: your ${props.surface === "glass" ? "glass" : props.surface === "pan" ? "pan" : props.surface === "bowl" ? "bowl" : props.surface === "plate" ? "plate" : props.surface === "pita" ? (props.recipe.id === "pizza" ? "pizza" : props.recipe.id === "avocado-toast" ? "toast" : "tortilla") : "cutting board"}`}>
+      role="img" aria-label={`${props.recipe.title}: your ${props.surface === "glass" ? "glass" : props.surface === "pan" ? "pan" : props.surface === "bowl" ? "bowl" : props.surface === "plate" ? "plate" : props.surface === "pita" ? (props.recipe.id === "pizza" ? "pizza" : (props.recipe.id === "avocado-toast" || props.recipe.id === "hummus-toast") ? "toast" : "tortilla") : "cutting board"}`}>
       <defs>
         <radialGradient id="ck-heat" cx="0.5" cy="0.5" r="0.5">
           <stop offset="0.55" stopColor="#ffb257" stopOpacity="0" />

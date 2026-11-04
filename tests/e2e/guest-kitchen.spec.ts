@@ -4,8 +4,10 @@ test('guest kitchen saves custom food and budget, reloads and clears information
   await page.goto('/');await page.getByRole('button',{name:/Continue as an adult/}).click();await page.getByRole('button',{name:'Try Meal Planner'}).click();
   await page.getByRole('combobox',{name:'Food name'}).fill('Frozen corn');
   await page.getByRole('button',{name:'Add food',exact:true}).click();
+  await page.getByRole('button',{name:'Change budget and family'}).click();
   await page.getByRole('textbox',{name:'Weekly grocery budget (USD)'}).fill('0');
   await page.reload();await page.getByRole('button',{name:/Continue as an adult/}).click();await expect(page.locator('.pantry-list')).toContainText('Frozen corn');
+  await page.getByRole('button',{name:'Change budget and family'}).click();
   await expect(page.getByRole('textbox',{name:'Weekly grocery budget (USD)'})).toHaveValue('0');
   await page.getByRole('button',{name:'Remove Frozen corn'}).click();await expect(page.locator('.pantry-list')).toHaveCount(0);
   await page.getByRole('button',{name:'Add sample pantry'}).click();
@@ -18,6 +20,7 @@ test('guest kitchen saves custom food and budget, reloads and clears information
 
 test('guest family allergies exclude peanuts and unknown amounts do not offset purchases',async({page})=>{
   await page.goto('/');await page.getByRole('button',{name:/Continue as an adult/}).click();await page.getByRole('button',{name:'Try a sample pantry'}).click();
+  await page.getByRole('button',{name:'Change budget and family'}).click();
   await page.getByText('Allergies and family food needs',{exact:true}).click();
   const allergy=page.getByRole('combobox',{name:'Food allergy',exact:true});await allergy.fill('pea');await allergy.press('ArrowDown');await allergy.press('Enter');
   await page.getByRole('button',{name:'Find meals',exact:true}).click();

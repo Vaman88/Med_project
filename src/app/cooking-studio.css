@@ -500,19 +500,4 @@
 
 /* Dark theme: the chrome goes dark; the lit counter and food stay light so
    the food keeps its natural colors. */
-@media (prefers-color-scheme: dark) {
-  .ck-app {
-    --ck-ink: #f3efe3;
-    --ck-muted: #c4cdbf;
-    background: linear-gradient(180deg, #2a3a2f 0, #1f2a23 190px);
-  }
-  .ck-app .ck-icon-btn, .ck-app .ck-pill, .ck-app .ck-chip, .ck-app .ck-answer,
-  .ck-app .ck-secondary, .ck-app .ck-card { color: #2f3a30; }
-  .ck-app .ck-link { color: #bfe3cc; }
-  .ck-card .ck-link { color: #245640; }
-  .ck-card .ck-note, .ck-card p { color: #4a574a; }
-  .ck-progress li { background: rgb(243 239 227 / 22%); }
-  .ck-progress li.done { background: #86c7a0; }
-  .ck-meter { background: rgb(243 239 227 / 22%); }
-  .ck-stage-wrap .ck-stage { box-shadow: 0 8px 28px rgb(0 0 0 / 40%); }
-}
+

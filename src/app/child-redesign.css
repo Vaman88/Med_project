@@ -1325,23 +1325,4 @@
   font-weight: 700;
 }
 .parent-gate [role="alert"] { color: #a12b26; }
-@media (prefers-color-scheme: dark) {
-  .parent-gate form {
-    --ink: #edf1de;
-    color-scheme: dark;
-    background: #2b382e;
-    border: 1px solid #627057;
-  }
-  .parent-gate .little-kicker { color: #ebbf92; }
-  .parent-gate input {
-    color: #edf1de;
-    background: #202b23;
-    border-color: #8a9e8c;
-  }
-  .parent-gate form > button:not(.little-primary) {
-    background: #354531;
-    color: #edf1de;
-    border-color: #8a9e8c;
-  }
-  .parent-gate [role="alert"] { color: #ffb4ab; }
-}
+

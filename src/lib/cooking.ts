@@ -232,6 +232,57 @@ export function planFor(recipe: LittleRecipe): Step[] {
           hint: "Drag the spoon around the bowl in a circle, or tap the bowl to turn it a quarter at a time." },
         quiz(1, "bowl"),
       ];
+    case "smoothie-bowl":
+      return [
+        placeOnBoard("banana", "banana"),
+        cut("banana", "banana", 3, "banana:slice"),
+        cut("strawberry", "strawberry", 2, "strawberry:slice"),
+        quiz(0, "board"),
+        drop("blend-in", "bowl", "Put yogurt and berries in the blender bowl",
+          "Drag the yogurt and strawberries into the bowl, or tap one and then tap the bowl.",
+          [{ asset: "yogurt:dollop", count: 2 }, { asset: "strawberry:slice", count: 2 }]),
+        { kind: "stir", id: "stir", surface: "bowl", turns: 2, title: "Blend it pink!",
+          hint: "Drag the spoon around the bowl in circles, or tap the bowl to blend a quarter turn at a time. A grown-up runs a real blender." },
+        drop("toppings", "bowl", "Decorate your smoothie bowl",
+          "Place banana coins, strawberries, blueberries and oats on top. Make a smiley face!",
+          [{ asset: "banana:slice", count: 3 }, { asset: "strawberry:slice", count: 2 }, { asset: "blueberry:pile", count: 1 }, { asset: "oats:pile", count: 1 }]),
+        quiz(1, "bowl"),
+      ];
+    case "taco-bowl":
+      return [
+        placeOnBoard("tomato", "tomato"),
+        cut("tomato", "tomato", 2, "tomato:dice", "Dice"),
+        placeOnBoard("pepper", "bell pepper"),
+        cut("pepper", "pepper", 2, "pepper:piece", "Dice"),
+        quiz(0, "board"),
+        drop("base", "bowl", "Start with rice, beans and corn",
+          "Drag each one into the bowl, or tap one and then tap the bowl.",
+          [{ asset: "rice:pile", count: 2 }, { asset: "beans:pile", count: 1 }, { asset: "corn:pile", count: 1 }]),
+        drop("toppings", "bowl", "Add your rainbow toppings",
+          "Place the tomato, pepper and cheese wherever you like. Make stripes of color!",
+          [{ asset: "tomato:dice", count: 3 }, { asset: "pepper:piece", count: 3 }, { asset: "cheese:pile", count: 2 }]),
+        quiz(1, "bowl"),
+      ];
+    case "hummus-toast":
+      return [
+        placeOnBoard("carrot", "carrot"),
+        cut("carrot", "carrot", 3, "carrot:coin"),
+        placeOnBoard("tomato", "tomato"),
+        cut("tomato", "tomato", 2, "tomato:dice", "Dice"),
+        quiz(0, "board"),
+        drop("place-bread", "pita", "Put the bread in the toaster",
+          "Drag the slice of bread onto the plate, or tap it and then tap the plate.", [{ asset: "bread:slice", count: 1 }], { fixed: true }),
+        { kind: "cook", id: "toast", surface: "pita", appliance: "oven", seconds: 4, label: "toast",
+          real: "Real toast takes about 2 to 3 minutes in a toaster.",
+          title: "Toast the bread", hint: "Press Start and watch the bread turn golden. This is pretend toasting: a grown-up handles a real toaster." },
+        { kind: "spread", id: "spread-hummus", surface: "pita", medium: "hummus", target: 0.8,
+          title: "Spread the hummus",
+          hint: "Drag the spoon around the toast to cover it, or tap the toast to spread a patch." },
+        drop("toppings", "pita", "Make a veggie face",
+          "Use cucumber eyes, a carrot nose and a tomato smile. Or make your own design!",
+          [{ asset: "cucumber:slice", count: 2 }, { asset: "carrot:coin", count: 3 }, { asset: "tomato:dice", count: 3 }]),
+        quiz(1, "pita"),
+      ];
     case "fruit-kabobs":
       return [
         placeOnBoard("banana", "banana"),
@@ -418,9 +469,9 @@ export function finalSurface(recipe: LittleRecipe): Surface {
     case "pizza": return "pita";
     case "bean-salad": return "bowl";
     case "veggie-dippers": return "plate";
-    case "fruit-salad": case "oatmeal-bowl": return "bowl";
+    case "fruit-salad": case "oatmeal-bowl": case "smoothie-bowl": case "taco-bowl": return "bowl";
     case "fruit-kabobs": case "veggie-wrap": return "plate";
-    case "avocado-toast": return "pita";
+    case "avocado-toast": case "hummus-toast": return "pita";
     default: return "pan";
   }
 }
