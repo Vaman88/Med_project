@@ -43,8 +43,8 @@ export function FoodDefs() {
       <Grad id="fa-leaf" x2={1} y2={1} stops={[[0, "#8cc45d"], [1, "#3f7d2e"]]} />
       <Grad id="fa-husk" stops={[[0, "#b8de80"], [0.5, "#86bb55"], [1, "#4f8c34"]]} />
       <Grad id="fa-cob" stops={[[0, "#fff1a0"], [0.5, "#f8cf45"], [1, "#d99a14"]]} />
-      <Grad id="fa-yogurt" x2={1} y2={0} stops={[[0, "#eadfc4"], [0.28, "#faf2de"], [0.55, "#fffcf1"], [1, "#eadfc4"]]} />
-      <Grad id="fa-yogurt-top" radial cx={0.4} cy={0.4} r={0.75} stops={[[0, "#fffefa"], [0.7, "#fbf3df"], [1, "#efe3c8"]]} />
+      <Grad id="fa-yogurt" x2={1} y2={0} stops={[[0, "#e4ded0"], [0.22, "#f6f3ea"], [0.52, "#fffffb"], [0.8, "#f4f0e6"], [1, "#ddd6c6"]]} />
+      <Grad id="fa-yogurt-top" radial cx={0.42} cy={0.38} r={0.75} stops={[[0, "#ffffff"], [0.62, "#f9f7f1"], [1, "#e9e3d6"]]} />
       <Grad id="fa-wood" stops={[[0, "#dcae76"], [1, "#c08b54"]]} />
       <Grad id="fa-board" stops={[[0, "#ebcb9e"], [0.5, "#dcb07a"], [1, "#cfa064"]]} />
       <Grad id="fa-ceramic" radial cx={0.4} cy={0.35} r={0.85} stops={[[0, "#fffdf8"], [1, "#eee3d1"]]} />

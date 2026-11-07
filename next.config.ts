@@ -3,7 +3,8 @@ const config: NextConfig = {
   distDir: process.env.HEALTHY_STEPS_AUTH_TEST === "1" ? ".next-auth-test" : ".next",
   poweredByHeader: false,
   devIndicators: false,
-  allowedDevOrigins: ['127.0.0.1', 'localhost'],
+  // Dev server only: let phones on the same Wi-Fi load the page by this computer's address.
+  allowedDevOrigins: ['127.0.0.1', 'localhost', '192.168.0.62', '10.202.236.68', '*.local'],
   async headers() {
     return [{ source: "/:path*", headers: [
       { key: "X-Content-Type-Options", value: "nosniff" },

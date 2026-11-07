@@ -7,3 +7,7 @@ node_modules/
 playwright-report/
 test-results/
 .npm-cache/
+
+# Third-party game screenshots used only for design study; kept locally, not redistributed.
+docs/references/cooking-game/*.jpg
+docs/references/cooking-game/*.png

@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   title: "Healthy Steps — meals that work for your family",
   description: "Simple pantry-first food planning, grocery budgeting, food preferences, and public food support."
 };
-export const viewport: Viewport = { width: "device-width", initialScale: 1 };
+export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover" };
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return <html lang="en" className={kitchenFont.variable}><body><FoodDefsHost />{children}</body></html>;
 }

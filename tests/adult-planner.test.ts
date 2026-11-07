@@ -7,6 +7,8 @@ import { recipes } from '../src/lib/demo-data';
 import { siteGuideReply } from '../src/lib/site-guide';
 import { GET, POST, PATCH, DELETE } from '../src/app/api/account/route';
 import { POST as suggestions } from '../src/app/api/recommendations/route';
+// The saved store prices were checked on 2026-10-05; these tests check basket math, not price freshness.
+const PRICES_CHECKED = new Date('2026-10-06T12:00:00Z');
 
 const profile = () => { const value = startingProfile('Alex Example'); value.members![0].noKnownAllergies=true; value.weeklyBudgetCents=2000; return value; };
 const setup = () => ({details:{name:'Alex Example',city:'Austin',state:'TX',age:30},profile:profile(),termsVersion:TERMS_VERSION,agreed:true,signature:'Alex Example'});
@@ -26,22 +28,22 @@ test('adult account setup requires matching consent, adult age and answered alle
   assert.equal(experienceForAge(9),'child');assert.equal(experienceForAge(10),'adult');assert.equal(experienceForAge(17),'adult');
 });
 test('suggested baskets respect full package costs, known fees and zero budget', () => {
-  const state=profile();const result=recommendBasket(state,[]);
+  const state=profile();const result=recommendBasket(state,[],valuePrices,PRICES_CHECKED);
   assert.ok(result.plan);assert.ok(result.selected.length>0&&result.selected.length<=3);
   assert.ok(result.plan.budget.totalCents<=state.weeklyBudgetCents);
   for(const item of result.plan.shoppingItems){const price=valuePrices.find(row=>row.id===item.priceObservationId)!;assert.equal(item.purchaseCostCents,item.packageCount!*price.priceCents);assert.ok(Number.isInteger(item.packageCount));}
-  state.weeklyBudgetCents=0;assert.equal(recommendBasket(state,[]).plan,null);
-  state.knownFeesCents=1;assert.equal(recommendBasket(state,[]).plan,null);
+  state.weeklyBudgetCents=0;assert.equal(recommendBasket(state,[],valuePrices,PRICES_CHECKED).plan,null);
+  state.knownFeesCents=1;assert.equal(recommendBasket(state,[],valuePrices,PRICES_CHECKED).plan,null);
 });
 test('sufficient confirmed pantry foods are used without buying again', () => {
   const state=profile();state.weeklyBudgetCents=0;
-  const result=recommendBasket(state,[{id:'oats',ingredientId:'oats',quantity:500,unit:'g',foodState:'dry',quantityConfirmed:true},{id:'banana',ingredientId:'banana',quantity:5,unit:'each',foodState:'raw',quantityConfirmed:true}]);
+  const result=recommendBasket(state,[{id:'oats',ingredientId:'oats',quantity:500,unit:'g',foodState:'dry',quantityConfirmed:true},{id:'banana',ingredientId:'banana',quantity:5,unit:'each',foodState:'raw',quantityConfirmed:true}],valuePrices,PRICES_CHECKED);
   assert.ok(result.plan);assert.equal(result.plan.shoppingItems.length,0);
   assert.ok(result.pantryUse.some(item=>item.ingredientId==='oats'&&!item.needsTopUp));
-  assert.equal(recommendBasket(state,[{id:'oats',ingredientId:'oats',quantity:500,unit:'g',foodState:'cooked',quantityConfirmed:true},{id:'banana',ingredientId:'banana',quantity:5,unit:'each',foodState:'raw',quantityConfirmed:true}]).plan,null);
+  assert.equal(recommendBasket(state,[{id:'oats',ingredientId:'oats',quantity:500,unit:'g',foodState:'cooked',quantityConfirmed:true},{id:'banana',ingredientId:'banana',quantity:5,unit:'each',foodState:'raw',quantityConfirmed:true}],valuePrices,PRICES_CHECKED).plan,null);
 });
 test('pantry amounts are reserved once across the selected meals', () => {
-  const result=recommendBasket(profile(),[{id:'banana',ingredientId:'banana',quantity:1,unit:'each',foodState:'raw',quantityConfirmed:true}]);
+  const result=recommendBasket(profile(),[{id:'banana',ingredientId:'banana',quantity:1,unit:'each',foodState:'raw',quantityConfirmed:true}],valuePrices,PRICES_CHECKED);
   assert.ok(result.plan);
   const used=result.pantryUse.find(item=>item.ingredientId==='banana');
   assert.ok(!used||used.used<=1);
@@ -51,11 +53,11 @@ test('allergies remain hard gates and conflicting cheap packages cannot replace 
   const state=profile();state.members![0].noKnownAllergies=false;state.members![0].allergies=[{rawText:'Peanuts',canonicalId:'peanut',status:'confirmed'}];
   const oat=valuePrices.find(item=>item.ingredientId==='oats')!;
   const prices=[{...oat,id:'unsafe-oats',priceCents:1,productTags:['peanut']},...valuePrices];
-  const result=recommendBasket(state,[],prices);
+  const result=recommendBasket(state,[],prices,PRICES_CHECKED);
   for(const match of [...result.selected,...result.alternatives])assert.equal(match.recipe.ingredients.some(item=>item.ingredientId==='peanut-butter'),false);
   assert.equal(result.plan?.shoppingItems.some(item=>item.priceObservationId==='unsafe-oats'),false);
   assert.ok(result.selected.every(match=>recipes.some(recipe=>recipe.id===match.recipe.id)));
-  state.members![0].allergies[0].status='pending_confirmation';assert.equal(recommendBasket(state,[]).selected.length,0);
+  state.members![0].allergies[0].status='pending_confirmation';assert.equal(recommendBasket(state,[],valuePrices,PRICES_CHECKED).selected.length,0);
 });
 test('a newer eligible listing wins over a cheaper stale listing', () => {
   const now=new Date('2026-10-05T12:00:00Z');

@@ -18,6 +18,14 @@ import { FoodPreferences } from './food-preferences';
 import { FoodAutocomplete } from './food-autocomplete';
 import type { CatalogFood } from '@/lib/food-catalog';
 
+/**
+ * A unique id for a pantry food. crypto.randomUUID only exists on https and localhost, so a
+ * phone opening the site over Wi-Fi (plain http) gets a random fallback instead of an error.
+ */
+function newId(): string {
+  try { if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') return crypto.randomUUID(); } catch { /* fall through */ }
+  return `food-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+}
 type GuestKitchenProps = { storageKey?: string; initialKitchen?: {profile:HouseholdProfile;foods:KitchenFood[]} };
 export function GuestKitchen(props: GuestKitchenProps = {}) {
   const allowCloud = cloudConfigured && !props.initialKitchen;
@@ -89,7 +97,7 @@ function GuestKitchenView({ storageKey = GUEST_STORAGE_KEY, initialKitchen, user
     if(!name||name.length>80){setNotice('Enter a food name up to 80 characters.');return;}
     if(quantity!==undefined&&(!Number.isFinite(quantity)||quantity<=0||quantity>100000)){setNotice('Enter a measured amount greater than zero, or leave it blank.');return;}
     if(!editing&&foods.length>=100){setNotice('Review your pantry before adding more food.');return;}
-    const food:KitchenFood={id:editing??crypto.randomUUID(),label:name,ingredientId:(picked&&picked.label===name?picked.ingredientId:undefined)??resolveKitchenFood(name),quantity,unit:unit as KitchenFood['unit'],foodState,storage,...(bestBy?{bestByDate:bestBy}:{})};
+    const food:KitchenFood={id:editing??newId(),label:name,ingredientId:(picked&&picked.label===name?picked.ingredientId:undefined)??resolveKitchenFood(name),quantity,unit:unit as KitchenFood['unit'],foodState,storage,...(bestBy?{bestByDate:bestBy}:{})};
     setFoods(current=>editing?current.map(item=>item.id===editing?food:item):[...current,food]);setEditing(null);setPicked(null);setLabel('');setAmount('');setBestBy('');setNotice(`${name} ${editing?'updated':'added'}.`);setChecked([]);input.current?.focus();
   }
   function edit(food:KitchenFood){setPicked(null);setLabel(food.label);setAmount(food.quantity?String(food.quantity):'');setUnit(food.unit);setFoodState(food.foodState);setStorage(food.storage);setBestBy(food.bestByDate??'');setEditing(food.id);input.current?.focus();}
@@ -107,7 +115,7 @@ function GuestKitchenView({ storageKey = GUEST_STORAGE_KEY, initialKitchen, user
     </div><small>Leave cooking appliances unchecked for no-cook ideas.</small></fieldset>
   </>;
   const addSample = () => {
-    setFoods(current => [...current, ...sampleKitchen().filter(sample => !current.some(food => food.ingredientId === sample.ingredientId)).map(sample => ({...sample, id: crypto.randomUUID()}))]);
+    setFoods(current => [...current, ...sampleKitchen().filter(sample => !current.some(food => food.ingredientId === sample.ingredientId)).map(sample => ({...sample, id: newId()}))]);
     setNotice('Sample amounts added. Check them against your own kitchen before shopping.');
   };
   return <div className="app-shell kitchen-app">

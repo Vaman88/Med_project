@@ -265,7 +265,7 @@ function bandPath(y0: number, y1: number): string {
   return `M ${c - r1} ${y1} A ${r1} ${ry1} 0 0 0 ${c + r1} ${y1} L ${c + r0} ${y0} A ${r0} ${ry0} 0 0 1 ${c - r0} ${y0} Z`;
 }
 
-function GlassScene({ plan, dish, step, fx, presenting }: SceneProps & { fx: Fx }) {
+function GlassScene({ plan, dish, step, fx, presenting, view }: SceneProps & { fx: Fx }) {
   const uid = useId().replace(/\W/g, "");
   const scoops = totalScoops(dish, plan, "glass");
   const top = glassSurface(scoops);
@@ -275,7 +275,9 @@ function GlassScene({ plan, dish, step, fx, presenting }: SceneProps & { fx: Fx 
   const baseRy = GLASS.bottomRx * 0.26;
   const bands = Array.from({ length: scoops }, (_, i) => i);
   const spoon = fx.spoon;
-  const showBowl = !presenting && (step?.kind === "scoop" || (step === null ? false : scoops === 0));
+  // The yogurt bowl sits beside the glass on wide screens; a close phone framing leaves it out.
+  const closeUp = !!view && view.w < 400;
+  const showBowl = !presenting && !closeUp && (step?.kind === "scoop" || (step === null ? false : scoops === 0));
   const left = `M ${c - GLASS.rimRx} ${GLASS.rimY} L ${c - GLASS.bottomRx} ${GLASS.bottomY}`;
   const right = `M ${c + GLASS.rimRx} ${GLASS.rimY} L ${c + GLASS.bottomRx} ${GLASS.bottomY}`;
   const interior = `M ${c - GLASS.rimRx + 4} ${GLASS.rimY} L ${c - GLASS.bottomRx + 4} ${GLASS.bottomY} A ${GLASS.bottomRx - 4} ${baseRy} 0 0 0 ${c + GLASS.bottomRx - 4} ${GLASS.bottomY} L ${c + GLASS.rimRx - 4} ${GLASS.rimY} A ${GLASS.rimRx - 4} ${rimRy} 0 0 1 ${c - GLASS.rimRx + 4} ${GLASS.rimY} Z`;
@@ -312,12 +314,19 @@ function GlassScene({ plan, dish, step, fx, presenting }: SceneProps & { fx: Fx 
         {/* toppings and slices; items in covered layers sit against the glass wall */}
         {items.map((d) => {
           const covered = d.lvl < scoops;
-          const y = itemY(d);
+          // A covered layer shows the way a real parfait does from the side: its fruit
+          // pressed against the front of the glass in an even stripe.
+          const layer = covered ? items.filter((o) => o.lvl === d.lvl && o.lvl < scoops) : [];
+          const slot = layer.indexOf(d);
+          const wall = covered ? glassRadius(itemY(d)) - 30 : 0;
+          const x = covered ? c - wall + ((slot + 0.5) / layer.length) * wall * 2 : d.x;
+          const y = covered ? itemY(d) + (slot % 2 ? 6 : -4) : itemY(d);
           return (
             <g key={d.id}>
-              {!covered && <ellipse cx={d.x} cy={y + 5} rx="30" ry="9" fill="url(#fa-shadow)" opacity=".75" />}
-              <Item asset={d.asset} x={d.x} y={y} rot={covered ? d.rot * 0.25 : d.rot} pitch={covered ? 0.66 : 0.52} scale={covered ? 1.2 : 1.35}
+              {!covered && <ellipse cx={d.x} cy={y + 6} rx="34" ry="10" fill="url(#fa-shadow)" opacity=".8" />}
+              <Item asset={d.asset} x={x} y={y} rot={covered ? d.rot * 0.2 : d.rot} pitch={covered ? 0.92 : 0.55} scale={covered ? 1.45 : 1.6}
                 landed={fx.landed === d.id} />
+              {covered && <ellipse cx={x} cy={y - 18} rx="28" ry="7" fill="#fbf9f3" opacity=".55" />}
             </g>
           );
         })}

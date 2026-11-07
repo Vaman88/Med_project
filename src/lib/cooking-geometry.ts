@@ -9,6 +9,18 @@ export interface ViewBox { x: number; y: number; w: number; h: number }
 // edges so the dish gets more room on a portrait phone.
 export const VIEW_WIDE: ViewBox = { x: 90, y: 44, w: 620, h: 430 };
 export const VIEW_TALL: ViewBox = { x: 140, y: 44, w: 520, h: 430 };
+// On a portrait phone each step gets its own close framing ("camera"): the wide
+// cutting board keeps the tall view, while the glass and the round dishes are
+// cropped square around the food so they fill the screen.
+const VIEW_TALL_BOARD: ViewBox = { x: 176, y: 78, w: 448, h: 384 };
+const VIEW_TALL_GLASS: ViewBox = { x: 232, y: 56, w: 336, h: 416 };
+const VIEW_TALL_ROUND: ViewBox = { x: 182, y: 46, w: 436, h: 432 };
+export function viewFor(surface: Surface, tall: boolean): ViewBox {
+  if (!tall) return VIEW_WIDE;
+  if (surface === "glass") return VIEW_TALL_GLASS;
+  if (surface === "board") return VIEW_TALL_BOARD;
+  return VIEW_TALL_ROUND;
+}
 
 // Explicit paint order for every scene (low to high). The dragged ghost is an
 // HTML element above all of these.

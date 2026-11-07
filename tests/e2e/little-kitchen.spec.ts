@@ -57,12 +57,11 @@ async function setup(page: Page, age = 7, allergy?: string, info?: TestInfo) {
   await page
     .getByRole("button", { name: "Create kitchen", exact: true })
     .click();
+  // Every child profile, teens included, lands in the kids' kitchen.
   if (age < 13)
     await expect(page.locator(".km-card")).toHaveCount(allergy ? kidsCount - 4 : kidsCount);
   else
-    await expect(
-      page.getByRole("heading", { name: "What's in your kitchen today?" }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Hey, Chef Sunny/ })).toBeVisible();
 }
 async function start(page: Page, title: string) {
   await page
@@ -75,7 +74,8 @@ async function start(page: Page, title: string) {
 }
 async function openSettings(page: Page) {
   await page.getByRole("button", { name: "Parent settings" }).click();
-  await page.getByRole("button", { name: "Edit child profile" }).click();
+  await page.getByRole("button", { name: "Child profile", exact: true }).click();
+  await page.getByRole("button", { name: "Edit everything" }).click();
 }
 
 test("parent settings open the original planner without a PIN and keep its changes", async ({ page }) => {
@@ -128,7 +128,9 @@ async function playStep(page: Page) {
   const zone = page.locator(".ck-hot").first();
   if (kind === "drop" || kind === "scoop" || kind === "pour") {
     for (let guard = 0; guard < 12; guard++) {
-      const chip = page.locator(".ck-chip").first();
+      // Play only this step: stop once the game has moved on, as a child would.
+      if ((await page.locator(".ck-step-title").innerText().catch(() => "")) !== title) break;
+      const chip = page.locator(".ck-chip:not(:disabled)").first();
       if (!(await chip.count())) break;
       await chip.click();
       await expect(chip).toHaveAttribute("aria-pressed", "true");
@@ -136,6 +138,9 @@ async function playStep(page: Page) {
       await page.waitForTimeout(kind === "drop" ? 120 : 250);
       if (kind !== "drop") await expect(page.locator(".ck-spoon-path, .ck-pour-path")).toHaveCount(0, { timeout: 4000 });
     }
+    // Free-decorating steps (optional extra toppings) end when the child taps Finish.
+    const finish = page.locator(".ck-finish");
+    if ((await page.locator(".ck-step-title").innerText().catch(() => "")) === title && await finish.count() && await finish.isEnabled().catch(() => false)) await finish.click();
   } else if (kind === "cut" || kind === "mash") {
     const mark = page.getByRole("button", { name: kind === "cut" ? /Cut mark/ : /Mash spot/ });
     while (await mark.count()) {
@@ -176,8 +181,8 @@ async function finishRecipe(page: Page) {
 }
 
 test("every dish plays through the cooking game to a finished dish", async ({ page }, info) => {
-  // Every dish, each played step by step with buttons only.
-  test.setTimeout(900000);
+  // Every dish (19 of them), each played step by step with buttons only.
+  test.setTimeout(1800000);
   await page.emulateMedia({ reducedMotion: "reduce" });
   await seedAllRecipes(page);
   for (const recipe of littleRecipes) {
@@ -348,13 +353,13 @@ test("My Cookbook stays visible and explains an empty cookbook", async ({ page }
   await expect(tab).toHaveAttribute("aria-current", "page");
   await expect(page.getByRole("heading", { name: "Your cookbook is waiting!" })).toBeVisible();
 });
-test("older teens retain original planner", async ({ page }) => {
+test("teens get the kids' kitchen and can still open the original planner", async ({ page }) => {
   await setup(page, 13, "Peanut");
-  await expect(
-    page.getByRole("heading", { name: "What's in your kitchen today?" }),
-  ).toBeVisible();
-  await expect(page.locator(".pantry-list")).toContainText("Black beans");
+  await expect(page.locator(".km-card").first()).toBeVisible();
   await page.reload();
+  await asChild(page);
+  await expect(page.getByRole("heading", { name: /Hey, Chef Sunny/ })).toBeVisible();
+  await page.getByRole("button", { name: "Switch profile" }).click();
   // The chooser comes first; a teen's family opens the planner without a PIN.
   await page.getByRole("button", { name: /Continue as an adult/ }).click();
   await expect(

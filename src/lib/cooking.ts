@@ -8,12 +8,16 @@ import {
 // An asset is "food:state", e.g. "banana:whole", "banana:slice", "banana:mash".
 export type AssetKey = string;
 
-export interface Item { asset: AssetKey; count: number }
+/**
+ * One thing to place in a step. `optional` extras (more toppings) never block the step;
+ * `allergen` names the kids' allergy choice that hides the extra for this child.
+ */
+export interface Item { asset: AssetKey; count: number; optional?: boolean; allergen?: string }
 /** A fixed place an item must go, in surface units (for example a spot on a skewer). */
 export interface Slot { x: number; y: number; rot: number }
 type Base = { id: string; surface: Surface; title: string; hint: string };
 export type Step =
-  | (Base & { kind: "drop"; items: Item[]; zone: Surface; fixed?: boolean; slots?: Slot[] })
+  | (Base & { kind: "drop"; items: Item[]; zone: Surface; fixed?: boolean; slots?: Slot[]; finish?: string })
   | (Base & { kind: "cut"; food: string; cuts: number; result: AssetKey })
   | (Base & { kind: "mash"; food: string; spots: number })
   | (Base & { kind: "scoop"; asset: AssetKey; into: Surface; count: number; verb: string })
@@ -95,8 +99,8 @@ export const KABOB_SLOTS: Slot[] = KABOB_SKEWERS.flatMap((s) =>
 
 const drop = (
   id: string, surface: Surface, title: string, hint: string, items: Item[],
-  extra: { zone?: Surface; fixed?: boolean; slots?: Slot[] } = {},
-): Step => ({ kind: "drop", id, surface, title, hint, items, zone: extra.zone ?? surface, fixed: extra.fixed, slots: extra.slots });
+  extra: { zone?: Surface; fixed?: boolean; slots?: Slot[]; finish?: string } = {},
+): Step => ({ kind: "drop", id, surface, title, hint, items, zone: extra.zone ?? surface, fixed: extra.fixed, slots: extra.slots, finish: extra.finish });
 const quiz = (index: 0 | 1, surface: Surface): Step => ({
   kind: "quiz", id: `quiz-${index + 1}`, surface, index,
   title: "Quick chef question", hint: "Look at your dish and pick an answer.",
@@ -141,9 +145,12 @@ export function planFor(recipe: LittleRecipe): Step[] {
         { kind: "scoop", id: "yogurt-top", surface: "glass", asset: "yogurt:bowl", into: "glass", count: 1,
           verb: "Scoop", title: "Add one more scoop",
           hint: "One more scoop of yogurt covers the banana layer." },
-        drop("toppings", "glass", "Arrange your toppings",
-          "Place the strawberry and banana slices on top. Arrange them any way you like!",
-          [{ asset: "banana:slice", count: 1 }, { asset: "strawberry:slice", count: 3 }]),
+        drop("toppings", "glass", "Decorate the top",
+          "Place the strawberry and banana slices on top, anywhere you like. Add blueberries or oats too if you want, then tap Finish.",
+          [{ asset: "banana:slice", count: 1 }, { asset: "strawberry:slice", count: 3 },
+            { asset: "blueberry:pile", count: 2, optional: true, allergen: "Blueberries" },
+            { asset: "oats:pile", count: 1, optional: true, allergen: "Oats" }],
+          { finish: "Finish my parfait" }),
         quiz(1, "glass"),
       ];
     case "pancakes":
@@ -498,8 +505,11 @@ export function trayItems(step: Step, dish: DishState): { asset: AssetKey; left:
 export function stepProgress(step: Step, dish: DishState): { done: number; total: number } {
   switch (step.kind) {
     case "drop": {
-      const total = step.items.reduce((s, i) => s + i.count, 0);
-      return { done: Math.min(total, dish.drops.filter((d) => d.step === step.id).length), total };
+      // Only the required pieces count; optional extras are a bonus.
+      const required = step.items.filter((i) => !i.optional);
+      const total = required.reduce((s, i) => s + i.count, 0);
+      const done = required.reduce((s, i) => s + Math.min(i.count, placedCount(dish, step.id, i.asset)), 0);
+      return { done, total };
     }
     case "cut": return { done: (dish.cuts[step.id] ?? []).length, total: step.cuts };
     case "mash": return { done: (dish.mash[step.id] ?? []).length, total: step.spots };

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { LittleKitchen } from "./little-kitchen";
 import { ParentWizard } from "./parent-wizard";
 import { RoleChooser } from "./role-chooser";
+import { ChildProfile, type ProfileStep } from "./child-profile";
 import { CHILD_PROGRESS_KEY } from "@/lib/child-progress";
 import {
   FAMILY_KEY,
@@ -20,6 +21,9 @@ export function FoodApp() {
   const [parentArea, setParentArea] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [role, setRole] = useState<"child" | "adult" | null>(null);
+  // The child profile page (every saved setting, each with an Edit button) and the setup step it opens.
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [setupStep, setSetupStep] = useState<ProfileStep>(0);
   const [notice, setNotice] = useState("");
   useEffect(() => {
     try {
@@ -83,6 +87,11 @@ export function FoodApp() {
     setFamily(value);
     setSetup(false);
     setParentArea(false);
+    setProfileOpen(false);
+  }
+  function editProfile(step: ProfileStep) {
+    setSetupStep(step);
+    setSetup(true);
   }
   function chooseChild() {
     setRole("child");
@@ -91,12 +100,13 @@ export function FoodApp() {
   function chooseAdult() {
     setRole("adult");
     // No Parent PIN for now: a grown-up goes straight to the parent area.
-    if (family && family.age < 13) setParentArea(true);
+    if (family) setParentArea(true);
   }
   function switchProfile() {
     setRole(null);
     setSetup(false);
     setParentArea(false);
+    setProfileOpen(false);
   }
   function openSettings() {
     if (family) { setRole("adult"); setParentArea(true); }
@@ -116,6 +126,7 @@ export function FoodApp() {
     setFamily(null);
     setSetup(false);
     setParentArea(false);
+    setProfileOpen(false);
     setRole(null);
     setNotice("Child profile cleared from this browser.");
   }
@@ -141,10 +152,13 @@ export function FoodApp() {
       ) : setup ? (
         <>
           <ParentWizard
+            key={setupStep}
             initial={family}
+            startStep={family ? setupStep : 0}
             onSave={save}
             onCancel={() => {
               setSetup(false);
+              setSetupStep(0);
               if (!family) setRole(null);
             }}
           />
@@ -156,12 +170,19 @@ export function FoodApp() {
             </div>
           )}
         </>
+      ) : profileOpen && family ? (
+        <ChildProfile
+          family={family}
+          onEdit={editProfile}
+          onBack={() => setProfileOpen(false)}
+          onDelete={forget}
+        />
       ) : parentArea && family ? (
         <>
           <div className="family-entry parent-area-entry">
             <span>Parent area · Meal planner</span>
             <div className="parent-area-actions">
-              <button onClick={() => setSetup(true)}>Edit child profile</button>
+              <button onClick={() => setProfileOpen(true)}>Child profile</button>
               <button onClick={() => { setParentArea(false); setRole("child"); }}>Back to child kitchen</button>
               <button onClick={switchProfile}>Switch profile</button>
             </div>
@@ -171,7 +192,9 @@ export function FoodApp() {
             initialKitchen={childPlannerSnapshot(family)}
           />
         </>
-      ) : family && family.age < 13 ? (
+      ) : family && (role === "child" || family.age < 13) ? (
+        // Any child profile (ages 5 to 17) opens the kids' kitchen from "Continue as a child".
+        // Teens can still use the meal planner from "Continue as an adult".
         <>
           <LittleKitchen family={family} onSettings={openSettings} />
           <button type="button" className="role-switch" onClick={switchProfile}>

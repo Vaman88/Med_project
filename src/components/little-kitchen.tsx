@@ -106,6 +106,7 @@ export function LittleKitchen({
       <CookingStudio
         key={recipe.id}
         recipe={recipe}
+        avoid={family.allergies}
         onBack={() => {
           setRecipe(null);
           window.scrollTo({ top: 0, behavior: "instant" });

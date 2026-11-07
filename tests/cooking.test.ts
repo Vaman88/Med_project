@@ -9,7 +9,7 @@ import {
 } from "../src/lib/cooking";
 import {
   GLASS, PAINT_VALID, angleDelta, autoSpot, clampToEllipse, glassSurface, glassSurfaceY, paintAt,
-  paintCoverage, paintNext, cutPositions, PLATE,
+  paintCoverage, paintNext, cutPositions, PLATE, viewFor,
 } from "../src/lib/cooking-geometry";
 import { ART } from "../src/components/food-art";
 import { awardRecipe, childProgressSchema, emptyProgress, saveCreation } from "../src/lib/child-progress";
@@ -176,4 +176,28 @@ test("saved creations are stored with progress and validated", () => {
   assert.equal(childProgressSchema.parse(JSON.parse(JSON.stringify(progress))).creations?.parfait.drops.length, dish.drops.length);
   assert.equal(childProgressSchema.safeParse({ version: 1, completed: {}, stars: 0, creations: { x: { drops: "no" } } }).success, false);
   assert.ok(childProgressSchema.safeParse({ version: 1, completed: {}, stars: 0 }).success, "older saves still load");
+});
+
+test("parfait toppings: optional extras never block the step, and only the required fruit counts", () => {
+  const parfait = littleRecipes.find((r) => r.id === "parfait")!;
+  const step = planFor(parfait).find((s) => s.id === "toppings")!;
+  assert.equal(step.kind, "drop");
+  if (step.kind !== "drop") return;
+  assert.equal(step.finish, "Finish my parfait");
+  const extras = step.items.filter((i) => i.optional);
+  assert.deepEqual(extras.map((i) => i.allergen), ["Blueberries", "Oats"], "each extra names the allergy that hides it");
+  let dish = emptyDish();
+  // Extras alone do not finish the step.
+  for (const asset of ["blueberry:pile", "blueberry:pile", "oats:pile"]) dish = { ...dish, drops: [...dish.drops, { id: dish.nextId, step: "toppings", asset, x: 400, y: 200, rot: 0, zone: "glass", lvl: 3 }], nextId: dish.nextId + 1 };
+  assert.equal(stepDone(step, dish), false);
+  // The required banana and strawberries do.
+  for (const asset of ["banana:slice", "strawberry:slice", "strawberry:slice", "strawberry:slice"]) dish = { ...dish, drops: [...dish.drops, { id: dish.nextId, step: "toppings", asset, x: 400, y: 200, rot: 0, zone: "glass", lvl: 3 }], nextId: dish.nextId + 1 };
+  assert.equal(stepDone(step, dish), true);
+});
+
+test("phones frame each action closely: tall glass, square round dishes, wide board", () => {
+  assert.ok(viewFor("glass", true).w < viewFor("glass", true).h, "the glass view is portrait");
+  assert.equal(viewFor("bowl", true).w, viewFor("pan", true).w);
+  assert.ok(viewFor("board", true).w > viewFor("board", true).h, "the board view stays landscape");
+  assert.deepEqual(viewFor("glass", false), viewFor("board", false), "larger screens keep one wide view");
 });

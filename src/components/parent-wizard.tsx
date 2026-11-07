@@ -142,14 +142,17 @@ function PantryPicker({
 
 export function ParentWizard({
   initial,
+  startStep = 0,
   onSave,
   onCancel,
 }: {
   initial: Family | null;
+  /** Step to open on, when a grown-up edits one section from the child profile page. */
+  startStep?: number;
   onSave: (family: Family) => void;
   onCancel: () => void;
 }) {
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(startStep);
   const [nickname, setNickname] = useState(initial?.nickname ?? "");
   const [age, setAge] = useState(initial?.age.toString() ?? "");
   const [avatar, setAvatar] = useState(initial?.avatar ?? defaultAvatar);

@@ -11,19 +11,18 @@ import {
 import type { LittleRecipe } from "@/lib/little-kitchen";
 import { recipeChallenges } from "@/lib/chef-challenges";
 import {
-  answerAsset, doCut, doFlip, doMash, doPaint, doPour, doScoop, doStir, dropItem, emptyDish,
+  answerAsset, dishSchema, doCut, doFlip, doMash, doPaint, doPour, doScoop, doStir, dropItem, emptyDish,
   finalSurface, planFor, setHeat, simulatedSeconds, stepDone, trayItems, totalScoops,
   type AssetKey, type DishState, type Step,
 } from "@/lib/cooking";
 import {
-  BOARD, BOARD_FOOD, BOWL, GLASS, PAN, PITA, PLATE, VIEW_TALL, VIEW_WIDE,
+  BOARD, BOARD_FOOD, BOWL, GLASS, PAN, PITA, PLATE, viewFor,
   angleBetween, angleDelta, cutLength, cutPositions, glassSurfaceY, paintAt, paintNext,
   type Point, type Surface, type ViewBox,
 } from "@/lib/cooking-geometry";
 import { SOUND_KEY, playSound, type SoundName } from "@/lib/sound";
 import { AssetIcon, ASSET_LABEL } from "./food-art";
 import { CookingScene, noFx, ToolIcon, type Fx } from "./cooking-scene";
-import { DishPreview } from "./dish-preview";
 
 type Rect = { x: number; y: number; w: number; h: number };
 type Hotspot = {
@@ -31,6 +30,8 @@ type Hotspot = {
   onActivate: (point: Point | null) => void;
 };
 const SPEED = { settle: 700, scoop: 1000, pour: 1300, advance: 950 };
+/** How far above a fingertip dragged food is held on touch screens, in CSS pixels. */
+const FINGER_LIFT = 64;
 const zoneRect = (s: Surface): Rect => {
   switch (s) {
     case "glass": return { x: 262, y: 56, w: 276, h: 396 };
@@ -41,7 +42,9 @@ const zoneRect = (s: Surface): Rect => {
     default: return { x: BOARD.cx - BOARD.rx, y: BOARD.cy - BOARD.ry, w: BOARD.rx * 2, h: BOARD.ry * 2 };
   }
 };
-const sourcePoint = (s: Step): Point => s.kind === "scoop" && s.into === "glass" ? { x: 205, y: 372 }
+// Where the spoon picks food up. On a phone the glass is framed so closely that the
+// yogurt comes straight up from the tray below, rather than from a bowl beside it.
+const sourcePoint = (s: Step, tall = false): Point => s.kind === "scoop" && s.into === "glass" ? (tall ? { x: 330, y: 500 } : { x: 205, y: 372 })
   : s.kind === "scoop" && s.into === "bowl" ? { x: 205, y: 404 }
     : s.kind === "scoop" ? { x: 205, y: 396 } : { x: 205, y: 90 };
 
@@ -69,9 +72,11 @@ function useTallView() {
 }
 
 export function CookingStudio({
-  recipe, onBack, onSettings, onComplete, onSave, onCollection, chefAge, saved,
+  recipe, onBack, onSettings, onComplete, onSave, onCollection, chefAge, saved, avoid = [],
 }: {
   recipe: LittleRecipe;
+  /** The child's allergy choices; optional extras containing them are never offered. */
+  avoid?: readonly string[];
   onBack: () => void;
   onSettings: () => void;
   onComplete: (stars: number) => void;
@@ -84,7 +89,6 @@ export function CookingStudio({
   const questions = useMemo(() => recipeChallenges(recipe.id, chefAge), [recipe.id, chefAge]);
   const reduced = useReducedMotion();
   const tall = useTallView();
-  const view: ViewBox = tall ? VIEW_TALL : VIEW_WIDE;
 
   const [index, setIndex] = useState(0);
   const [hist, setHist] = useState<{ dish: DishState; past: DishState[] }>({ dish: emptyDish(), past: [] });
@@ -109,18 +113,53 @@ export function CookingStudio({
   const suppressClick = useRef(false);
   const fxKey = useRef(1);
   const completed = useRef(false);
-  const drag = useRef<{ asset: AssetKey; startX: number; startY: number; moved: boolean; id: number } | null>(null);
+  const drag = useRef<{ asset: AssetKey; startX: number; startY: number; moved: boolean; id: number; lift: number } | null>(null);
   const dishRef = useRef(dish);
   dishRef.current = dish;
 
   const finished = index >= plan.length;
   const step: Step | null = finished ? null : plan[index];
   const surface: Surface = step?.surface ?? finalSurface(recipe);
+  // Close framing for the current action (overhead board, angled glass, round dish).
+  const view: ViewBox = viewFor(surface, tall);
   const locked = () => paused || advancing || Date.now() < lockUntil.current;
 
   useEffect(() => {
     try { setSound(localStorage.getItem(SOUND_KEY) !== "off"); } catch { /* optional */ }
     return () => timers.current.forEach(window.clearTimeout);
+  }, []);
+
+  // ---- keep progress through app switches, reloads and rotation --------------
+  // The dish in progress lives in sessionStorage for this tab, so returning from
+  // another app (or a browser that reloaded the tab) picks up at the same step.
+  const progressKey = `healthy-steps-cooking-${recipe.id}`;
+  const restored = useRef(false);
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(progressKey);
+      const saved = raw ? JSON.parse(raw) as { v?: number; index?: number; dish?: unknown; mistakes?: number } : null;
+      const parsed = saved?.v === 1 ? dishSchema.safeParse(saved.dish) : null;
+      if (parsed?.success && Number.isInteger(saved!.index) && saved!.index! > 0 && saved!.index! < plan.length) {
+        dishRef.current = parsed.data;
+        setHist({ dish: parsed.data, past: [] });
+        setIndex(saved!.index!);
+        setMistakes(Number.isInteger(saved!.mistakes) ? saved!.mistakes! : 0);
+      }
+    } catch { /* starting fresh is fine */ }
+    restored.current = true;
+  }, [progressKey, plan.length]);
+  useEffect(() => {
+    if (!restored.current) return;
+    try {
+      if (index >= plan.length || (index === 0 && !hist.dish.drops.length)) sessionStorage.removeItem(progressKey);
+      else sessionStorage.setItem(progressKey, JSON.stringify({ v: 1, index, dish: hist.dish, mistakes }));
+    } catch { /* optional */ }
+  }, [index, hist.dish, mistakes, plan.length, progressKey]);
+  // Leaving the app pauses the game, so no pretend timer runs while the child is away.
+  useEffect(() => {
+    const away = () => { if (document.visibilityState === "hidden") setPaused(true); };
+    document.addEventListener("visibilitychange", away);
+    return () => document.removeEventListener("visibilitychange", away);
   }, []);
   const later = useCallback((fn: () => void, ms: number) => {
     const id = window.setTimeout(fn, reduced ? Math.min(ms, 60) : ms);
@@ -145,7 +184,10 @@ export function CookingStudio({
   }, [later]);
 
   // ---- finishing a step moves on after a short, visible settle -------------
-  const done = step ? stepDone(step, dish) : false;
+  // A step with a Finish button (free decorating) waits for the child to say it is done.
+  const [finishedSteps, setFinishedSteps] = useState<string[]>([]);
+  const needsFinish = !!step && step.kind === "drop" && !!step.finish && !finishedSteps.includes(step.id);
+  const done = step ? stepDone(step, dish) && !needsFinish : false;
   useEffect(() => {
     if (!done || paused) return;
     setAdvancing(true);
@@ -224,7 +266,7 @@ export function CookingStudio({
   }
   function startScoop(s: Extract<Step, { kind: "scoop" }>) {
     if (locked() || (dishRef.current.scoops[s.id] ?? 0) >= s.count) return;
-    const from = sourcePoint(s);
+    const from = sourcePoint(s, tall);
     const to: Point = s.into === "glass"
       ? { x: GLASS.cx, y: glassSurfaceY(totalScoops(dishRef.current, plan, "glass")) - 64 }
       : s.into === "bowl" ? { x: BOWL.cx, y: BOWL.cy - 60 } : { x: PLATE.cx, y: PLATE.cy - 50 };
@@ -370,14 +412,15 @@ export function CookingStudio({
   // ---- dragging an ingredient from the tray -------------------------------
   function chipDown(e: ReactPointerEvent<HTMLButtonElement>, asset: AssetKey) {
     if (e.button > 0) return;
-    drag.current = { asset, startX: e.clientX, startY: e.clientY, moved: false, id: e.pointerId };
+    // On touch the food rides above the fingertip so the child can see where it will land.
+    drag.current = { asset, startX: e.clientX, startY: e.clientY, moved: false, id: e.pointerId, lift: e.pointerType === "mouse" ? 0 : FINGER_LIFT };
     e.currentTarget.setPointerCapture(e.pointerId);
   }
   function chipMove(e: ReactPointerEvent<HTMLButtonElement>) {
     const d = drag.current;
     if (!d || d.id !== e.pointerId) return;
     if (Math.hypot(e.clientX - d.startX, e.clientY - d.startY) > 8) d.moved = true;
-    if (d.moved) setGhost({ asset: d.asset, x: e.clientX, y: e.clientY });
+    if (d.moved) setGhost({ asset: d.asset, x: e.clientX, y: e.clientY - d.lift });
   }
   function chipUp(e: ReactPointerEvent<HTMLButtonElement>) {
     const d = drag.current;
@@ -386,14 +429,17 @@ export function CookingStudio({
     if (!d?.moved) return;
     suppressClick.current = true;
     window.setTimeout(() => { suppressClick.current = false; }, 60);
+    // The food lands where it was drawn: above the finger on touch, under the cursor with a mouse.
+    const at = { clientX: e.clientX, clientY: e.clientY - d.lift };
     const r = stageRef.current?.getBoundingClientRect();
-    if (!r || e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) {
+    if (!r || at.clientX < r.left || at.clientX > r.right || at.clientY < r.top || at.clientY > r.bottom) {
       toast("Drop it onto the dish.");
       return;
     }
-    const p = toSvg(e);
+    const p = toSvg(at);
     const zr = step ? zoneRect(step.surface) : null;
-    if (zr && (p.x < zr.x || p.x > zr.x + zr.w || p.y < zr.y || p.y > zr.y + zr.h)) {
+    const slack = zr ? Math.max(zr.w, zr.h) * 0.18 : 0; // forgiving: a near miss still counts
+    if (zr && (p.x < zr.x - slack || p.x > zr.x + zr.w + slack || p.y < zr.y - slack || p.y > zr.y + zr.h + slack)) {
       toast("Drop it onto the dish.");
       return;
     }
@@ -408,6 +454,8 @@ export function CookingStudio({
     say("pick");
   }
   function startOver() {
+    try { sessionStorage.removeItem(progressKey); } catch { /* optional */ }
+    setFinishedSteps([]);
     setIndex(0);
     setHist({ dish: emptyDish(), past: [] });
     setSelected(null);
@@ -446,13 +494,13 @@ export function CookingStudio({
     } else if (step.kind === "cut") {
       cutPositions(step.cuts, cutLength(step.food)).forEach((x, i) => {
         if (dish.cuts[step.id]?.includes(i)) return;
-        hotspots.push({ id: `cut-${i}`, label: `Cut mark ${i + 1} of ${step.cuts}`, rect: { x: x - 30, y: 128, w: 60, h: 60 }, round: true, marker: String(i + 1), onActivate: () => tapMarker(i) });
+        hotspots.push({ id: `cut-${i}`, label: `Cut mark ${i + 1} of ${step.cuts}`, rect: { x: x - 38, y: 120, w: 76, h: 76 }, round: true, marker: String(i + 1), onActivate: () => tapMarker(i) });
       });
     } else if (step.kind === "mash") {
       for (let i = 0; i < step.spots; i++) {
         if (dish.mash[step.id]?.includes(i)) continue;
         const x = spotX(step, i);
-        hotspots.push({ id: `mash-${i}`, label: `Mash spot ${i + 1} of ${step.spots}`, rect: { x: x - 34, y: BOARD_FOOD.cy - 34, w: 68, h: 68 }, round: true, marker: "●", onActivate: () => tapMarker(i) });
+        hotspots.push({ id: `mash-${i}`, label: `Mash spot ${i + 1} of ${step.spots}`, rect: { x: x - 38, y: BOARD_FOOD.cy - 38, w: 76, h: 76 }, round: true, marker: "●", onActivate: () => tapMarker(i) });
       }
     } else if (step.kind === "spread") {
       hotspots.push({ id: "spread", label: step.medium === "sauce" ? "Spread sauce on the pizza" : step.medium === "cheese" ? "Sprinkle cheese on the pizza" : step.title, rect: zoneRect("pita"), round: true, onActivate: () => undefined });
@@ -479,7 +527,9 @@ export function CookingStudio({
     }
   }
 
-  const tray = step ? trayItems(step, dish).filter((i) => i.left > 0) : [];
+  const offLimits = new Set(step && step.kind === "drop" ? step.items.filter((i) => i.allergen && avoid.includes(i.allergen)).map((i) => i.asset) : []);
+  const tray = step ? trayItems(step, dish).filter((i) => i.left > 0 && !offLimits.has(i.asset)) : [];
+  const requiredLeft = step && step.kind === "drop" ? !stepDone(step, dish) : true;
   const toolFor: Record<string, "knife" | "masher" | "spoon" | "spatula" | undefined> = {
     cut: "knife", mash: "masher", spread: "spoon", stir: "spoon", flip: "spatula",
   };
@@ -633,7 +683,13 @@ export function CookingStudio({
                   <span>{toolName[toolFor[step.kind]!]}</span>
                 </div>
               )}
-              {step && step.kind === "drop" && tray.length === 0 && <p className="ck-note">Nice! That’s everything for this step.</p>}
+              {step && step.kind === "drop" && tray.length === 0 && !step.finish && <p className="ck-note">Nice! That’s everything for this step.</p>}
+              {step && step.kind === "drop" && step.finish && (
+                <button type="button" className="ck-primary ck-finish" disabled={requiredLeft || paused || advancing}
+                  onClick={() => { setFinishedSteps((s) => [...s, step.id]); say("chime"); }}>
+                  {requiredLeft ? "Add the fruit first" : step.finish}
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -668,46 +724,24 @@ function Finale({
   onAgain: () => void; onSave: () => void; onCollection: () => void; onRecipe: () => void;
   showRecipe: boolean; closeRecipe: () => void; stars: number;
 }) {
-  // The real photograph is the hero. If it cannot load, the child's own
-  // illustrated dish takes its place at full size.
+  // The child's own arrangement is the hero, exactly as they made it. A real photo
+  // appears only in the grown-up recipe card, clearly labelled as the real-kitchen version.
   const [photoFailed, setPhotoFailed] = useState(false);
-  const photoRef = useRef<HTMLImageElement>(null);
-  useEffect(() => {
-    const el = photoRef.current;
-    if (el && el.complete && el.naturalWidth === 0) setPhotoFailed(true);
-  }, []);
-  const showPhoto = Boolean(recipe.image) && !photoFailed;
   return (
     <div className="ck-app ck-finale">
       <main className="ck-finale-main">
-        <figure className="ck-hero">
-          {showPhoto ? (
-            <div className="ck-hero-photo">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img ref={photoRef} src={recipe.image} width={1254} height={1254} decoding="async"
-                alt={`A photo of ${recipe.title.toLowerCase()}, ready to eat`} onError={() => setPhotoFailed(true)} />
+        <figure className="ck-hero ck-hero-creation">
+          <div className="ck-frame">
+            <div className="ck-frame-art" style={{ aspectRatio: ar, "--ar": ar } as React.CSSProperties}>
+              <CookingScene recipe={recipe} plan={plan} dish={dish} step={null} surface={finalSurface(recipe)} presenting view={view} />
             </div>
-          ) : (
-            <div className="ck-frame">
-              <div className="ck-frame-art" style={{ aspectRatio: ar, "--ar": ar } as React.CSSProperties}>
-                <CookingScene recipe={recipe} plan={plan} dish={dish} step={null} surface={finalSurface(recipe)} presenting view={view} />
-              </div>
-            </div>
-          )}
+          </div>
+          <figcaption>Made by you, just the way you arranged it</figcaption>
         </figure>
         <section className="ck-finale-text" aria-live="polite">
           <p className="ck-kicker">Your {recipe.title.toLowerCase()}</p>
           <h1>Look what you made!</h1>
           <p className="ck-finale-benefit">{recipe.benefit} You earned {stars} chef {stars === 1 ? "star" : "stars"}.</p>
-          {showPhoto && (
-            <div className="ck-creation">
-              <div className="ck-creation-art"><DishPreview recipe={recipe} dish={dish} photo={false} label={`Your ${recipe.title.toLowerCase()}, the one you made`} /></div>
-              <div className="ck-creation-text">
-                <span className="ck-creation-title">Your creation</span>
-                <span className="ck-creation-note">The one you made</span>
-              </div>
-            </div>
-          )}
           <div className="ck-actions">
             <button type="button" className="ck-primary" onClick={onAgain}>Make another</button>
             {saved
@@ -721,6 +755,13 @@ function Finale({
         <div className="ck-overlay" role="dialog" aria-modal="true" aria-label="Recipe for grown-ups">
           <div className="ck-card ck-recipe">
             <h2>Make it with a grown-up</h2>
+            {recipe.image && !photoFailed && (
+              <figure className="ck-recipe-photo">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={recipe.image} alt={`A real ${recipe.title.toLowerCase()}`} loading="lazy" decoding="async" onError={() => setPhotoFailed(true)} />
+                <figcaption>What the real one can look like</figcaption>
+              </figure>
+            )}
             <p className="ck-note">
               In the game, cooking took about {pretendSeconds || "a few"} seconds of pretend time.
               {recipe.game === "assembly"

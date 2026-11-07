@@ -76,7 +76,8 @@
 .ck-progress li.current { background: #e59a6f; }
 
 /* instruction */
-.ck-main { display: flex; flex: 1; flex-direction: column; min-height: 0; }
+/* globals.css pads every <main>; the game screen needs every pixel for the dish. */
+.ck-main { display: flex; flex: 1; flex-direction: column; min-height: 0; padding: 0; }
 .ck-instruction {
   display: flex;
   flex-wrap: wrap;
@@ -99,7 +100,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  min-height: 40px;
+  min-height: 44px;
   padding: 4px 14px;
   border: 0;
   border-radius: 999px;
@@ -235,7 +236,7 @@
 .ck-ghost {
   position: fixed;
   z-index: 80;
-  transform: translate(-50%, -64%) scale(1.1);
+  transform: translate(-50%, -50%) scale(1.1);
   pointer-events: none;
   filter: drop-shadow(0 16px 12px rgb(60 40 20 / 32%));
 }
@@ -463,9 +464,11 @@
   .ck-progress { grid-column: 1 / -1; grid-row: 2; }
   .ck-instruction { padding: 2px 12px 4px; }
   .ck-step-title { font-size: 20px; }
-  .ck-main { justify-content: center; }
-  .ck-stage-wrap { display: block; flex: none; padding: 2px 8px; container-type: normal; }
-  .ck-stage { width: 100%; border-radius: 18px; }
+  /* The cooking surface fills every pixel between the instruction and the tray, so the
+     food, the tools and the instruction are always visible together without scrolling. */
+  .ck-main { justify-content: flex-start; }
+  .ck-stage-wrap { display: grid; flex: 1; min-height: 0; place-items: center; padding: 2px 8px 4px; container-type: size; }
+  .ck-stage { width: min(100cqw, calc(100cqh * var(--ar, 1))); border-radius: 18px; }
   .ck-chip { width: 84px; font-size: 12px; }
   .ck-chips { gap: 8px; }
   .ck-tray { min-height: 90px; padding: 6px 10px calc(10px + env(safe-area-inset-bottom)); }
@@ -501,3 +504,28 @@
 /* Dark theme: the chrome goes dark; the lit counter and food stay light so
    the food keeps its natural colors. */
 
+
+/* Finale: the child's own creation is the hero, framed like a food photo. */
+.ck-hero-creation .ck-frame { width: min(100%, calc((100dvh - 300px) * var(--ar-hero, 1)), 640px); margin-inline: auto; }
+.ck-hero-creation figcaption {
+  margin-top: 10px; color: var(--ck-muted); font-size: 14px; font-weight: 700; text-align: center;
+}
+/* The real-kitchen photo lives only in the grown-up recipe card. */
+.ck-recipe-photo { margin: 10px 0 14px; }
+.ck-recipe-photo img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 16px; }
+.ck-recipe-photo figcaption { margin-top: 6px; color: var(--ck-muted); font-size: 13px; font-weight: 700; }
+/* Safe areas: notches and rounded corners never cover the top bar or tray. */
+.ck-top { padding-top: max(6px, env(safe-area-inset-top)); padding-left: max(10px, env(safe-area-inset-left)); padding-right: max(10px, env(safe-area-inset-right)); }
+
+/* Landscape phones: the dish takes the full height on the left; the instruction and
+   the tray sit in a column on the right, within thumb reach. */
+@media (max-height: 560px) and (min-aspect-ratio: 5/4) {
+  .ck-app:not(.ck-finale) .ck-main {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(230px, 36%); grid-template-rows: auto minmax(0, 1fr);
+    padding-right: env(safe-area-inset-right); padding-left: env(safe-area-inset-left);
+  }
+  .ck-app:not(.ck-finale) .ck-stage-wrap { grid-column: 1; grid-row: 1 / span 2; padding: 4px 6px 8px 10px; }
+  .ck-app:not(.ck-finale) .ck-instruction { grid-column: 2; grid-row: 1; width: 100%; padding: 8px 12px 4px; }
+  .ck-app:not(.ck-finale) .ck-tray { grid-column: 2; grid-row: 2; align-items: flex-start; min-height: 0; overflow-y: auto; padding: 4px 12px calc(8px + env(safe-area-inset-bottom)); }
+  .ck-app:not(.ck-finale) .ck-chip { flex-direction: column; width: 84px; padding: 6px; }
+}
