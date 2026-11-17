@@ -117,8 +117,10 @@ export function FoodApp() {
   }
   function save(value: Family) {
     persist(value);
-    // Returning to the child kitchen is a role change, so the parent area locks again.
+    // Returning to the child kitchen is a role change, so the parent area locks again. Otherwise the
+    // grown-up who saved came through the PIN (or just created it), so the parent view stays open.
     if (role !== "adult" || value.age < 13) lock();
+    else setUnlocked(true);
     setSetup(false);
     setParentArea(false);
     setProfileOpen(false);
@@ -207,7 +209,7 @@ export function FoodApp() {
           {notice}
         </p>
       )}
-      {showGate && family ? (
+      {showGate && family && (
         <ParentGate
           key={gate?.reason ?? "locked"}
           family={family}
@@ -229,7 +231,10 @@ export function FoodApp() {
             else switchProfile();
           }}
         />
-      ) : !role && !setup ? (
+      )}
+      {/* The screen behind the gate stays mounted but hidden, so an idle lock keeps unsaved edits. */}
+      <div style={{ display: showGate ? "none" : "contents" }}>
+      {!role && !setup ? (
         <RoleChooser
           hasChildProfile={!!family}
           onChild={chooseChild}
@@ -305,6 +310,7 @@ export function FoodApp() {
           />
         </>
       )}
+      </div>
     </>
   );
 }

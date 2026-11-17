@@ -1,7 +1,7 @@
 import type { HouseholdProfile } from './domain';
 import { findCatalogFood } from './food-catalog';
 import { effectiveAllergies, effectiveRules } from './food-settings';
-import { libraryIngredientTags } from './ingredient-relationships';
+import { libraryIngredientTags, splitFoodTerms, typedTermTags } from './ingredient-relationships';
 import { simpleFoodName } from './recipe-library';
 
 /*
@@ -58,10 +58,13 @@ export function checkLibraryRecipe(ingredientNames: string[], profile?: Househol
     .filter(entry => entry.status !== 'confirmed' && entry.canonicalId).map(entry => entry.canonicalId!.toLowerCase())]);
   const rules = new Set<string>([...(profile ? effectiveRules(profile) : [])]);
   const excluded = new Set(profile?.excludedIngredientIds ?? []);
-  const nameOnlySettings = [...new Set([
-    ...members.flatMap(member => member.allergies).filter(entry => !entry.canonicalId).map(entry => entry.rawText.trim()),
-    ...members.flatMap(member => member.otherExclusions).map(value => value.trim()),
-  ].filter(Boolean))];
+  // Typed entries may hold a list ("kiwi, mango", saved before lists were split): check each food on its own.
+  const typed = [
+    ...members.flatMap(member => member.allergies).filter(entry => !entry.canonicalId).map(entry => entry.rawText),
+    ...members.flatMap(member => member.otherExclusions),
+  ].flatMap(text => splitFoodTerms(text, 30));
+  const nameOnlySettings = typed.filter((term, index) => typed.findIndex(other => other.toLowerCase() === term.toLowerCase()) === index);
+  const typedTerms = nameOnlySettings.map(term => ({ term, words: words(term), tags: typedTermTags(term) }));
   const noEgg = members.some(member => member.eggAllowed === false);
   const noDairy = members.some(member => member.dairyAllowed === false);
   const hasSettings = !!(allergyIds.size || rules.size || excluded.size || nameOnlySettings.length || noEgg || noDairy);
@@ -85,9 +88,9 @@ export function checkLibraryRecipe(ingredientNames: string[], profile?: Househol
     if (glutenRule && has('gluten', 'wheat')) conflicts.push('Contains gluten');
     if (ingredientIds.some(id => excluded.has(id))) conflicts.push('Excluded in your food settings');
     const nameWords = words(name);
-    for (const term of nameOnlySettings) {
-      const termWords = words(term);
-      if (termWords.trim() && nameWords.includes(termWords)) conflicts.push(`Matches “${term}” in your food settings`);
+    // A typed group ("nuts", "seafood", "dairy") covers its members; a typed food also matches by name.
+    for (const { term, words: termWords, tags: termTags } of typedTerms) {
+      if ((termWords.trim() && nameWords.includes(termWords)) || has(...termTags)) conflicts.push(`Matches “${term}” in your food settings`);
     }
     const meatRule = ['vegan', 'vegetarian', 'pescatarian', 'exclude_beef', 'exclude_pork'].some(rule => rules.has(rule));
     if (!conflicts.length && meatRule && has('animal-source-unknown')) checks.push('Animal source unknown, check the label');

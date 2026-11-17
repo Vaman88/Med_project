@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
   PARENT_LOCK_KEY,
   PIN_PATTERN,
@@ -54,16 +54,36 @@ export function ParentGate({
   const [confirmPin, setConfirmPin] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [grownUp, setGrownUp] = useState(false);
   const [lock, setLock] = useState<LockState>(freshLockState);
-  const [now, setNow] = useState(() => Date.now());
-  useEffect(() => setLock(readLock()), []);
-  const waitMs = remainingLockMs(lock, now);
+  const [now, setNow] = useState(() => ({ wall: Date.now(), mono: 0 }));
+  // A wait also runs on the page's own monotonic clock, so moving the device clock forward cannot shorten it.
+  const monoUntil = useRef(0);
+  function noteWait(state: LockState) {
+    const wall = Date.now();
+    const mono = performance.now();
+    monoUntil.current = Math.max(monoUntil.current, mono + remainingLockMs(state, wall));
+    setLock(state);
+    setNow({ wall, mono });
+  }
+  const waitFor = (state: LockState, wall: number, mono: number) =>
+    Math.max(remainingLockMs(state, wall), Math.ceil(monoUntil.current - mono));
   useEffect(() => {
-    if (!waitMs) return;
-    const timer = setInterval(() => setNow(Date.now()), 1000);
+    noteWait(readLock());
+    // Misses in another tab count here too.
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === PARENT_LOCK_KEY) noteWait(parseLockState(event.newValue));
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+  const waitMs = waitFor(lock, now.wall, now.mono);
+  useEffect(() => {
+    if (waitMs <= 0) return;
+    const timer = setInterval(() => setNow({ wall: Date.now(), mono: performance.now() }), 1000);
     return () => clearInterval(timer);
   }, [waitMs]);
-  const waitSeconds = Math.ceil(waitMs / 1000);
+  const waitSeconds = Math.ceil(Math.max(0, waitMs) / 1000);
 
   async function submit(event: FormEvent) {
     event.preventDefault();
@@ -71,6 +91,7 @@ export function ParentGate({
     if (setupMode) {
       if (!PIN_PATTERN.test(pin)) return setError("Choose a PIN of 4 to 8 digits.");
       if (pin !== confirmPin) return setError("The two PINs do not match. Type the same PIN twice.");
+      if (!grownUp) return setError("A parent or guardian needs to set this PIN. Tick the box to confirm.");
       setBusy(true);
       try {
         onCreatePin(await createParentPin(pin));
@@ -81,23 +102,25 @@ export function ParentGate({
       return;
     }
     const current = readLock();
-    const stamp = Date.now();
-    setNow(stamp);
-    setLock(current);
-    if (remainingLockMs(current, stamp)) return setError("");
+    noteWait(current);
+    if (waitFor(current, Date.now(), performance.now()) > 0) return setError("");
+    // Count the try as a miss before checking it, so tries running at once in several tabs still add up.
+    const next = recordFailure(current, Date.now());
+    writeLock(next);
     setBusy(true);
-    const ok =
-      PIN_PATTERN.test(pin) && (await verifyParentPin(pin, family.pinSalt!, family.pinHash!));
+    let ok = false;
+    try {
+      ok = PIN_PATTERN.test(pin) && (await verifyParentPin(pin, family.pinSalt!, family.pinHash!));
+    } catch {
+      ok = false;
+    }
     setBusy(false);
     if (ok) {
       writeLock(freshLockState());
       onUnlock();
       return;
     }
-    const next = recordFailure(current, Date.now());
-    writeLock(next);
-    setLock(next);
-    setNow(Date.now());
+    noteWait(readLock());
     setPin("");
     const left = triesBeforeWait(next);
     setError(
@@ -113,11 +136,14 @@ export function ParentGate({
         <span className="little-kicker">Parent area</span>
         <h1 id="parent-gate-title">{setupMode ? "Create a Parent PIN" : "Grown-ups only"}</h1>
         {setupMode ? (
-          <p>
-            This kitchen does not have a Parent PIN yet. A parent or guardian should create one now
-            to {reason}. Children will need it to open the meal planner, change food settings or
-            delete the child profile.
-          </p>
+          <>
+            <p>
+              <strong>Grown-ups: please set this PIN yourself.</strong> This kitchen does not have a
+              Parent PIN yet. Create one now to {reason}. After that, the PIN is needed to open the
+              meal planner, change food settings or delete the child profile.
+            </p>
+            <p>Children: please hand the device to a grown-up and tap Back.</p>
+          </>
         ) : (
           <p>Enter your Parent PIN to {reason}.</p>
         )}
@@ -147,6 +173,12 @@ export function ParentGate({
             />
           </label>
         )}
+        {setupMode && (
+          <label className="parent-gate-confirm">
+            <input type="checkbox" checked={grownUp} onChange={(event) => setGrownUp(event.target.checked)} />
+            I am a parent or guardian, age 18+, and I am choosing this PIN myself.
+          </label>
+        )}
         {error && <p role="alert">{error}</p>}
         {!!waitMs && (
           <p role="status">
@@ -161,7 +193,7 @@ export function ParentGate({
         </button>
         <small>
           {setupMode
-            ? "The PIN is a family control for a shared device, not a password. It is stored only in this browser, and someone with access to the browser’s storage or settings can get around it."
+            ? "The PIN is a family control for a shared device, not a password. It is stored only in this browser, and someone with access to the browser’s storage or settings can get around it. If a child set the PIN, clearing this site’s data in browser settings removes it, along with the saved child profile."
             : "Forgot the PIN? Clearing this site’s data in your browser settings removes the PIN, and also deletes the saved child profile and kitchen on this device."}
         </small>
       </form>

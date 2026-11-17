@@ -55,7 +55,7 @@ export async function verifyParentPin(
  * can bypass it. It is not authentication and must not be described as security.
  */
 export const PIN_PATTERN = /^\d{4,8}$/;
-/** Wrong PINs allowed before each further miss starts a waiting period. */
+/** The wrong PIN in a row that starts the first waiting period (each later miss doubles it). */
 export const FREE_ATTEMPTS = 3;
 export const BASE_LOCKOUT_MS = 30_000;
 export const MAX_LOCKOUT_MS = 15 * 60_000;
@@ -86,9 +86,9 @@ export function remainingLockMs(state: LockState, now: number) {
   // Capped so a changed device clock cannot lock a parent out for longer than the policy allows.
   return Math.min(MAX_LOCKOUT_MS, Math.max(0, state.lockedUntil - now));
 }
-/** Tries left before the next miss starts a wait (0 once waits have begun). */
+/** Tries left before a wait starts, counting the try whose miss would start it (0 once waits have begun). */
 export function triesBeforeWait(state: LockState) {
-  return Math.max(0, FREE_ATTEMPTS - 1 - state.failures);
+  return Math.max(0, FREE_ATTEMPTS - state.failures);
 }
 export function parseLockState(raw: string | null): LockState {
   try {

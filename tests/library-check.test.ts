@@ -72,3 +72,38 @@ test('without food settings nothing is compared', () => {
   assert.equal(check.conflicts.length, 0);
   assert.equal(checkLibraryRecipe(['Butter']).hasSettings, false);
 });
+
+test('a typed list of foods to avoid is split, so each food is matched on its own', () => {
+  const family: Family = { version: 1, age: 7, pantry: ['Banana'], allergies: [], otherAllergies: 'kiwi, mango and pineapple', allergyConfirmed: true, parentConfirmed: true };
+  const profileFromKids = childPlannerSnapshot(family).profile;
+  assert.deepEqual(profileFromKids.members?.[0].allergies.map(entry => entry.rawText), ['kiwi', 'mango', 'pineapple']);
+  const check = checkLibraryRecipe(['Kiwi', 'Mango Chutney', 'Pineapple Chunks', 'Rice'], profileFromKids);
+  assert.deepEqual(check.conflicts.map(item => item.name), ['Kiwi', 'Mango Chutney', 'Pineapple Chunks']);
+  // Profiles saved before lists were split hold one combined entry; it is split when checking too.
+  const member = { ...newMember('a', 'A'), allergies: [{ rawText: 'kiwi, mango', canonicalId: null, status: 'needs_review' as const }] };
+  const legacy = checkLibraryRecipe(['Kiwi', 'Mango'], profile({ members: [member] }));
+  assert.deepEqual(legacy.conflicts.map(item => item.name), ['Kiwi', 'Mango']);
+  assert.deepEqual(legacy.nameOnlySettings, ['kiwi', 'mango']);
+});
+
+test('typed food groups cover their members, and specific foods do not cover their whole group', () => {
+  const typed = (text: string) => profile({ members: [{ ...newMember('a', 'A'), otherExclusions: [text] }] });
+  const nuts = checkLibraryRecipe(['Almonds', 'Peanuts', 'Cashew Nuts', 'Rice'], typed('nuts'));
+  assert.deepEqual(nuts.conflicts.map(item => item.name), ['Almonds', 'Peanuts', 'Cashew Nuts']);
+  const seafood = checkLibraryRecipe(['Prawns', 'Salmon', 'Mussels', 'Rice'], typed('seafood'));
+  assert.deepEqual(seafood.conflicts.map(item => item.name), ['Prawns', 'Salmon', 'Mussels']);
+  const dairy = checkLibraryRecipe(['Butter', 'Parmesan', 'Coconut Milk'], typed('Dairy'));
+  assert.deepEqual(dairy.conflicts.map(item => item.name), ['Butter', 'Parmesan']);
+  // The kids' setup carries typed groups through to the planner profile too.
+  const family: Family = { version: 1, age: 7, pantry: [], allergies: [], otherAllergies: 'seafood, nuts', allergyConfirmed: true, parentConfirmed: true };
+  assert.deepEqual(checkLibraryRecipe(['King Prawns', 'Walnuts', 'Rice'], childPlannerSnapshot(family).profile).conflicts.map(item => item.name), ['King Prawns', 'Walnuts']);
+  // "salmon" is one fish, not every fish; "almonds" is one nut.
+  assert.equal(status(checkLibraryRecipe(['Tuna'], typed('salmon')), 'Tuna'), 'no-known-conflict');
+  assert.equal(status(checkLibraryRecipe(['Almond Flour', 'Walnuts'], typed('almonds')), 'Almond Flour'), 'conflict');
+  assert.equal(status(checkLibraryRecipe(['Walnuts'], typed('almonds')), 'Walnuts'), 'no-known-conflict');
+});
+
+test('Worcestershire sauce counts as fish', () => {
+  assert.equal(status(checkLibraryRecipe(['Worcestershire Sauce'], profile({ allergies: ['fish'] })), 'Worcestershire Sauce'), 'conflict');
+  assert.equal(status(checkLibraryRecipe(['Worcestershire Sauce'], profile({ dietaryRestrictions: ['vegetarian'] })), 'Worcestershire Sauce'), 'conflict');
+});

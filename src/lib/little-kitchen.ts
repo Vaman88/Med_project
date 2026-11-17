@@ -5,6 +5,7 @@ import {
   resolveKitchenFood,
 } from "./guest-kitchen";
 import { newMember } from "./food-settings";
+import { splitFoodTerms } from "./ingredient-relationships";
 
 export const FAMILY_KEY = "healthy-steps-family-v1";
 export const CHILD_PLANNER_KEY = "healthy-steps-child-planner-v1";
@@ -160,7 +161,8 @@ export function childPlannerSnapshot(
       noKnownAllergies: !family.allergies.length && !family.otherAllergies,
       allergies: [
         ...family.allergies.filter((a) => !ids[a]),
-        ...(family.otherAllergies ? [family.otherAllergies.slice(0, 80)] : []),
+        // "kiwi, mango" is two foods to avoid, each matched on its own.
+        ...splitFoodTerms(family.otherAllergies),
       ].map((rawText) => ({
         rawText,
         canonicalId: null,

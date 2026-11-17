@@ -20,8 +20,8 @@ Open http://localhost:3000. Browser-saved pantry, budget and child profiles rema
 
 The Parent PIN is a **family control for a shared device, not security**. It keeps a child from opening the meal planner, changing allergies and food restrictions, or deleting the child profile through the ordinary screens.
 
-- A parent creates a 4–8 digit PIN when setting up a child's kitchen. Profiles saved before PINs existed are asked to create one the first time the parent area is opened.
-- The PIN is stored only in this browser as a salted PBKDF2 hash. After three wrong PINs, each further miss starts a wait that doubles from 30 seconds up to 15 minutes.
+- A parent creates a 4–8 digit PIN when setting up a child's kitchen. Profiles saved before PINs existed are asked to create one the first time the parent area is opened; the screen asks a grown-up to do this and to confirm they are the parent or guardian, but it cannot tell who is actually typing.
+- The PIN is stored only in this browser as a salted PBKDF2 hash. The third wrong PIN in a row starts a 30-second wait, and each further miss doubles it, up to 15 minutes. Tries in other tabs of the same browser count too.
 - The parent area locks again when someone switches profile or returns to the child kitchen, and after 5 minutes without activity.
 - Anyone with access to the browser's storage, developer tools or site-data settings can get around it. Clearing this site's data resets a forgotten PIN and also deletes the saved child profile. It is not a separate authenticated child account; real child accounts would need server-side authorization.
 

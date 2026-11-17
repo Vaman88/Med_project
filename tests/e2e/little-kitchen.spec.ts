@@ -457,7 +457,7 @@ test("a wrong Parent PIN keeps the parent area closed and waits after repeated m
   await setup(page);
   await page.getByRole("button", { name: "Parent settings" }).click();
   await unlock(page, "1111");
-  await expect(page.locator("[role=alert]:not(#__next-route-announcer__)")).toContainText("That PIN did not match");
+  await expect(page.locator("[role=alert]:not(#__next-route-announcer__)")).toContainText("That PIN did not match. 2 more tries before a short wait.");
   await expect(page.getByRole("heading", { name: "Grown-ups only" })).toBeVisible();
   for (const miss of ["2222", "3333"]) {
     await page.getByLabel("Parent PIN", { exact: true }).fill(miss);
@@ -494,6 +494,10 @@ test("an older profile with no Parent PIN must create one before the parent area
   await page.getByRole("button", { name: "Save PIN and continue" }).click();
   await expect(page.locator("[role=alert]:not(#__next-route-announcer__)")).toContainText("do not match");
   await page.getByLabel("Type the PIN again").fill("1357");
+  // A grown-up has to confirm they are choosing the PIN.
+  await page.getByRole("button", { name: "Save PIN and continue" }).click();
+  await expect(page.locator("[role=alert]:not(#__next-route-announcer__)")).toContainText("parent or guardian");
+  await page.getByRole("checkbox", { name: /I am a parent or guardian/ }).check();
   await page.getByRole("button", { name: "Save PIN and continue" }).click();
   await expect(page.getByRole("heading", { name: "What's in your kitchen today?" })).toBeVisible();
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("healthy-steps-family-v1") ?? "{}"));
@@ -529,4 +533,34 @@ test("library recipes are labelled unchecked and show known conflicts with the c
   await expect(safety).toContainText("Eggs");
   await expect(safety).toContainText("Not verified: Sumac");
   await expect(dialog.locator(".library-ingredients li.conflict")).toHaveCount(1);
+});
+
+test("a grown-up who sets up a teen from the planner is not asked for the new PIN straight away", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: /Continue as an adult/ }).click();
+  await page.getByRole("button", { name: "Set up a child’s kitchen" }).click();
+  await page.getByRole("textbox", { name: "Chef nickname" }).fill("Sunny");
+  await page.getByRole("spinbutton", { name: "Child’s age" }).fill("14");
+  await page.getByRole("button", { name: /Continue/ }).click();
+  await page.getByRole("button", { name: /Continue/ }).click();
+  await page.getByRole("checkbox", { name: "I confirm there are no known food allergies." }).check();
+  await page.getByRole("button", { name: /Continue/ }).click();
+  await page.getByRole("checkbox", { name: "I am a parent or guardian", exact: false }).check();
+  await page.getByLabel("Parent PIN (4–8 digits)").fill(PIN);
+  await page.getByLabel("Type the Parent PIN again").fill(PIN);
+  await page.getByRole("button", { name: "Create kitchen", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "What's in your kitchen today?" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Grown-ups only" })).toHaveCount(0);
+});
+
+test("an idle lock keeps unsaved settings edits for after the PIN", async ({ page }) => {
+  await page.clock.install();
+  await setup(page);
+  await openSettings(page);
+  await page.getByRole("textbox", { name: "Chef nickname" }).fill("River");
+  await page.clock.fastForward("05:01");
+  await expect(page.getByRole("heading", { name: "Grown-ups only" })).toBeVisible();
+  await expect(page.getByRole("textbox", { name: "Chef nickname" })).toHaveCount(0);
+  await unlock(page);
+  await expect(page.getByRole("textbox", { name: "Chef nickname" })).toHaveValue("River");
 });

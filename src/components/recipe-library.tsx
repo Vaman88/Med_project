@@ -35,7 +35,7 @@ function SafetySummary({ check }: { check: LibraryRecipeCheck }) {
   return <div className={`library-safety${check.conflicts.length ? ' has-conflicts' : ''}`} role="note" aria-label="Check against your food settings">
     {check.conflicts.length > 0 ? <>
       <strong><IconAlertTriangle size={18} aria-hidden="true" />Known conflicts with your food settings</strong>
-      <ul>{check.conflicts.map(item => <li key={item.name}><b>{item.name}</b>: {item.reasons.join('; ')}</li>)}</ul>
+      <ul>{check.conflicts.map((item, index) => <li key={`${index}-${item.name}`}><b>{item.name}</b>: {item.reasons.join('; ')}</li>)}</ul>
     </> : <strong><IconHelpCircle size={18} aria-hidden="true" />No known conflicts found, but this recipe is not verified</strong>}
     {unverifiedNames.length > 0 && <p>Not verified: {unverifiedNames.join(', ')}. We could not fully check {unverifiedNames.length === 1 ? 'this ingredient' : 'these ingredients'}; read the labels.</p>}
     {check.nameOnlySettings.length > 0 && <p>Matched by name only: {check.nameOnlySettings.join(', ')}.</p>}
@@ -102,7 +102,7 @@ function RecipeDialog({ dish, pantry, amounts, profile, onClose }: { dish: Libra
             const owned = pantryHas(pantry, item.name);
             const check = checks[index];
             const fit = safety.items[index];
-            return <li key={item.name + item.measure} className={[owned ? check?.status === 'short' ? 'owned short' : 'owned' : '', fit.status === 'conflict' ? 'conflict' : ''].filter(Boolean).join(' ') || undefined}>
+            return <li key={`${index}-${item.name}-${item.measure}`} className={[owned ? check?.status === 'short' ? 'owned short' : 'owned' : '', fit.status === 'conflict' ? 'conflict' : ''].filter(Boolean).join(' ') || undefined}>
               {owned ? <IconCheck size={16} aria-label="In your kitchen" /> : <IconShoppingBag size={16} aria-label="To buy" />}
               <span>{item.name}{check?.status === 'short' && <em>you have {formatMeasure(check.have!, check.unit!)} · need {formatMeasure(check.missing!, check.unit!)} more</em>}{check?.status === 'enough' && <em>you have {formatMeasure(check.have!, check.unit!)} · enough</em>}{fit.status === 'conflict' && <em className="library-fit conflict">Conflicts with your food settings</em>}{fit.status === 'unverified' && safety.hasSettings && <em className="library-fit unverified">Not verified</em>}</span>
               <small>{item.measure}</small>

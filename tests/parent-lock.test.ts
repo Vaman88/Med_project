@@ -37,12 +37,16 @@ test('PINs are 4 to 8 digits', () => {
 test('wrong PINs get a few free tries, then doubling waits that stop at a cap', () => {
   let state = freshLockState();
   const now = 1_000_000;
+  assert.equal(triesBeforeWait(state), FREE_ATTEMPTS);
   for (let miss = 1; miss < FREE_ATTEMPTS; miss++) {
     state = recordFailure(state, now);
     assert.equal(remainingLockMs(state, now), 0, `miss ${miss} has no wait`);
+    // The count includes the try whose miss would start the wait, so it never reads "0 more tries" while a try is still free.
+    assert.equal(triesBeforeWait(state), FREE_ATTEMPTS - miss);
   }
-  assert.equal(triesBeforeWait(state), 0);
+  assert.equal(triesBeforeWait(state), 1);
   state = recordFailure(state, now);
+  assert.equal(triesBeforeWait(state), 0);
   assert.equal(remainingLockMs(state, now), BASE_LOCKOUT_MS);
   state = recordFailure(state, now);
   assert.equal(remainingLockMs(state, now), BASE_LOCKOUT_MS * 2);
