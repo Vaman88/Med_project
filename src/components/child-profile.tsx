@@ -1,10 +1,11 @@
 "use client";
 import { IconEdit } from "@tabler/icons-react";
 import { ChefAvatar } from "./chef-avatar";
+import { chefTitle } from "@/lib/chef-name";
 import { littleRecipes, recipeChoices, type Family } from "@/lib/little-kitchen";
 
-/** Wizard steps, in order: 0 chef, 1 pantry, 2 foods to avoid, 3 family details. */
-export type ProfileStep = 0 | 1 | 2 | 3;
+/** Wizard steps, in order: 0 pantry, 1 foods to avoid, 2 family details. */
+export type ProfileStep = 0 | 1 | 2;
 
 function List({ items, empty }: { items: readonly string[] | undefined; empty: string }) {
   if (!items?.length) return <p className="cp-empty">{empty}</p>;
@@ -41,26 +42,18 @@ export function ChildProfile({ family, onEdit, onBack, onDelete }: {
           <ChefAvatar avatar={family.avatar ?? { skin: "tan", hair: "curly", apron: "coral" }} size="small" />
           <div>
             <span className="eyebrow">Child profile</span>
-            <h1>Chef {family.nickname || "(no nickname)"}</h1>
+            <h1>{chefTitle(family.nickname)}</h1>
             <p>Age {family.age} · {shown} of {littleRecipes.length} dishes shown{hidden ? ` · ${hidden} hidden by food settings` : ""}</p>
           </div>
           <button type="button" className="button" onClick={() => onEdit(0)}>Edit everything</button>
         </header>
 
-        {section("Chef", 0, (
-          <dl className="cp-facts">
-            <div><dt>Nickname</dt><dd>{family.nickname || "Not set"}</dd></div>
-            <div><dt>Age</dt><dd>{family.age}</dd></div>
-            <div><dt>Look</dt><dd>{family.avatar ? `${family.avatar.skin} skin · ${family.avatar.hair} hair · ${family.avatar.apron} apron` : "Default chef"}</dd></div>
-          </dl>
-        ))}
-
-        {section("Pantry", 1, <>
+        {section("Pantry", 0, <>
           <p className="cp-note">Foods at home. Dishes that need other foods still show, with a note for the grown-up.</p>
           <List items={family.pantry} empty="No foods added yet." />
         </>)}
 
-        {section("Foods to avoid", 2, <>
+        {section("Foods to avoid", 1, <>
           <dl className="cp-facts">
             <div><dt>Allergies and exclusions</dt><dd><List items={family.allergies} empty="No known food allergies." /></dd></div>
             <div><dt>Other foods to avoid</dt><dd>{family.otherAllergies.trim() || "None"}</dd></div>
@@ -69,8 +62,9 @@ export function ChildProfile({ family, onEdit, onBack, onDelete }: {
           <p className="cp-note">Any dish with one of these foods is hidden from the kids’ menu. The 9 major allergens also carry over to the meal planner.</p>
         </>)}
 
-        {section("Family details", 3, (
+        {section("Family details", 2, (
           <dl className="cp-facts">
+            <div><dt>Age</dt><dd>{family.age}</dd></div>
             <div><dt>Weekly grocery budget</dt><dd>{family.weeklyBudget !== undefined ? `$${family.weeklyBudget}` : "Not set"}</dd></div>
             <div><dt>People eating</dt><dd>{family.householdSize ?? "Not set"}</dd></div>
             <div><dt>Kitchen equipment</dt><dd><List items={family.equipment} empty="Not set" /></dd></div>
