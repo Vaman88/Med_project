@@ -70,12 +70,21 @@ async function setup(page: Page, age = 7, allergy?: string, info?: TestInfo) {
     .getByRole("button", { name: "Create kitchen", exact: true })
     .click();
   // Every child profile, teens included, lands in the kids' kitchen.
-  if (age < 13)
+  if (age < 13) {
+    await expect(page.getByRole("button", { name: "See all dishes" })).toBeVisible();
+    await showAllDishes(page);
     await expect(page.locator(".km-card")).toHaveCount(allergy ? kidsCount - 4 : kidsCount);
+  }
   else
     await expect(page.getByRole("heading", { name: /Hey, Chef Seedy/ })).toBeVisible();
 }
+/** The kids' home is the "Let's cook!" kitchen; the full grid of dishes is one tap away. */
+async function showAllDishes(page: Page) {
+  const button = page.getByRole("button", { name: "See all dishes" });
+  if (await button.isVisible().catch(() => false)) await button.click();
+}
 async function start(page: Page, title: string) {
+  await showAllDishes(page);
   await page
     .locator(".km-card")
     .filter({ hasText: title })
@@ -131,6 +140,8 @@ async function seedAllRecipes(page: Page) {
   })));
   await page.goto("/");
   await asChild(page);
+  await expect(page.getByRole("button", { name: "See all dishes" })).toBeVisible();
+  await showAllDishes(page);
   await expect(page.locator(".km-card")).toHaveCount(kidsCount);
 }
 
@@ -149,7 +160,9 @@ async function playStep(page: Page) {
       if (!(await chip.count())) break;
       await chip.click();
       await expect(chip).toHaveAttribute("aria-pressed", "true");
-      await zone.click({ position: { x: 150, y: 150 } });
+      // Tap well inside the drop zone, whatever size the dish frame is on this screen.
+      const box = await zone.boundingBox();
+      await zone.click({ position: box ? { x: Math.min(150, box.width / 2), y: Math.min(150, box.height / 2) } : undefined });
       await page.waitForTimeout(kind === "drop" ? 120 : 250);
       if (kind !== "drop") await expect(page.locator(".ck-spoon-path, .ck-pour-path")).toHaveCount(0, { timeout: 4000 });
     }
@@ -292,6 +305,8 @@ test("allergy and pantry edits keep their safety rules without hiding the fun", 
     .getByRole("checkbox", { name: "I am a parent or guardian", exact: false })
     .check();
   await page.getByRole("button", { name: "Save kitchen" }).click();
+  await expect(page.getByRole("button", { name: "See all dishes" })).toBeVisible();
+  await showAllDishes(page);
   const pizza = page.locator(".km-card").filter({ hasText: "Rainbow mini pizzas" });
   await expect(pizza).toContainText("a grown-up may need to add");
   await expect(pizza).toContainText("Tomato");
@@ -371,6 +386,7 @@ test("My Cookbook stays visible and explains an empty cookbook", async ({ page }
 });
 test("teens get the kids' kitchen and can still open the original planner", async ({ page }) => {
   await setup(page, 13, "Peanut");
+  await showAllDishes(page);
   await expect(page.locator(".km-card").first()).toBeVisible();
   await page.reload();
   await asChild(page);
@@ -385,6 +401,9 @@ test("teens get the kids' kitchen and can still open the original planner", asyn
 });
 test("age twelve sees the child cooking game", async ({ page }) => {
   await setup(page, 12);
+  // setup() already confirmed the "Let's cook!" kitchen and opened the full dish grid.
+  await expect(page.getByRole("heading", { name: "All dishes" })).toBeVisible();
+  await page.getByRole("button", { name: "Back to the kitchen" }).click();
   await expect(page.getByRole("heading", { name: /Hey, Chef Seedy/ })).toBeVisible();
   await start(page, "Rainbow mini pizzas");
 });

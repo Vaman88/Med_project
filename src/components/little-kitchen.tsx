@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Image, { type ImageProps } from "next/image";
 import {
+  IconArrowLeft,
   IconArrowRight,
   IconBook2,
   IconChefHat,
@@ -13,6 +14,8 @@ import {
 import { CookingStudio } from "./cooking-studio";
 import { DishPreview } from "./dish-preview";
 import { ChefAvatar } from "./chef-avatar";
+import { Sprig, dishesCooked, sprigGrowth, sprigNextGoal } from "./sprig";
+import { KitchenStage } from "./kitchen-stage";
 import {
   awardRecipe,
   CHILD_PROGRESS_KEY,
@@ -47,7 +50,8 @@ export function LittleKitchen({
   const [category, setCategory] = useState<
     "all" | "breakfast" | "lunch" | "snack" | "sweet"
   >("all");
-  const [destination, setDestination] = useState<"cook" | "recipes" | "chef">(
+  // "cook" is the kitchen home (Sprig + the shuffling counter); "all" is the full dish grid.
+  const [destination, setDestination] = useState<"cook" | "all" | "recipes" | "chef">(
     "cook",
   );
   const [progress, setProgress] = useState(emptyProgress);
@@ -96,6 +100,8 @@ export function LittleKitchen({
   const cookbook = choices.filter(
     ({ recipe: item }) => progress.creations?.[item.id],
   );
+  // Sprig, the companion, grows with every dish the child finishes.
+  const dishes = dishesCooked(progress);
   const cook = (item: LittleRecipe) => {
     setJustSaved(null);
     setRecipe(item);
@@ -120,6 +126,7 @@ export function LittleKitchen({
           setDestination("recipes");
         }}
         chefAge={family.age}
+        sprigDishes={dishes}
       />
     );
   return (
@@ -132,7 +139,7 @@ export function LittleKitchen({
           {(["cook", "recipes", "chef"] as const).map((item) => (
             <button
               key={item}
-              aria-current={destination === item ? "page" : undefined}
+              aria-current={destination === item || (item === "cook" && destination === "all") ? "page" : undefined}
               onClick={() => setDestination(item)}
             >
               {item === "cook" ? (
@@ -183,6 +190,16 @@ export function LittleKitchen({
               <span className="little-kicker">My chef</span>
               <h1>{title}</h1>
               <p className="chef-stars">⭐ {progress.stars} chef stars</p>
+              <div className="sprig-garden">
+                <Sprig mood={dishes ? "cheer" : "hello"} dishes={dishes} size={150} label={`Sprig the bean sprout, with ${sprigGrowth(dishes).leaves} leaves`} />
+                <div>
+                  <h2>Sprig’s garden</h2>
+                  <p>You’ve cooked {dishes} {dishes === 1 ? "dish" : "dishes"}. {sprigNextGoal(dishes)}</p>
+                  <div className="sprig-meter" aria-hidden="true">
+                    {Array.from({ length: 6 }, (_, i) => <i key={i} className={i < Math.min(dishes, 6) ? "on" : undefined} />)}
+                  </div>
+                </div>
+              </div>
               <h2>Your badges</h2>
               <div className="chef-badges">
                 <span>
@@ -210,14 +227,28 @@ export function LittleKitchen({
             </div>
           </section>
         ) : (
+          destination === "cook" && !family.otherAllergies.trim() && choices.length > 0 ? (
+          // The kids' kitchen home, straight after setup: Sprig greets the chef and the
+          // dishes shuffle along the counter. "See all dishes" opens the full grid.
+          <section className="km-section km-home">
+            <KitchenStage title={title} dishes={dishes} recipes={choices.map((c) => c.recipe)} completed={progress.completed}
+              onCook={cook} onAll={() => { setDestination("all"); window.scrollTo({ top: 0, behavior: "instant" }); }} />
+          </section>
+        ) : (
           <section className="km-section">
-            <div className="km-hello">
-              <ChefAvatar avatar={family.avatar} size="small" />
-              <div>
-                <h1>Hey, {title}! What’s cooking?</h1>
-                <p className="km-sub">Pick a dish and make it in your play kitchen.</p>
+            {destination === "all" ? (
+              <div className="km-all-head">
+                <h1>All dishes</h1>
+                <button type="button" className="km-back" onClick={() => setDestination("cook")}>
+                  <IconArrowLeft size={20} aria-hidden="true" /> Back to the kitchen
+                </button>
               </div>
-            </div>
+            ) : (
+              <div className="km-hello">
+                <Sprig mood="hello" dishes={dishes} size={104} label="Sprig the bean sprout, waving hello" />
+                <div><h1>Hey, {title}! What’s cooking?</h1></div>
+              </div>
+            )}
             <div className="km-filters" role="group" aria-label="Kinds of dishes">
               {(["all", "breakfast", "lunch", "snack", "sweet"] as const).map((item) => (
                 <button key={item} aria-pressed={category === item} onClick={() => setCategory(item)}>
@@ -287,6 +318,7 @@ export function LittleKitchen({
               </div>
             )}
           </section>
+        )
         )}
         <p className="little-footnote">
           This is a pretend cooking game. Ask a grown-up for help with real

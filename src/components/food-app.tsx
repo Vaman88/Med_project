@@ -123,6 +123,8 @@ export function FoodApp() {
     // grown-up who saved came through the PIN (or just created it), so the parent view stays open.
     if (role !== "adult" || value.age < 13) lock();
     else setUnlocked(true);
+    // Land at the top of the kitchen, not part-way down where the setup form was scrolled.
+    window.scrollTo({ top: 0, behavior: "instant" });
     setSetup(false);
     setParentArea(false);
     setProfileOpen(false);

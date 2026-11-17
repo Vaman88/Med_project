@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Healthy Steps — Style 2: Night Market</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Fredoka:wght@700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0d1030; color: #cfd6ff; font-family: Nunito, system-ui, sans-serif; }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 40px 28px 80px; }
+  .tag { display: inline-block; padding: 4px 14px; border-radius: 999px; background: #ff2e88; color: #fff; font-weight: 800; font-size: 14px; letter-spacing: .04em; }
+  h1 { font: 400 48px/1.05 "Lilita One", sans-serif; margin: 10px 0 6px; color: #fff; letter-spacing: .01em; }
+  .lead { margin: 0 0 6px; font-size: 17px; font-weight: 700; max-width: 880px; line-height: 1.5; }
+  .why { margin: 22px 0 0; padding: 18px 22px; border-radius: 20px; background: #171c44; border: 3px solid #00e0c6; }
+  .why h3 { margin: 0 0 8px; font: 400 22px "Lilita One", sans-serif; color: #fff; }
+  .why ul { margin: 0; padding-left: 20px; line-height: 1.6; font-weight: 700; }
+  .why b { color: #ffd23f; }
+  h2 { font: 400 28px "Lilita One", sans-serif; margin: 44px 0 2px; display: flex; align-items: center; gap: 10px; color: #fff; }
+  h2 b { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: #ffd23f; color: #141a3a; font-size: 19px; font-weight: 400; }
+  .sub { margin: 0 0 14px; font-weight: 700; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; }
+  .grid.wide { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+  .grid.small { grid-template-columns: repeat(auto-fill, minmax(124px, 1fr)); }
+  .card { background: #171c44; border: 2px solid #2a3170; border-radius: 18px; padding: 14px 12px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px; }
+  .card svg { display: block; max-width: 100%; height: auto; }
+  .card strong { font-size: 16px; text-align: center; color: #fff; text-transform: capitalize; }
+  .card span { font-size: 13px; text-align: center; line-height: 1.35; }
+  table { border-collapse: separate; border-spacing: 0 8px; width: 100%; }
+  td { background: #171c44; padding: 8px 14px; border-top: 2px solid #2a3170; border-bottom: 2px solid #2a3170; vertical-align: middle; }
+  td:first-child { border-left: 2px solid #2a3170; border-radius: 16px 0 0 16px; font: 400 20px "Lilita One", sans-serif; width: 150px; color: #fff; }
+  td:last-child { border-right: 2px solid #2a3170; border-radius: 0 16px 16px 0; }
+  .states { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; }
+  .state { display: flex; flex-direction: column; align-items: center; font-size: 13px; font-weight: 800; }
+  .arrow { align-self: center; color: #00e0c6; font: 400 26px "Lilita One"; margin-bottom: 14px; }
+  .mocks { display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-start; }
+  .phone { border: 10px solid #05061a; border-radius: 40px; overflow: hidden; width: 330px; background: #000; box-shadow: 0 0 0 2px #2a3170, 0 18px 50px #000; }
+  .phone svg { display: block; width: 100%; height: auto; }
+  .cap { max-width: 330px; margin-top: 10px; font-size: 14px; font-weight: 700; line-height: 1.45; }
+  .cap b { color: #fff; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="tag">STYLE 2 OF 2</span>
+  <h1>Night Market Food Truck</h1>
+  <p class="lead">The child runs a food truck at a glowing night market. Dark sky, neon lights, and food drawn as bright stickers that pop off the screen. Order tickets, points and “PERFECT!” pop-ups give it real game energy. Best for older chefs (about 8 to 12).</p>
+  <div class="why">
+    <h3>Why a child would want to play this one</h3>
+    <ul>
+      <li><b>Every tap answers back.</b> Points pop up, the combo counter grows and “PERFECT!” flashes the moment a step is done right.</li>
+      <li><b>The food is the brightest thing on screen.</b> Sticker-style food with a white edge glows against the dark market, one clear item per crate.</li>
+      <li><b>A clear goal.</b> An order ticket shows the dish and its ingredients, with a green tick for each one added.</li>
+      <li><b>Stars for doing it right, not fast.</b> There is no timer, and a mistake costs nothing; the combo simply starts again.</li>
+    </ul>
+  </div>
+
+  <h2><b>1</b>The market and the truck counter</h2>
+  <p class="sub">A night sky, city lights, string bulbs and a striped awning. The counter is the truck’s steel worktop.</p>
+  <div class="grid wide" id="s1"></div>
+  <h2><b>2</b>Cooking stations</h2>
+  <p class="sub">Bold street-food gear, each drawn as a sticker.</p>
+  <div class="grid" id="s2"></div>
+  <h2><b>3</b>Serving dishes</h2>
+  <div class="grid" id="s3"></div>
+  <h2><b>4</b>Ingredient crates</h2>
+  <p class="sub">Each ingredient pops out of its own glowing crate. The badge shows how many are left.</p>
+  <div class="grid" id="s4"></div>
+  <h2><b>5</b>Ingredients and how they change</h2>
+  <p class="sub">Bright sticker food. Every food has a look for each stage of cooking.</p>
+  <table id="s5"></table>
+  <h2><b>6</b>Tools</h2>
+  <div class="grid small" id="s6"></div>
+  <h2><b>7</b>Game pieces and rewards</h2>
+  <div class="grid wide" id="s7"></div>
+  <h2><b>8</b>All together</h2>
+  <p class="sub">The same pieces building two different steps on a phone.</p>
+  <div class="mocks" id="s8"></div>
+</div>
+
+<script src="game-kit.js"></script>
+<script>
+const { dk, lt } = kitColor;
+const NAVY = "#141a3a";
+const S = {
+  stroke: (c, w) => `stroke="${dk(c, 0.35)}" stroke-width="${w || 1.6}" stroke-linejoin="round" stroke-linecap="round"`,
+  thin: (c) => `stroke="${c}" stroke-width="1"`,
+  ground: 0, ropeEdge: 2.4,
+  pal: { wood: "#f0b064", steel: "#cfd8e6", steelLine: "#7f90aa", pot: "#ff4d6d", pan: "#4a5268", handle: "#ffb000", oven: "#7b5cff", knob: "#00e0c6", dish: "#00b8c8", dishRim: "#ffffff", dishDot: "#ffe45c", bowl: "#ffb000", mitt: "#ff4d6d" },
+};
+const K = makeKit(S);
+const { FOOD, ST, TOOL, SIZE, SPRIG } = K;
+
+const DEFS = `<defs>
+  <linearGradient id="bSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#140f3c"/><stop offset="1" stop-color="#40207a"/></linearGradient>
+  <pattern id="bCheck" width="36" height="36" patternUnits="userSpaceOnUse"><rect width="36" height="36" fill="#141a3a"/><rect width="18" height="18" fill="#ff2e88"/><rect x="18" y="18" width="18" height="18" fill="#ff2e88"/></pattern>
+  <filter id="stk" x="-25%" y="-25%" width="150%" height="160%" color-interpolation-filters="sRGB"><feMorphology in="SourceAlpha" operator="dilate" radius="3" result="d"/><feFlood flood-color="#fff"/><feComposite in2="d" operator="in" result="w"/><feGaussianBlur in="d" stdDeviation="2.2" result="b"/><feOffset in="b" dy="4" result="o"/><feFlood flood-color="#000" flood-opacity=".5"/><feComposite in2="o" operator="in" result="sh"/><feMerge><feMergeNode in="sh"/><feMergeNode in="w"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>`;
+const svg = (w, h, inner, px) => `<svg viewBox="0 0 ${w} ${h}" width="${px || w}" role="img">${DEFS}${inner}</svg>`;
+const stk = (art) => `<g filter="url(#stk)">${art}</g>`;
+const nest = (inner, x, y, w, h, vw, vh) => `<svg x="${x}" y="${y}" width="${w}" height="${h}" viewBox="0 0 ${vw} ${vh}" overflow="visible">${inner}</svg>`;
+const nFood = (k, x, y, s) => nest(FOOD[k], x, y, s, s, 100, 100);
+const nSt = (k, x, y, w) => nest(ST[k], x, y, w, (w * SIZE[k][1]) / SIZE[k][0], SIZE[k][0], SIZE[k][1]);
+const card = (html, title, note) => `<div class="card">${html}<strong>${title}</strong>${note ? `<span>${note}</span>` : ""}</div>`;
+const txt = (x, y, t, size, fill = "#fff", anchor = "start", extra = "", font = "'Lilita One', sans-serif", weight = 400) => `<text x="${x}" y="${y}" text-anchor="${anchor}" font-family="${font}" font-weight="${weight}" font-size="${size}" fill="${fill}" ${extra}>${t}</text>`;
+const pop = (x, y, t, size, fill = "#ffd23f", rot = 0) => txt(x, y, t, size, fill, "middle", `stroke="${NAVY}" stroke-width="${Math.max(5, size / 5)}" paint-order="stroke" stroke-linejoin="round" transform="rotate(${rot} ${x} ${y})"`);
+const star = (cx, cy, r, fill, extra = "") => { let p = ""; for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + (i * Math.PI) / 5, rr = i % 2 ? r * 0.46 : r; p += (i ? "L" : "M") + (cx + Math.cos(a) * rr).toFixed(1) + " " + (cy + Math.sin(a) * rr).toFixed(1); } return `<path d="${p}Z" fill="${fill}" stroke-linejoin="round" ${extra}/>`; };
+const tick = (x, y, on) => `<circle cx="${x}" cy="${y}" r="8.5" fill="${on ? "#22c55e" : "#fff"}" stroke="${on ? "#0f7a36" : "#b8c0d8"}" stroke-width="2.2"/>${on ? `<path d="M${x - 4} ${y} l3 3.2 l5.2 -5.8" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>` : ""}`;
+
+/* ---------- backdrop ---------- */
+const skyStars = [[20, 70], [58, 96], [96, 60], [132, 88], [176, 70], [214, 96], [252, 64], [290, 92], [372, 74], [152, 116], [316, 112], [36, 124]].map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="${i % 3 ? 1.3 : 2}" fill="#fff" opacity="${i % 2 ? 0.9 : 0.6}"/>`).join("");
+const towers = [[0, 168, 50], [44, 140, 46], [96, 178, 60], [150, 126, 40], [196, 160, 70], [262, 136, 44], [300, 170, 60], [352, 148, 48]];
+const skyline = towers.map(([x, y, w]) => `<rect x="${x}" y="${y}" width="${w}" height="${300 - y}" fill="#231a5a"/>`).join("") +
+  towers.map(([x, y, w], i) => [0, 1, 2].map((r) => [0, 1].map((c) => ((i + r + c) % 3 ? `<rect x="${x + 8 + c * (w - 26)}" y="${y + 12 + r * 18}" width="9" height="9" rx="1.5" fill="#ffd23f" opacity=".85"/>` : "")).join("")).join("")).join("");
+const BULBS = [[30, 45.4], [70, 54.8], [110, 57.6], [150, 53.9], [190, 43.6], [230, 30.2], [270, 22], [310, 19.4], [350, 22.4], [390, 31]];
+const BULB_COL = ["#ff4d8d", "#ffd23f", "#00e0c6", "#4db8ff"];
+const lights = `<g transform="translate(0 34)"><path d="M0 34 Q100 78 200 40 T400 34" fill="none" stroke="#0a0822" stroke-width="2.5"/>${BULBS.map(([x, y], i) => `<circle cx="${x}" cy="${y + 7}" r="14" fill="${BULB_COL[i % 4]}" opacity=".22"/><circle cx="${x}" cy="${y + 7}" r="6" fill="${BULB_COL[i % 4]}"/><circle cx="${x - 2}" cy="${y + 5}" r="1.8" fill="#fff" opacity=".8"/>`).join("")}</g>`;
+const awning = Array.from({ length: 10 }, (_, i) => `<rect x="${i * 40}" width="40" height="28" fill="${i % 2 ? "#ffffff" : "#ff2e88"}"/><circle cx="${20 + i * 40}" cy="28" r="20" fill="${i % 2 ? "#ffffff" : "#ff2e88"}"/>`).join("");
+const WALL = `<rect width="400" height="300" fill="url(#bSky)"/>${skyStars}<circle cx="66" cy="120" r="32" fill="#fff3c4" opacity=".14"/><circle cx="66" cy="120" r="20" fill="#fff3c4"/><circle cx="60" cy="114" r="4" fill="#e9d894"/><circle cx="72" cy="126" r="3" fill="#e9d894"/>
+  ${skyline}`;
+const SIGN = `<rect x="266" y="150" width="112" height="46" rx="12" fill="#140f3c" stroke="#00e0c6" stroke-width="3.5" filter="url(#glow)"/>${txt(322, 184, "OPEN", 30, "#00e0c6", "middle", 'filter="url(#glow)"')}`;
+const TOP = lights + awning;
+const BG = WALL + SIGN + TOP + `<rect y="214" width="400" height="14" fill="#3fd0df"/><rect y="226" width="400" height="4" fill="#0b5a66"/><rect y="230" width="400" height="70" fill="url(#bCheck)"/>`;
+const COUNTER = `<rect width="400" height="104" fill="#128a99"/>${[40, 150, 260, 340].map((x) => `<path d="M${x} 10 l-40 86" stroke="#3fd0df" stroke-width="10" opacity=".25" stroke-linecap="round"/>`).join("")}<rect width="400" height="6" fill="#6fe6f0"/><rect y="104" width="400" height="5" fill="#0b5a66"/><rect y="109" width="400" height="41" fill="url(#bCheck)"/>`;
+
+/* ---------- ingredient crates ---------- */
+const NEON = ["#ff4d8d", "#00e0c6", "#ffd23f", "#9b7bff", "#4db8ff", "#ff8a3d"];
+function crate(k, i, count, hot) {
+  const c = NEON[i % NEON.length];
+  return `<rect x="8" y="38" width="114" height="78" rx="16" fill="${hot ? "#26307a" : NAVY}" stroke="${hot ? "#ffffff" : c}" stroke-width="${hot ? 5 : 3.5}" filter="url(#glow)"/><rect x="18" y="48" width="94" height="14" rx="7" fill="#fff" opacity=".07"/>` +
+    stk(nFood(k, 20, 14, 90)) + (count ? `<circle cx="112" cy="36" r="13" fill="${c}" stroke="${NAVY}" stroke-width="3"/>${txt(112, 41.5, "×" + count, 14, NAVY, "middle")}` : "");
+}
+const nCrate = (k, i, count, x, y, w, hot) => nest(crate(k, i, count, hot), x, y, w, (w * 125) / 130, 130, 125);
+
+/* ---------- sections 1 to 6 ---------- */
+const piece = (k, px) => svg(SIZE[k][0], SIZE[k][1], stk(ST[k]), px);
+document.getElementById("s1").innerHTML =
+  card(svg(400, 300, BG, 380), "Night market backdrop", "Sits behind every dish. The dark sky makes the food and the neon stand out.") +
+  card(svg(400, 150, COUNTER, 380), "Truck counter", "Steel worktop with a checker front. Stations and crates sit on it.");
+document.getElementById("s2").innerHTML =
+  card(piece("board", 200), "Cutting board + knife", "Chop, slice, dice, mash") + card(piece("pot", 180), "Cooking pot", "Boil, simmer, stir") + card(piece("pan", 210), "Frying pan", "Fry, flip, sauté") +
+  card(piece("burner", 200), "Stove burner", "Goes under the pot or pan") + card(piece("oven", 170), "Oven", "Bake and toast; the window glows") + card(piece("mixbowl", 190), "Mixing bowl + whisk", "Mix batters, toss salads") + card(piece("tray", 200), "Baking tray", "Cookies, muffins, toast");
+document.getElementById("s3").innerHTML = card(piece("bowl", 200), "Serving bowl", "Bowls, salads, pasta") + card(piece("plate", 210), "Plate", "Toast, wraps, pancakes") + card(piece("glass", 130), "Glass", "Parfaits and smoothies");
+const BIN_KEYS = ["rice", "beans", "corn", "tomatoDice", "cheeseShreds", "bananaSlices", "blueberries", "oats", "pepperStrips", "carrotCoins", "cucumber", "strawberrySlices"];
+const nice = (k) => k.replace(/([A-Z])/g, " $1").toLowerCase();
+document.getElementById("s4").innerHTML = BIN_KEYS.map((k, i) => card(svg(130, 125, crate(k, i, [3, 2, 4, 3, 2, 4][i % 6]), 150), nice(k))).join("");
+const rows = [
+  ["Banana", ["banana", "Whole"], ["bananaSlices", "Sliced"], ["bananaMash", "Mashed"]], ["Strawberry", ["strawberry", "Whole"], ["strawberrySlices", "Sliced"]],
+  ["Tomato", ["tomato", "Whole"], ["tomatoDice", "Diced"]], ["Carrot", ["carrot", "Whole"], ["carrotCoins", "Coins"]], ["Bell pepper", ["pepper", "Whole"], ["pepperStrips", "Strips"]],
+  ["Egg", ["egg", "Whole"], ["eggFried", "Fried"]], ["Bread", ["bread", "Slice"], ["toast", "Toasted"]], ["Cheese", ["cheese", "Block"], ["cheeseShreds", "Shredded"], ["cheeseMelt", "Melted"]],
+  ["Ready to use", ["rice", "Rice"], ["beans", "Beans"], ["corn", "Corn"], ["oats", "Oats"], ["blueberries", "Blueberries"], ["cucumber", "Cucumber"], ["yogurt", "Yogurt"], ["pasta", "Pasta"]],
+];
+document.getElementById("s5").innerHTML = rows.map(([name, ...st], r) => `<tr><td>${name}</td><td><div class="states">${st.map(([k, l], i) => `${i && r < 8 ? '<span class="arrow">→</span>' : ""}<span class="state">${svg(100, 100, stk(FOOD[k]), 104)}${l}</span>`).join("")}</div></td></tr>`).join("");
+document.getElementById("s6").innerHTML = Object.entries(TOOL).map(([n, a]) => card(svg(80, 80, stk(a), 88), n)).join("");
+
+/* ---------- section 7: game pieces ---------- */
+function ticket(done, title, no) {
+  let zig = "M10 10 H140 V190"; for (let x = 127, i = 0; x >= 10; x -= 13, i++) zig += ` L${x} ${i % 2 ? 190 : 201}`;
+  return `<rect x="58" y="0" width="34" height="18" rx="5" fill="#8fa0b8"/><path d="${zig}Z" fill="#fffdf5"/>${txt(20, 34, no, 15, "#ff2e88")}${txt(134, 34, title, 15, NAVY, "end")}
+    ${nest(ST.bowl, 38, 40, 74, 60.5, 220, 180)}<path d="M18 108 H132" stroke="#b8c0d8" stroke-width="2" stroke-dasharray="4 5"/>
+    ${["rice", "beans", "corn", "tomatoDice", "pepperStrips", "cheeseShreds"].map((k, i) => { const x = 16 + (i % 3) * 41, y = 112 + Math.floor(i / 3) * 37; return nFood(k, x, y, 34) + tick(x + 30, y + 27, i < done); }).join("")}`;
+}
+const neonBtn = (x, y, w, label, fill = "#ff2e88", edge = "#a80f52") => `<rect x="${x}" y="${y}" width="${w}" height="48" rx="16" fill="${fill}" filter="url(#glow)" opacity=".7"/><rect x="${x}" y="${y + 6}" width="${w}" height="48" rx="16" fill="${edge}"/><rect x="${x}" y="${y}" width="${w}" height="48" rx="16" fill="${fill}"/><rect x="${x + 12}" y="${y + 6}" width="${w - 24}" height="8" rx="4" fill="#fff" opacity=".3"/>${txt(x + w / 2, y + 33, label, 22, "#fff", "middle")}`;
+const score = (x, y, n) => `<rect x="${x}" y="${y}" width="128" height="40" rx="20" fill="${NAVY}" stroke="#ffd23f" stroke-width="3"/>${star(x + 24, y + 20, 12, "#ffd23f")}${txt(x + 44, y + 28, n, 22)}`;
+const stars3 = (x, y, lit, r = 15, gap = 36) => [0, 1, 2].map((i) => star(x + i * gap, y, r, i < lit ? "#ffd23f" : "#39428f", `stroke="${i < lit ? "#fff" : "#8f9aff"}" stroke-width="2.4"`)).join("");
+const burst = (cx, cy, r, fill) => { let p = ""; for (let i = 0; i < 24; i++) { const a = (i * Math.PI) / 12, rr = i % 2 ? r * 0.76 : r; p += (i ? "L" : "M") + (cx + Math.cos(a) * rr).toFixed(1) + " " + (cy + Math.sin(a) * rr).toFixed(1); } return `<path d="${p}Z" fill="${fill}" stroke="#fff" stroke-width="4" stroke-linejoin="round"/>`; };
+const combo = (cx, cy, s = 1) => `<g transform="translate(${cx} ${cy}) scale(${s}) rotate(-8)">${burst(0, 0, 52, "#ff2e88")}${txt(0, 0, "x3", 34, "#fff", "middle")}${txt(0, 20, "COMBO!", 15, "#ffd23f", "middle")}</g>`;
+const gauge = (f) => { const t = Math.PI * f, x = 60 - 46 * Math.cos(t), y = 66 - 46 * Math.sin(t), nx = 60 - 32 * Math.cos(t), ny = 66 - 32 * Math.sin(t);
+  return `<path d="M14 66 A46 46 0 0 1 106 66" fill="none" stroke="#2a3170" stroke-width="12" stroke-linecap="round"/><path d="M14 66 A46 46 0 0 1 ${x.toFixed(1)} ${y.toFixed(1)}" fill="none" stroke="#ff8a3d" stroke-width="12" stroke-linecap="round"/><path d="M60 66 L${nx.toFixed(1)} ${ny.toFixed(1)}" stroke="#fff" stroke-width="4" stroke-linecap="round"/><circle cx="60" cy="66" r="6" fill="#fff"/>${txt(60, 92, "HEAT", 14, "#ffd23f", "middle")}`; };
+document.getElementById("s7").innerHTML =
+  card(svg(150, 210, ticket(3, "TACO BOWL", "#12"), 200), "Order ticket", "The dish and what goes in it. Each ingredient gets a green tick when it is added.") +
+  card(svg(320, 204, score(8, 8, "1,250") + stars3(180, 28, 2) + neonBtn(8, 64, 190, "LET’S COOK!") + neonBtn(210, 64, 100, "UNDO", "#00b8c8", "#06707a") + nest(gauge(0.62), 8, 126, 90, 75, 120, 100) + txt(112, 162, "Stars are earned by doing", 14, "#cfd6ff", "start", "", "Nunito, sans-serif", 800) + txt(112, 180, "each step right. No timer.", 14, "#cfd6ff", "start", "", "Nunito, sans-serif", 800), 340), "Score, stars, buttons, heat dial", "Chunky glowing buttons. The dial swings up while food cooks.") +
+  card(svg(320, 170, combo(70, 86) + pop(214, 74, "PERFECT!", 40, "#ffd23f", -4) + pop(176, 126, "+50", 30, "#00e0c6") + pop(254, 130, "Nice flip!", 22, "#fff"), 340), "Pop-ups", "Instant praise on every correct step. A mistake just restarts the combo; nothing is lost.");
+
+/* ---------- section 8: full screens ---------- */
+const roundBtn = (x, y, d) => `<circle cx="${x}" cy="${y}" r="20" fill="${NAVY}" stroke="#00e0c6" stroke-width="3"/><path d="${d}" transform="translate(${x} ${y})" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`;
+const say = (x, y, w, tailX, t) => `<path d="M${tailX - 10} ${y + 38} L${tailX} ${y + 56} L${tailX + 12} ${y + 38}Z" fill="#fff"/><rect x="${x}" y="${y}" width="${w}" height="42" rx="16" fill="#fff"/>${txt(x + w / 2, y + 28, t, 19, NAVY, "middle")}`;
+const scene = (inner, pts, lit) => svg(390, 720, `<svg x="0" y="0" width="390" height="292" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">${WALL}${TOP}</svg>
+  <rect y="270" width="390" height="450" fill="#128a99"/>${[60, 190, 320].map((x) => `<path d="M${x} 290 l-150 420" stroke="#3fd0df" stroke-width="26" opacity=".12" stroke-linecap="round"/>`).join("")}<rect y="270" width="390" height="7" fill="#6fe6f0"/><path d="M0 270 H390" stroke="#0b5a66" stroke-width="3"/>
+  ${score(12, 52, pts)}${stars3(196, 72, lit, 13, 32)}${roundBtn(356, 72, "M-5 -7 v14 M5 -7 v14")}${inner}`, 390);
+const bigBowl = stk(nest(K.R(84, 156, 52, 14, 6, dk(S.pal.dish, 0.3)) + ST.bowlBack + nFood("rice", 30, 6, 100) + nFood("corn", 92, 6, 100) + ST.bowlFront, 55, 292, 280, 229, 220, 180));
+const mockA = scene(
+  `<path d="M0 108 H246" stroke="#8fa0b8" stroke-width="4"/>` + nest(ticket(2, "TACO BOWL", "#12"), 12, 106, 100, 140, 150, 210) + nest(ticket(0, "FRUIT CUP", "#13"), 124, 106, 100, 140, 150, 210) +
+  stk(nest(SPRIG, 262, 150, 124, 124, 200, 200)) + say(250, 102, 132, 318, "Beans next!") +
+  `<ellipse cx="195" cy="486" rx="150" ry="24" fill="#00e0c6" opacity=".35" filter="url(#glow)"/>` + bigBowl + pop(322, 326, "+50", 28, "#ffd23f", 8) +
+  nCrate("rice", 0, 0, 14, 496, 112) + nCrate("beans", 1, 4, 139, 496, 112, true) + nCrate("corn", 2, 0, 265, 496, 112) + nCrate("tomatoDice", 3, 3, 14, 606, 112) + nCrate("pepperStrips", 4, 3, 139, 606, 112) + nCrate("cheeseShreds", 5, 2, 265, 606, 112), "1,250", 2);
+const mockB = scene(
+  stk(nest(SPRIG, 6, 150, 124, 124, 200, 200)) + say(118, 112, 136, 138, "Nice flip!") + combo(318, 184, 0.8) +
+  stk(nSt("burner", 60, 392, 260)) + stk(nest(ST.pan + nFood("eggFried", 54, 38, 92), 40, 286, 300, 180, 250, 150)) +
+  [150, 190, 230].map((x, i) => `<path d="M${x} 300 q-8 -10 0 -20 q8 -10 0 -20" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity="${0.7 - i * 0.12}"/>`).join("") +
+  pop(180, 268, "PERFECT!", 38, "#ffd23f", -4) + nest(gauge(0.62), 22, 530, 96, 80, 120, 100) + neonBtn(140, 546, 226, "FLIP IT!") +
+  nCrate("egg", 0, 2, 14, 610, 108) + nCrate("bread", 2, 2, 141, 610, 108) + nCrate("cheese", 5, 1, 268, 610, 108), "1,400", 3);
+document.getElementById("s8").innerHTML =
+  `<div><div class="phone">${mockA}</div><p class="cap"><b>Filling an order.</b> Tickets hang at the top. The next crate glows, a tap sends the food into the bowl, and points pop up.</p></div>` +
+  `<div><div class="phone">${mockB}</div><p class="cap"><b>Frying.</b> The pan sits on the burner while the heat dial climbs. Flip at the right moment for a “PERFECT!” and a bigger combo.</p></div>`;
+</script>
+</body>
+</html>

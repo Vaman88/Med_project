@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Healthy Steps — Style 1: Kitchen Friends</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Fredoka:wght@700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #fff5f8; color: #6b3b4a; font-family: Nunito, system-ui, sans-serif; }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 40px 28px 80px; }
+  .tag { display: inline-block; padding: 4px 14px; border-radius: 999px; background: #ff7fa3; color: #fff; font-weight: 800; font-size: 14px; letter-spacing: .04em; }
+  h1 { font: 800 46px/1.05 "Baloo 2", sans-serif; margin: 10px 0 6px; color: #5a2d3d; }
+  .lead { margin: 0 0 6px; font-size: 17px; font-weight: 700; max-width: 880px; line-height: 1.5; }
+  .why { margin: 22px 0 0; padding: 18px 22px; border-radius: 24px; background: #fff; border: 3px dashed #ffb6c9; }
+  .why h3 { margin: 0 0 8px; font: 800 21px "Baloo 2", sans-serif; color: #5a2d3d; }
+  .why ul { margin: 0; padding-left: 20px; line-height: 1.6; font-weight: 700; }
+  h2 { font: 800 28px "Baloo 2", sans-serif; margin: 44px 0 2px; display: flex; align-items: center; gap: 10px; color: #5a2d3d; }
+  h2 b { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: #8fd6c8; color: #fff; font-size: 19px; }
+  .sub { margin: 0 0 14px; font-weight: 700; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; }
+  .grid.wide { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+  .grid.small { grid-template-columns: repeat(auto-fill, minmax(124px, 1fr)); }
+  .card { background: #fff; border: 3px solid #ffe0e9; border-radius: 24px; padding: 14px 12px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px; }
+  .card svg { display: block; max-width: 100%; height: auto; }
+  .card strong { font-size: 16px; text-align: center; color: #5a2d3d; text-transform: capitalize; }
+  .card span { font-size: 13px; text-align: center; line-height: 1.35; }
+  .card.mint { background: #eafaf5; border-color: #c9efe6; }
+  table { border-collapse: separate; border-spacing: 0 8px; width: 100%; }
+  td { background: #fff; padding: 8px 14px; border-top: 3px solid #ffe0e9; border-bottom: 3px solid #ffe0e9; vertical-align: middle; }
+  td:first-child { border-left: 3px solid #ffe0e9; border-radius: 22px 0 0 22px; font: 800 19px "Baloo 2", sans-serif; width: 150px; color: #5a2d3d; }
+  td:last-child { border-right: 3px solid #ffe0e9; border-radius: 0 22px 22px 0; }
+  .states { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; }
+  .state { display: flex; flex-direction: column; align-items: center; font-size: 13px; font-weight: 800; }
+  .arrow { align-self: center; color: #ff7fa3; font: 800 26px "Baloo 2"; margin-bottom: 14px; }
+  .mocks { display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-start; }
+  .phone { border: 10px solid #5a2d3d; border-radius: 40px; overflow: hidden; width: 330px; background: #fff; box-shadow: 0 18px 40px #5a2d3d30; }
+  .phone svg { display: block; width: 100%; height: auto; }
+  .cap { max-width: 330px; margin-top: 10px; font-size: 14px; font-weight: 700; line-height: 1.45; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="tag">STYLE 1 OF 2</span>
+  <h1>Kitchen Friends</h1>
+  <p class="lead">A soft, sunny kitchen where the helpers are alive: the pot, the bowls and the jars all have friendly faces. Pastel colours, round shapes, hearts and stars. Calm and cuddly, best for younger chefs (about 5 to 8).</p>
+  <div class="why">
+    <h3>Why a child would want to play this one</h3>
+    <ul>
+      <li><b>The kitchen smiles back.</b> Helpers with faces react to what the child does, the same way Sprig does. Food itself has no face, so chopping never feels mean.</li>
+      <li><b>One clear thing in every bowl.</b> Each ingredient is a tidy heap or three big pieces with a number badge, never a crowded pile.</li>
+      <li><b>Rewards to keep.</b> Stars for each dish and a sticker book that fills up, so there is always one more to collect.</li>
+      <li><b>No way to lose.</b> A mistake just means “try again”; nothing is taken away.</li>
+    </ul>
+  </div>
+
+  <h2><b>1</b>The kitchen and the counter</h2>
+  <p class="sub">A pastel wall with a sunny window, a scalloped awning and a shelf of sleepy jars.</p>
+  <div class="grid wide" id="s1"></div>
+  <h2><b>2</b>Cooking stations</h2>
+  <p class="sub">One station for each kind of step. The pot and mixing bowl are characters.</p>
+  <div class="grid" id="s2"></div>
+  <h2><b>3</b>Serving dishes</h2>
+  <div class="grid" id="s3"></div>
+  <h2><b>4</b>Ingredient bowls</h2>
+  <p class="sub">Each ingredient sits in its own smiling bowl. The badge shows how many are left.</p>
+  <div class="grid" id="s4"></div>
+  <h2><b>5</b>Ingredients and how they change</h2>
+  <p class="sub">Painted like game icons: rich shading, glossy highlights and a glow behind each one. Every food has a look for each stage of cooking.</p>
+  <table id="s5"></table>
+  <h2><b>6</b>Tools</h2>
+  <div class="grid small" id="s6"></div>
+  <h2><b>7</b>Game pieces and rewards</h2>
+  <div class="grid wide" id="s7"></div>
+  <h2><b>8</b>All together</h2>
+  <p class="sub">The same pieces building two different steps on a phone.</p>
+  <div class="mocks" id="s8"></div>
+</div>
+
+<script src="game-kit.js"></script>
+<script>
+const { dk, lt } = kitColor;
+const INK = "#5a2d3d";
+const S = {
+  stroke: (c, w) => `stroke="${dk(c, 0.5)}" stroke-width="${w || 3}" stroke-linejoin="round" stroke-linecap="round"`,
+  thin: (c) => `stroke="${c}" stroke-width="1.2"`,
+  ground: 0.1,
+  face: (x, y, s = 1, m) => {
+    const eyes = m === "sleep"
+      ? `<path d="M-12.5 0 q3.5 3.4 7 0 M5.5 0 q3.5 3.4 7 0" fill="none" stroke="#4a2c22" stroke-width="2.3" stroke-linecap="round"/>`
+      : `<circle cx="-9" cy="0" r="3.7" fill="#4a2c22"/><circle cx="9" cy="0" r="3.7" fill="#4a2c22"/><circle cx="-10.2" cy="-1.3" r="1.3" fill="#fff"/><circle cx="7.8" cy="-1.3" r="1.3" fill="#fff"/>`;
+    const mouth = m === "wow" ? `<ellipse cx="0" cy="7" rx="3" ry="3.6" fill="#8a3324"/>` : `<path d="M-4 4.5 Q0 9.5 4 4.5" fill="none" stroke="#4a2c22" stroke-width="2.3" stroke-linecap="round"/>`;
+    return `<g transform="translate(${x} ${y}) scale(${s})"><ellipse cx="-16" cy="6" rx="5" ry="3.2" fill="#ff8fa3" opacity=".7"/><ellipse cx="16" cy="6" rx="5" ry="3.2" fill="#ff8fa3" opacity=".7"/>${eyes}${mouth}</g>`;
+  },
+  pal: { wood: "#f6cfa0", steel: "#dfe7f5", steelLine: "#9fb0cc", pot: "#ff9db5", pan: "#b9a7e8", handle: "#c98e63", oven: "#bfeedd", knob: "#ff9db5", dish: "#8fd6c8", dishRim: "#fff7ea", dishDot: "#ffffff", bowl: "#ffe08a", mitt: "#ff9db5" },
+};
+const K = makeKit(S);
+const { ST, TOOL, SIZE, SPRIG } = K;
+/* Painted ingredients: the same shapes, lit like hand-painted game icons. Every piece gets a
+   glossy highlight ("paint"), and the whole food gets soft light, shade and a drop shadow ("vol"). */
+const KP = makeKit({ ...S, face: null, ground: 0, ropeEdge: 2.6,
+  stroke: (c, w) => `stroke="${dk(c, 0.55)}" stroke-width="${w || 1.5}" stroke-linejoin="round" stroke-linecap="round" filter="url(#paint)"`,
+  thin: (c) => `stroke="${dk(c, 0.35)}" stroke-width=".8" filter="url(#paintS)"` });
+const FOOD = Object.fromEntries(Object.entries(KP.FOOD).map(([k, art]) => [k, `<g filter="url(#vol)">${art}</g>`]));
+const GLOW = { banana: "#d9a800", bananaSlices: "#d9a800", bananaMash: "#d9a800", strawberry: "#e0246a", strawberrySlices: "#e0246a", tomato: "#d93a22", tomatoDice: "#d93a22",
+  carrot: "#e87410", carrotCoins: "#e87410", pepper: "#e09a00", pepperStrips: "#e09a00", egg: "#a8946a", eggFried: "#d9a020", bread: "#b87a3a", toast: "#b8661e",
+  cheese: "#e0a000", cheeseShreds: "#e0a000", cheeseMelt: "#e0a000", rice: "#8fa3b8", beans: "#a8603e", corn: "#e0a800", oats: "#b8965a", blueberries: "#4a5fe0", cucumber: "#3fa838", yogurt: "#7f9fc8", pasta: "#e0a020" };
+let tileN = 0;
+/* A dark icon tile with a coloured glow, like a game inventory slot. */
+const tile = (k) => { const id = "tg" + tileN++; return `<defs><radialGradient id="${id}" cx=".5" cy=".55" r=".6"><stop offset="0" stop-color="${GLOW[k] || "#888"}" stop-opacity=".95"/><stop offset=".6" stop-color="${GLOW[k] || "#888"}" stop-opacity=".35"/><stop offset="1" stop-color="${GLOW[k] || "#888"}" stop-opacity="0"/></radialGradient></defs><rect x="2" y="2" width="96" height="96" rx="20" fill="#2a1830" stroke="#4a2c52" stroke-width="2.5"/><rect x="2" y="2" width="96" height="96" rx="20" fill="url(#${id})"/><path d="M14 10 H86" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".18"/>`; };
+
+const DEFS = `<defs>
+<filter id="paint" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB"><feGaussianBlur in="SourceAlpha" stdDeviation="2.4" result="b"/><feSpecularLighting in="b" surfaceScale="4" specularConstant=".75" specularExponent="16" lighting-color="#ffffff" result="s"><feDistantLight azimuth="225" elevation="52"/></feSpecularLighting><feComposite in="s" in2="SourceAlpha" operator="in" result="si"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="si"/></feMerge></filter>
+<filter id="paintS" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB"><feGaussianBlur in="SourceAlpha" stdDeviation=".9" result="b"/><feSpecularLighting in="b" surfaceScale="2.4" specularConstant=".7" specularExponent="12" lighting-color="#ffffff" result="s"><feDistantLight azimuth="225" elevation="52"/></feSpecularLighting><feComposite in="s" in2="SourceAlpha" operator="in" result="si"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="si"/></feMerge></filter>
+<filter id="vol" x="-25%" y="-25%" width="150%" height="165%" color-interpolation-filters="sRGB">
+<feOffset in="SourceAlpha" dx="-7" dy="-9" result="o1"/><feComposite in="SourceAlpha" in2="o1" operator="out" result="e1"/><feGaussianBlur in="e1" stdDeviation="6" result="b1"/><feComposite in="b1" in2="SourceAlpha" operator="in" result="m1"/><feFlood flood-color="#2a0a2e" flood-opacity=".6" result="f1"/><feComposite in="f1" in2="m1" operator="in" result="dark"/>
+<feOffset in="SourceAlpha" dx="6" dy="8" result="o2"/><feComposite in="SourceAlpha" in2="o2" operator="out" result="e2"/><feGaussianBlur in="e2" stdDeviation="5" result="b2"/><feComposite in="b2" in2="SourceAlpha" operator="in" result="m2"/><feFlood flood-color="#fff6d8" flood-opacity=".5" result="f2"/><feComposite in="f2" in2="m2" operator="in" result="light"/>
+<feGaussianBlur in="SourceAlpha" stdDeviation="3" result="sb"/><feOffset in="sb" dy="5" result="so"/><feFlood flood-color="#000" flood-opacity=".4"/><feComposite in2="so" operator="in" result="sh"/>
+<feMerge><feMergeNode in="sh"/><feMergeNode in="SourceGraphic"/><feMergeNode in="dark"/><feMergeNode in="light"/></feMerge></filter>
+<pattern id="aDot" width="28" height="28" patternUnits="userSpaceOnUse"><circle cx="7" cy="7" r="3" fill="#ffd3df"/><circle cx="21" cy="21" r="3" fill="#ffd3df"/></pattern></defs>`;
+const svg = (w, h, inner, px) => `<svg viewBox="0 0 ${w} ${h}" width="${px || w}" role="img">${DEFS}${inner}</svg>`;
+const nest = (inner, x, y, w, h, vw, vh) => `<svg x="${x}" y="${y}" width="${w}" height="${h}" viewBox="0 0 ${vw} ${vh}" overflow="visible">${inner}</svg>`;
+const nFood = (k, x, y, s) => nest(FOOD[k], x, y, s, s, 100, 100);
+const nSt = (k, x, y, w) => nest(ST[k], x, y, w, (w * SIZE[k][1]) / SIZE[k][0], SIZE[k][0], SIZE[k][1]);
+const card = (html, title, note, cls = "") => `<div class="card ${cls}">${html}<strong>${title}</strong>${note ? `<span>${note}</span>` : ""}</div>`;
+const txt = (x, y, t, size, fill = INK, font = "'Baloo 2', sans-serif", weight = 800, anchor = "start") => `<text x="${x}" y="${y}" text-anchor="${anchor}" font-family="${font}" font-weight="${weight}" font-size="${size}" fill="${fill}">${t}</text>`;
+const star = (cx, cy, r, fill, extra = "") => { let p = ""; for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + (i * Math.PI) / 5, rr = i % 2 ? r * 0.46 : r; p += (i ? "L" : "M") + (cx + Math.cos(a) * rr).toFixed(1) + " " + (cy + Math.sin(a) * rr).toFixed(1); } return `<path d="${p}Z" fill="${fill}" stroke-linejoin="round" ${extra}/>`; };
+const heart = (x, y, s, fill, o = 1) => `<path transform="translate(${x} ${y}) scale(${s})" d="M0 -4 C6 -12 16 -4 0 10 C-16 -4 -6 -12 0 -4Z" fill="${fill}" opacity="${o}"/>`;
+const tick = (x, y, on) => `<circle cx="${x}" cy="${y}" r="9" fill="${on ? "#3cc9a3" : "#fff"}" stroke="${on ? "#1f9a79" : "#f3c9d4"}" stroke-width="2.4"/>${on ? `<path d="M${x - 4} ${y} l3 3.4 l5.4 -6" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>` : ""}`;
+
+/* ---------- backdrop ---------- */
+const scallops = Array.from({ length: 14 }, (_, i) => `<circle cx="${15 + i * 29}" cy="24" r="15" fill="${i % 2 ? "#ffffff" : "#8fd6c8"}"/>`).join("");
+const jars = [[246, "#ffc2d1", 34], [284, "#c9efe6", 44], [322, "#ffe9a8", 30], [356, "#d9ccf5", 40]].map(([x, c, h]) => `<rect x="${x}" y="${118 - h}" width="26" height="${h}" rx="8" fill="${c}"/><rect x="${x - 1}" y="${118 - h - 6}" width="28" height="8" rx="4" fill="#f6cfa0"/>${S.face(x + 13, 118 - h / 2 + 2, 0.42, "sleep")}`).join("");
+const WALL = `<rect width="400" height="300" fill="#ffe6ee"/><rect width="400" height="300" fill="url(#aDot)"/>
+  <rect x="34" y="56" width="120" height="100" rx="18" fill="#c9ecff" stroke="#fff" stroke-width="9"/><circle cx="124" cy="86" r="15" fill="#ffe27a"/>${S.face(124, 86, 0.42)}
+  <path d="M46 150 q10 -18 26 -8 q10 -14 26 -2 q14 -8 24 10Z" fill="#fff"/><path d="M94 56 V156 M34 106 H154" stroke="#fff" stroke-width="6"/>
+  <rect x="232" y="118" width="150" height="10" rx="5" fill="#f6cfa0"/>${jars}
+  ${heart(196, 84, 1.3, "#ff9db5", 0.7)}${heart(214, 150, 0.9, "#ff9db5", 0.5)}${heart(184, 176, 0.8, "#8fd6c8", 0.8)}${heart(360, 172, 1.1, "#ff9db5", 0.5)}
+  <rect width="400" height="24" fill="#8fd6c8"/>${scallops}`;
+const BG = WALL + `<rect y="214" width="400" height="14" fill="#fff7ea"/><rect y="226" width="400" height="3" fill="#f3d9c2"/><rect y="229" width="400" height="71" fill="#a9e3d6"/>
+  ${[20, 148, 276].map((x) => `<rect x="${x}" y="240" width="104" height="52" rx="12" fill="none" stroke="#8fd6c8" stroke-width="4"/>${heart(x + 52, 264, 0.9, "#ffffff", 0.9)}`).join("")}`;
+const COUNTER = `<rect width="400" height="104" fill="#fff7ea"/><rect width="400" height="104" fill="url(#aDot)" opacity=".45"/><rect width="400" height="6" fill="#ffffff"/><rect y="104" width="400" height="5" fill="#f3d9c2"/><rect y="109" width="400" height="41" fill="#a9e3d6"/>${[30, 150, 270].map((x) => `<rect x="${x}" y="116" width="100" height="26" rx="10" fill="none" stroke="#8fd6c8" stroke-width="4"/>`).join("")}`;
+
+/* ---------- ingredient bowls ---------- */
+const BOWLS = ["#ff9db5", "#8fd6c8", "#ffe08a", "#c7b4f0", "#9fd0ff", "#ffb38a"];
+function jar(k, i, count, mood) {
+  const c = BOWLS[i % BOWLS.length];
+  return K.fe(65, 112, 46, 6, "#000", 0.1) + K.E(65, 52, 54, 15, lt(c, 0.4)) + K.fe(65, 54, 46, 10, dk(c, 0.3)) + nFood(k, 23, -6, 84) +
+    K.P("M11 52 C13 92 38 108 65 108 C92 108 117 92 119 52 A54 15 0 0 1 11 52Z", c) + K.shine("M22 68 C26 82 34 92 44 98", 4, 0.5) + S.face(65, 86, 0.8, mood) +
+    (count ? `<circle cx="112" cy="26" r="13" fill="#fff" stroke="${dk(c, 0.5)}" stroke-width="2.6"/>${txt(112, 31.5, "×" + count, 14, INK, "'Baloo 2', sans-serif", 800, "middle")}` : "");
+}
+const jarSvg = (k, i, count, px = 150) => svg(130, 125, jar(k, i, count), px);
+const nJar = (k, i, count, x, y, w, mood) => nest(jar(k, i, count, mood), x, y, w, (w * 125) / 130, 130, 125);
+
+/* ---------- sections 1 to 6 ---------- */
+const piece = (k, px) => svg(SIZE[k][0], SIZE[k][1], ST[k], px);
+document.getElementById("s1").innerHTML =
+  card(svg(400, 300, BG, 380), "Kitchen backdrop", "Sits behind every dish. Soft colours keep the food the brightest thing on screen.") +
+  card(svg(400, 150, COUNTER, 380), "Counter", "Cream worktop with mint cupboards. Stations and bowls sit on it.");
+document.getElementById("s2").innerHTML =
+  card(piece("board", 200), "Cutting board + knife", "Chop, slice, dice, mash") + card(piece("pot", 180), "Poppy the pot", "Boil, simmer, stir") + card(piece("pan", 210), "Frying pan", "Fry, flip, sauté") +
+  card(piece("burner", 200), "Stove burner", "Goes under the pot or pan") + card(piece("oven", 170), "Oven", "Bake and toast; the window glows") + card(piece("mixbowl", 190), "Mimi the mixing bowl", "Mix batters, toss salads") + card(piece("tray", 200), "Baking tray", "Cookies, muffins, toast");
+document.getElementById("s3").innerHTML = card(piece("bowl", 200), "Serving bowl", "Smiles when the dish is done") + card(piece("plate", 210), "Plate", "Toast, wraps, pancakes") + card(piece("glass", 130), "Glass", "Parfaits and smoothies");
+const BIN_KEYS = ["rice", "beans", "corn", "tomatoDice", "cheeseShreds", "bananaSlices", "blueberries", "oats", "pepperStrips", "carrotCoins", "cucumber", "strawberrySlices"];
+const nice = (k) => k.replace(/([A-Z])/g, " $1").toLowerCase();
+document.getElementById("s4").innerHTML = BIN_KEYS.map((k, i) => card(jarSvg(k, i, [3, 2, 4, 3, 2, 4][i % 6]), nice(k), "", "mint")).join("");
+const rows = [
+  ["Banana", ["banana", "Whole"], ["bananaSlices", "Sliced"], ["bananaMash", "Mashed"]], ["Strawberry", ["strawberry", "Whole"], ["strawberrySlices", "Sliced"]],
+  ["Tomato", ["tomato", "Whole"], ["tomatoDice", "Diced"]], ["Carrot", ["carrot", "Whole"], ["carrotCoins", "Coins"]], ["Bell pepper", ["pepper", "Whole"], ["pepperStrips", "Strips"]],
+  ["Egg", ["egg", "Whole"], ["eggFried", "Fried"]], ["Bread", ["bread", "Slice"], ["toast", "Toasted"]], ["Cheese", ["cheese", "Block"], ["cheeseShreds", "Shredded"], ["cheeseMelt", "Melted"]],
+  ["Ready to use", ["rice", "Rice"], ["beans", "Beans"], ["corn", "Corn"], ["oats", "Oats"], ["blueberries", "Blueberries"], ["cucumber", "Cucumber"], ["yogurt", "Yogurt"], ["pasta", "Pasta"]],
+];
+document.getElementById("s5").innerHTML = rows.map(([name, ...st], r) => `<tr><td>${name}</td><td><div class="states">${st.map(([k, l], i) => `${i && r < 8 ? '<span class="arrow">→</span>' : ""}<span class="state">${svg(100, 100, tile(k) + nFood(k, 10, 8, 80), 112)}${l}</span>`).join("")}</div></td></tr>`).join("");
+document.getElementById("s6").innerHTML = Object.entries(TOOL).map(([n, a]) => card(svg(80, 80, a, 88), n)).join("");
+
+/* ---------- section 7: game pieces ---------- */
+const pill = (x, y, w, label, fill = "#ff7fa3", edge = "#e2567f", ink = "#fff") => `<rect x="${x}" y="${y + 6}" width="${w}" height="48" rx="24" fill="${edge}"/><rect x="${x}" y="${y}" width="${w}" height="48" rx="24" fill="${fill}"/><rect x="${x + 16}" y="${y + 7}" width="${w - 32}" height="9" rx="4.5" fill="#fff" opacity=".35"/>${txt(x + w / 2, y + 33, label, 21, ink, "'Baloo 2', sans-serif", 800, "middle")}`;
+const stars = (x, y, n, lit, r = 13, gap = 32) => Array.from({ length: n }, (_, i) => star(x + i * gap, y, r, i < lit ? "#ffd23f" : "#ffffff", `stroke="${i < lit ? "#e0a400" : "#f3c9d4"}" stroke-width="2.4"`)).join("");
+const warm = (x, y, w, f) => `<rect x="${x}" y="${y}" width="${w}" height="22" rx="11" fill="#fff" stroke="#ffb6c9" stroke-width="3"/><rect x="${x + 4}" y="${y + 4}" width="${(w - 8) * f}" height="14" rx="7" fill="#ff9f5a"/><rect x="${x + 8}" y="${y + 6}" width="${(w - 8) * f - 10}" height="4" rx="2" fill="#ffd9a8"/>${heart(x - 16, y + 10, 1, "#ff7fa3")}`;
+const recipe = (done) => `<rect x="100" y="0" width="50" height="16" rx="3" fill="#ffe08a"/><rect x="4" y="8" width="242" height="140" rx="20" fill="#fffaf0" stroke="#ff9db5" stroke-width="3" stroke-dasharray="7 6"/>${txt(18, 38, "Rainbow taco bowl", 19)}
+  ${["rice", "beans", "corn", "tomatoDice", "pepperStrips", "cheeseShreds"].map((k, i) => nFood(k, 14 + i * 38, 46, 36) + tick(14 + i * 38 + 30, 84, i < done)).join("")}
+  ${txt(18, 128, "Chef stars", 15, "#8a5a6a", "Nunito, sans-serif", 800)}${stars(118, 122, 3, 2, 11, 28)}`;
+const burst = (cx, cy, r, fill, stroke) => { let p = ""; for (let i = 0; i < 28; i++) { const a = (i * Math.PI) / 14, rr = i % 2 ? r * 0.8 : r; p += (i ? "L" : "M") + (cx + Math.cos(a) * rr).toFixed(1) + " " + (cy + Math.sin(a) * rr).toFixed(1); } return `<path d="${p}Z" fill="${fill}" stroke="${stroke}" stroke-width="3" stroke-linejoin="round"/>`; };
+document.getElementById("s7").innerHTML =
+  card(svg(250, 154, recipe(3), 310), "Recipe card", "Shows what the dish needs. Each ingredient gets a green tick when it goes in.") +
+  card(svg(300, 150, pill(8, 6, 176, "Let’s cook!") + pill(196, 6, 96, "Undo", "#ffffff", "#f3c9d4", INK) + warm(34, 80, 170, 0.62) + txt(214, 97, "Warm", 16) + stars(22, 128, 5, 3, 12, 30) + txt(176, 134, "3 of 5 steps", 15, "#8a5a6a", "Nunito, sans-serif", 800), 330), "Buttons, heat bar, step stars", "Big and round, easy for small fingers. Stars fill as steps are done.") +
+  card(svg(320, 150, burst(66, 72, 56, "#ffe08a", "#ffb347") + txt(66, 80, "Yummy!", 24, "#c9431f", "'Baloo 2', sans-serif", 800, "middle") +
+    ["tomato", "banana", "strawberry"].map((k, i) => `<circle cx="${160 + i * 54}" cy="60" r="24" fill="#fff" stroke="#ffb6c9" stroke-width="3"/>` + nFood(k, 141 + i * 54, 41, 38)).join("") +
+    `<circle cx="322" cy="60" r="0"/>` + txt(214, 118, "Sticker book: 3 of 12", 16, "#8a5a6a", "Nunito, sans-serif", 800, "middle") + `<rect x="140" y="128" width="148" height="10" rx="5" fill="#ffe0e9"/><rect x="140" y="128" width="37" height="10" rx="5" fill="#ff7fa3"/>`, 340), "Rewards", "A cheer when a dish is done, and a sticker to keep for every new food cooked.");
+
+/* ---------- section 8: full screens ---------- */
+const roundBtn = (x, y, d) => `<circle cx="${x}" cy="${y + 3}" r="20" fill="#f3c9d4"/><circle cx="${x}" cy="${y}" r="20" fill="#fff" stroke="#ffb6c9" stroke-width="3"/><path d="${d}" transform="translate(${x} ${y})" fill="none" stroke="#ff7fa3" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`;
+const bubble = (x, y, w, h, tailX, big, small) => `<path d="M${tailX - 12} ${y + h - 2} L${tailX} ${y + h + 20} L${tailX + 14} ${y + h - 2}Z" fill="#fff" stroke="#ff9db5" stroke-width="3" stroke-linejoin="round"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="22" fill="#fff" stroke="#ff9db5" stroke-width="3"/><rect x="${tailX - 10}" y="${y + h - 6}" width="22" height="5" fill="#fff"/>${txt(x + w / 2, y + 32, big, 21, INK, "'Baloo 2', sans-serif", 800, "middle")}${txt(x + w / 2, y + 54, small, 14, "#8a5a6a", "Nunito, sans-serif", 800, "middle")}`;
+const scene = (inner, lit) => svg(390, 720, `<svg x="0" y="0" width="390" height="292" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">${WALL}</svg>
+  <rect y="270" width="390" height="450" fill="#fff7ea"/><rect y="270" width="390" height="450" fill="url(#aDot)" opacity=".4"/><rect y="270" width="390" height="7" fill="#ffffff"/><path d="M0 270 H390" stroke="#f3c9d4" stroke-width="3"/>
+  ${roundBtn(34, 60, "M5 -7 l-8 7 l8 7")}${roundBtn(356, 60, "M-5 -7 v14 M5 -7 v14")}${stars(131, 60, 5, lit, 13, 32)}${inner}`, 390);
+const bigBowl = nest(K.fe(110, 172, 80, 9, "#000", 0.1) + K.R(84, 156, 52, 14, 6, dk(S.pal.dish, 0.3)) + ST.bowlBack + nFood("rice", 30, 6, 100) + nFood("beans", 92, 6, 100) + ST.bowlFront, 55, 292, 280, 229, 220, 180);
+const mockA = scene(
+  nest(SPRIG, 4, 154, 124, 124, 200, 200) + bubble(126, 100, 250, 68, 150, "Corn is next!", "Tap the corn bowl to add it.") + bigBowl + star(332, 316, 9, "#ffd23f") + star(54, 332, 7, "#ffd23f") + heart(346, 356, 0.9, "#ff9db5", 0.8) +
+  `<rect x="262" y="492" width="118" height="112" rx="24" fill="#fff3b8" stroke="#ffd23f" stroke-width="3" stroke-dasharray="7 6"/>` +
+  nJar("rice", 0, 0, 14, 496, 112) + nJar("beans", 1, 0, 139, 496, 112) + nJar("corn", 2, 4, 265, 496, 112, "wow") + nJar("tomatoDice", 3, 3, 14, 606, 112) + nJar("pepperStrips", 4, 3, 139, 606, 112) + nJar("cheeseShreds", 5, 2, 265, 606, 112), 2);
+const mockB = scene(
+  nest(SPRIG, 262, 154, 124, 124, 200, 200) + bubble(14, 100, 240, 68, 236, "Stir, stir, stir!", "The pot is getting warm.") +
+  nSt("burner", 70, 372, 250) + nSt("pot", 75, 222, 240) + heart(128, 226, 1, "#ff9db5", 0.8) + heart(264, 232, 0.8, "#ff9db5", 0.7) +
+  warm(84, 524, 236, 0.62) + pill(95, 554, 200, "Stir it!") + nJar("pasta", 0, 2, 14, 610, 108) + nJar("tomatoDice", 3, 3, 141, 610, 108) + nJar("cheeseShreds", 5, 2, 268, 610, 108), 3);
+document.getElementById("s8").innerHTML =
+  `<div><div class="phone">${mockA}</div><p class="cap"><b>Building a bowl.</b> Sprig says what comes next and the right bowl lights up. Tap it and the food hops into the big bowl, which smiles wider as it fills.</p></div>` +
+  `<div><div class="phone">${mockB}</div><p class="cap"><b>Cooking.</b> Poppy the pot sits on the burner. The heat bar fills, hearts float up as steam, and the child stirs with one big button.</p></div>`;
+</script>
+</body>
+</html>

@@ -529,3 +529,67 @@
   .ck-app:not(.ck-finale) .ck-tray { grid-column: 2; grid-row: 2; align-items: flex-start; min-height: 0; overflow-y: auto; padding: 4px 12px calc(8px + env(safe-area-inset-bottom)); }
   .ck-app:not(.ck-finale) .ck-chip { flex-direction: column; width: 84px; padding: 6px; }
 }
+
+/* Sprig asks the quiz from the side, as a popup card beside the dish */
+.ck-quiz.ck-quiz-pop {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: end; gap: 0;
+  width: min(760px, 100%); margin: 0 auto; animation: ck-quiz-pop 420ms cubic-bezier(.2, .8, .25, 1) both;
+}
+.ck-quiz-pop .ck-quiz-sprig { position: relative; z-index: 2; margin-right: -6px; align-self: end; }
+.ck-quiz-card {
+  position: relative; display: flex; flex-direction: column; align-items: stretch; gap: 8px;
+  padding: 14px 16px 12px; border: 3px solid #2d1b0f; border-radius: 24px; background: #fffdf8;
+  box-shadow: 0 10px 28px rgb(45 27 15 / 18%);
+}
+.ck-quiz-card::before {
+  content: ""; position: absolute; left: -12px; bottom: 34px; width: 20px; height: 20px;
+  background: #fffdf8; border-left: 3px solid #2d1b0f; border-bottom: 3px solid #2d1b0f; transform: rotate(45deg);
+}
+.ck-quiz-who { margin: 0; color: #4c9a2a; font-size: 13px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.ck-quiz-card .ck-question { margin: 0; text-align: left; font-size: clamp(18px, 2.4vw, 22px); line-height: 1.25; }
+.ck-quiz-card .ck-answers { justify-content: flex-start; }
+.ck-quiz-card .ck-feedback { margin: 0; min-height: 1.3em; text-align: left; }
+.ck-quiz-card .ck-quiz-actions { justify-content: flex-start; }
+@keyframes ck-quiz-pop { from { opacity: 0; transform: translateX(-28px) scale(.97); } to { opacity: 1; transform: none; } }
+/* Narrow phones: Sprig peeks over the card's top-left corner so the answers keep the full width. */
+@media (max-width: 480px) {
+  .ck-quiz.ck-quiz-pop { grid-template-columns: minmax(0, 1fr); padding-top: 58px; position: relative; }
+  .ck-quiz-pop .ck-quiz-sprig { position: absolute; left: 4px; top: 0; margin: 0; --sprig-size: 92px !important; }
+  .ck-quiz-card { padding-top: 12px; }
+  .ck-quiz-card::before { left: 34px; top: -12px; bottom: auto; transform: rotate(135deg); }
+  .ck-quiz-who { padding-left: 82px; }
+  .ck-quiz-card .ck-question { padding-top: 4px; }
+}
+@media (prefers-reduced-motion: reduce) { .ck-quiz.ck-quiz-pop { animation: none; } }
+/* The step companion: bigger, still beside the instruction, never over the dish */
+.ck-app .ck-instruction .ck-step-sprig { order: -1; margin: -6px 0 -4px; }
+/* A tap message floats beside Sprig instead of pushing the dish down. */
+.ck-app .ck-step-sprig { position: relative; }
+.ck-app .ck-step-sprig .sprig-bubble {
+  position: absolute; left: calc(100% + 6px); top: 4px; z-index: 12; width: max-content; max-width: min(260px, 64vw);
+  margin: 0; box-shadow: 0 8px 20px rgb(45 27 15 / 18%);
+}
+
+/* Sprig beside the dish. Wide screens: a big Sprig stands to the left of the dish.
+   Phones (portrait or landscape): Sprig stands in the tray just below or beside the dish. */
+.ck-app .ck-dish-sprig { position: relative; flex: none; }
+.ck-app .ck-dish-sprig .sprig-bubble {
+  position: absolute; bottom: calc(100% - 8px); left: 8px; z-index: 14; width: max-content; max-width: min(260px, 70vw);
+  margin: 0; box-shadow: 0 10px 24px rgb(45 27 15 / 20%);
+}
+.ck-app .ck-dish-sprig .sprig-bubble::before { left: 22px; bottom: -11px; transform: rotate(-45deg); }
+.ck-app .ck-dish-sprig-tray { display: none; }
+@media (min-aspect-ratio: 5/4) and (min-height: 561px) and (min-width: 641px) {
+  .ck-app:not(.ck-finale) .ck-stage-wrap { display: flex; align-items: center; justify-content: center; gap: 12px; }
+  .ck-app .ck-dish-sprig-side { --sprig-size: clamp(130px, 34cqh, 220px); align-self: flex-end; margin-bottom: 12px; }
+  .ck-app:not(.ck-finale) .ck-stage-wrap .ck-stage { width: min(calc(100cqw - clamp(150px, 30cqh, 230px)), calc(100cqh * var(--ar, 1.6))); }
+}
+@media (max-aspect-ratio: 5/4), (max-width: 640px), (max-height: 560px) {
+  .ck-app .ck-dish-sprig-side { display: none; }
+  .ck-app .ck-dish-sprig-tray { display: flex; --sprig-size: 104px; margin: -26px 4px 0 0; align-self: flex-end; }
+  .ck-app .ck-tray:not(.ck-quiz-tray) { justify-content: flex-start; gap: 6px; }
+  .ck-app .ck-tray:not(.ck-quiz-tray) > :not(.ck-dish-sprig) { flex: 1; min-width: 0; }
+}
+@media (max-height: 560px) and (min-aspect-ratio: 5/4) {
+  .ck-app .ck-dish-sprig-tray { --sprig-size: 88px; margin-top: 0; }
+}

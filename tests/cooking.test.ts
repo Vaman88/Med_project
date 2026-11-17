@@ -217,3 +217,24 @@ test("phones frame each action closely: tall glass, square round dishes, wide bo
   assert.ok(viewFor("board", true).w > viewFor("board", true).h, "the board view stays landscape");
   assert.deepEqual(viewFor("glass", false), viewFor("board", false), "larger screens keep one wide view");
 });
+
+test("plating keeps every piece the child chose and tidies them inside the dish", async () => {
+  const { plateDish, garnishFor } = await import("../src/lib/plating");
+  const { glassSurface } = await import("../src/lib/cooking-geometry");
+  const parfait = littleRecipes.find((r) => r.id === "parfait")!;
+  const plan = planFor(parfait);
+  let dish = emptyDish();
+  dish = { ...dish, scoops: { "yogurt-base": 2, "yogurt-top": 1 } };
+  const add = (asset: string, x: number, y: number) => { dish = { ...dish, drops: [...dish.drops, { id: dish.nextId, step: "toppings", asset, x, y, rot: 0, zone: "glass", lvl: 3 }], nextId: dish.nextId + 1 }; };
+  // A messy pile, all in one corner.
+  add("banana:slice", 330, 140); add("strawberry:slice", 334, 142); add("strawberry:slice", 331, 139); add("strawberry:slice", 336, 141); add("blueberry:pile", 333, 140);
+  const plated = plateDish(parfait, plan, dish);
+  const count = (d: typeof dish, a: string) => d.drops.filter((x) => x.asset === a).length;
+  for (const a of ["banana:slice", "strawberry:slice", "blueberry:pile"]) assert.equal(count(plated, a), count(dish, a), a);
+  const top = glassSurface(3);
+  for (const d of plated.drops) assert.ok(Math.hypot((d.x - top.cx) / top.rx, (d.y - top.cy) / top.ry) <= 0.85, `${d.asset} stays on the yogurt`);
+  const spread = new Set(plated.drops.map((d) => `${Math.round(d.x)},${Math.round(d.y)}`));
+  assert.equal(spread.size, plated.drops.length, "no two pieces sit on the same spot");
+  assert.equal(garnishFor("parfait").kind, "mint");
+  assert.equal(garnishFor("veggie-fried-rice").kind, "herbs");
+});

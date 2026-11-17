@@ -47,7 +47,7 @@ export function FoodDefs() {
       <Grad id="fa-yogurt-top" radial cx={0.42} cy={0.38} r={0.75} stops={[[0, "#ffffff"], [0.62, "#f9f7f1"], [1, "#e9e3d6"]]} />
       <Grad id="fa-wood" stops={[[0, "#dcae76"], [1, "#c08b54"]]} />
       <Grad id="fa-board" stops={[[0, "#ebcb9e"], [0.5, "#dcb07a"], [1, "#cfa064"]]} />
-      <Grad id="fa-ceramic" radial cx={0.4} cy={0.35} r={0.85} stops={[[0, "#fffdf8"], [1, "#eee3d1"]]} />
+      <Grad id="fa-ceramic" radial cx={0.4} cy={0.35} r={0.85} stops={[[0, "#ffffff"], [1, "#e6f7f2"]]} />
       <Grad id="fa-ceramic-in" radial cx={0.5} cy={0.65} r={0.7} stops={[[0, "#f3ead8"], [1, "#d9c9ab"]]} />
       <Grad id="fa-glass" x2={1} y2={0} stops={[[0, "#ffffff", 0.7], [0.14, "#ffffff", 0.14], [0.5, "#dfeae2", 0.05], [0.84, "#ffffff", 0.12], [1, "#ffffff", 0.6]]} />
       <Grad id="fa-pita" radial cx={0.4} cy={0.35} r={0.8} stops={[[0, "#f6dfb0"], [0.7, "#e6c284"], [1, "#cf9f5c"]]} />
@@ -68,7 +68,21 @@ export function FoodDefs() {
       <Grad id="fa-pancake-side" x2={1} y2={0} stops={[[0, "#b9772f"], [0.35, "#dca155"], [0.7, "#d19347"], [1, "#a9692a"]]} />
       <Grad id="fa-brownie" radial cx={0.4} cy={0.3} r={0.9} stops={[[0, "#6a422b"], [1, "#3e2417"]]} />
       <Grad id="fa-steel" x2={0} y2={1} stops={[[0, "#f4f5f4"], [0.5, "#c9ccca"], [1, "#9ea3a1"]]} />
-      <Grad id="fa-counter" x2={1} y2={1} stops={[[0, "#fbf6ea"], [1, "#efe6d2"]]} />
+      <Grad id="fa-counter" x2={1} y2={1} stops={[[0, "#fff9ef"], [1, "#fdeee0"]]} />
+      {/* Kitchen Friends counter: cream worktop with soft pink polka dots. */}
+      <pattern id="fa-dots" width="40" height="40" patternUnits="userSpaceOnUse">
+        <circle cx="10" cy="10" r="3.4" fill="#ffd3df" opacity=".75" />
+        <circle cx="30" cy="30" r="3.4" fill="#ffd3df" opacity=".75" />
+      </pattern>
+      {/* Painted look for every ingredient: a soft glossy highlight from the top left. */}
+      <filter id="fa-paint" x="-25%" y="-25%" width="150%" height="150%" colorInterpolationFilters="sRGB">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="2.2" result="b" />
+        <feSpecularLighting in="b" surfaceScale="3.6" specularConstant=".7" specularExponent="16" lightingColor="#ffffff" result="s">
+          <feDistantLight azimuth={225} elevation={52} />
+        </feSpecularLighting>
+        <feComposite in="s" in2="SourceAlpha" operator="in" result="si" />
+        <feMerge><feMergeNode in="SourceGraphic" /><feMergeNode in="si" /></feMerge>
+      </filter>
       <ExtraDefs />
       {/* cheap tiling textures, no filters */}
       {/* silhouettes reused to keep surface detail inside the food */}
@@ -683,7 +697,7 @@ export function AssetIcon({ asset, size = 56, chocolate }: { asset: string; size
   const f = art.fit;
   return (
     <svg className="ck-icon" width={size} height={size} viewBox={`${-f} ${-f} ${f * 2} ${f * 2}`} aria-hidden="true" focusable="false">
-      {art.draw({ pitch: 1, chocolate })}
+      <g filter="url(#fa-paint)">{art.draw({ pitch: 1, chocolate })}</g>
     </svg>
   );
 }

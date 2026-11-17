@@ -598,3 +598,500 @@
   .cp-app .cp-head .button { margin-left: 0; width: 100%; }
   .cp-app .cp-facts > div { grid-template-columns: 1fr; gap: 2px; }
 }
+
+/* ============================ Sprig, the companion ============================ */
+.sprig { display: flex; align-items: flex-end; gap: 10px; min-width: 0; }
+.sprig-figure { flex: none; height: var(--sprig-size, 96px); }
+.sprig-svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.sprig-bubble {
+  position: relative; min-width: 0; max-width: 34ch; margin-bottom: calc(var(--sprig-size, 96px) * .35);
+  padding: 10px 14px; border: 3px solid #2d1b0f; border-radius: 18px; background: #fff;
+  color: #2d1b0f; font-weight: 800; font-size: 16px; line-height: 1.3;
+}
+.sprig-bubble::before {
+  content: ""; position: absolute; left: -11px; bottom: 12px; width: 16px; height: 16px;
+  background: #fff; border-left: 3px solid #2d1b0f; border-bottom: 3px solid #2d1b0f; transform: rotate(45deg);
+}
+/* One short reaction per mood change, never a constant loop. */
+.sprig-cheer .sprig-body, .sprig-cheer .sprig-sprout { animation: sprig-hop 620ms cubic-bezier(.3, .7, .3, 1) both; transform-origin: 100px 180px; }
+.sprig-cheer .sprig-sprout { animation-name: sprig-wave; transform-origin: 103px 66px; }
+.sprig-think .sprig-body { animation: sprig-tilt 520ms ease both; transform-origin: 100px 180px; }
+.sprig-encourage .sprig-sprout { animation: sprig-wave 700ms ease both; transform-origin: 103px 66px; }
+@keyframes sprig-hop { 0% { transform: translateY(0); } 35% { transform: translateY(-14px); } 65% { transform: translateY(0); } 80% { transform: translateY(-4px); } 100% { transform: translateY(0); } }
+@keyframes sprig-wave { 0%, 100% { transform: rotate(0); } 30% { transform: rotate(-8deg); } 65% { transform: rotate(6deg); } }
+@keyframes sprig-tilt { 0% { transform: rotate(0); } 100% { transform: rotate(-5deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .sprig-svg * { animation: none !important; }
+}
+
+/* Kids menu: Sprig greets the chef beside the heading */
+.little-app .km-hello .sprig { flex: none; }
+.little-app .km-hello .sprig-bubble { display: none; }
+.little-app .km-sprig-line { margin-top: 10px; }
+.little-app .km-sprig-line .sprig-bubble { margin-bottom: 18px; font-size: 15px; }
+/* My Chef: Sprig's garden */
+.little-app .sprig-garden {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 18px; margin: 18px 0 8px; padding: 18px 20px;
+  border-radius: 26px; background: #fff1c7; border: 3px solid #2d1b0f;
+}
+.little-app .sprig-garden h2 { margin: 0 0 4px; font-size: 24px; }
+.little-app .sprig-garden p { margin: 0; font-weight: 700; color: #6a4c38; }
+.little-app .sprig-garden .sprig-meter { display: flex; gap: 6px; margin-top: 10px; }
+.little-app .sprig-garden .sprig-meter i { width: 22px; height: 10px; border-radius: 99px; background: #e9d9b4; }
+.little-app .sprig-garden .sprig-meter i.on { background: #4c9a2a; }
+/* Cooking game: Sprig beside the instruction, never over the dish */
+.ck-app .ck-instruction .sprig { order: -1; }
+.ck-app .ck-sprig-quiz { margin-bottom: 6px; }
+.ck-app .ck-sprig-quiz .sprig-bubble { font-size: 17px; }
+.ck-app .ck-finale-text .sprig { margin: 2px 0 4px; }
+
+/* Interactive Sprig: follows the pointer, reacts to hover and taps */
+.sprig-poke {
+  display: block; padding: 0; margin: 0; border: 0; background: none; cursor: pointer;
+  border-radius: 24px; -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+}
+.sprig-poke:focus-visible { outline: 4px solid #0b7f8a; outline-offset: 4px; }
+.sprig-figure-inner { display: block; width: 100%; height: 100%; }
+.sprig-live .sprig-svg { transform: rotate(var(--sprig-lean, 0deg)); transform-origin: 50% 92%; transition: transform 220ms ease-out; }
+.sprig-poke:hover .sprig-svg, .sprig-poke:focus-visible .sprig-svg { transform: rotate(var(--sprig-lean, 0deg)) scale(1.06); }
+.sprig-poke:active .sprig-svg { transform: scale(.94); }
+.sprig-poke .sprig-figure-inner { animation: sprig-giggle 520ms ease both; }
+@keyframes sprig-giggle { 0% { transform: rotate(0); } 20% { transform: rotate(-7deg) translateY(-6px); } 45% { transform: rotate(6deg); } 70% { transform: rotate(-3deg); } 100% { transform: rotate(0); } }
+.sprig-live .sprig-bubble { animation: sprig-say 260ms cubic-bezier(.2, .8, .3, 1) both; }
+@keyframes sprig-say { from { opacity: 0; transform: translateX(-8px) scale(.96); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .sprig-live .sprig-svg, .sprig-poke .sprig-figure-inner, .sprig-live .sprig-bubble { animation: none !important; transition: none !important; }
+}
+.sprig-live .sprig-poke { height: var(--sprig-size, 96px); width: auto; }
+/* A tapped message fades out at the end of its ~7 seconds. */
+.sprig-live .sprig-bubble-timed { animation: sprig-say 260ms cubic-bezier(.2, .8, .3, 1) both, sprig-fade 700ms ease 6300ms forwards; }
+@keyframes sprig-fade { to { opacity: 0; transform: translateY(-6px); } }
+
+/* ===================== Kids' home: the "Let's cook!" kitchen ===================== */
+.little-app .ks { display: flex; flex-direction: column; gap: 14px; margin: 4px 0 26px; }
+.little-app .ks-scene {
+  position: relative; overflow: hidden; border: 3px solid #2d1b0f; border-radius: 30px;
+  /* soft gingham wall */
+  background-color: #fff6dc;
+  background-image:
+    repeating-linear-gradient(0deg, rgb(255 210 63 / 22%) 0 22px, transparent 22px 44px),
+    repeating-linear-gradient(90deg, rgb(255 210 63 / 22%) 0 22px, transparent 22px 44px);
+  box-shadow: 0 10px 0 #2d1b0f1f;
+}
+.little-app .ks-banner { position: relative; z-index: 3; display: flex; justify-content: center; margin: 14px 0 0; }
+.little-app .ks-banner span {
+  position: relative; padding: 6px 30px 8px; border: 3px solid #2d1b0f; border-radius: 14px; background: #0b7f8a; color: #fff;
+  font-family: "Fredoka", sans-serif; font-weight: 700; font-size: clamp(24px, 4vw, 34px); letter-spacing: .02em; box-shadow: 0 5px 0 #2d1b0f;
+}
+/* a little shelf of jars behind Sprig */
+.little-app .ks-shelf { position: absolute; right: 18px; top: 74px; display: flex; gap: 8px; align-items: flex-end; padding: 0 8px 6px; border-bottom: 8px solid #b8803f; opacity: .9; }
+.little-app .ks-shelf i { display: block; width: 22px; height: 30px; border: 2px solid #2d1b0f; border-radius: 6px 6px 4px 4px; background: #fbe3d0; }
+.little-app .ks-shelf i:nth-child(2) { height: 38px; background: #dff3e4; }
+.little-app .ks-shelf i:nth-child(3) { height: 26px; background: #ffe0ea; }
+.little-app .ks-shelf i:nth-child(4) { height: 34px; background: #fff1c7; }
+.little-app .ks-talk { position: relative; z-index: 2; display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; padding: 6px 16px 0 18px; }
+.little-app .ks-bubble {
+  position: relative; flex: 1; min-width: 0; max-width: 460px; margin-bottom: 70px; padding: 14px 18px;
+  border: 3px solid #2d1b0f; border-radius: 24px; background: #fffdf8; box-shadow: 0 6px 0 #2d1b0f26;
+}
+.little-app .ks-bubble::after {
+  content: ""; position: absolute; right: -14px; bottom: 30px; width: 24px; height: 24px; background: #fffdf8;
+  border-right: 3px solid #2d1b0f; border-bottom: 3px solid #2d1b0f; transform: rotate(-45deg);
+}
+.little-app .ks-bubble h1 { margin: 0 0 6px; font-size: clamp(22px, 3.6vw, 34px); line-height: 1.08; color: #2d1b0f; }
+.little-app .ks-bubble p { margin: 0; font-weight: 800; font-size: clamp(15px, 2vw, 19px); line-height: 1.35; color: #6a4c38; animation: sprig-say 300ms ease both; }
+.little-app .ks-sprig { flex: none; --sprig-size: clamp(150px, 26vw, 240px); margin-bottom: -6px; }
+.little-app .ks-sprig .sprig-bubble { position: absolute; right: 30%; bottom: 92%; z-index: 5; width: max-content; max-width: 220px; margin: 0; }
+/* the wooden counter with the dishes on plates */
+.little-app .ks-counter {
+  position: relative; z-index: 1; display: flex; align-items: center; gap: 6px; padding: 18px 10px 20px;
+  border-top: 6px solid #8a5528; background: linear-gradient(180deg, #d9a066 0%, #c48a52 55%, #b07a45 100%);
+}
+.little-app .ks-arrow {
+  flex: none; display: grid; place-items: center; width: 56px; height: 56px; padding: 0; border: 3px solid #2d1b0f; border-radius: 50%;
+  background: #c9431f; color: #fff; box-shadow: 0 5px 0 #8f2e14; cursor: pointer; transition: transform 120ms ease;
+}
+.little-app .ks-arrow:active { transform: translateY(4px); box-shadow: 0 1px 0 #8f2e14; }
+.little-app .ks-arrow:focus-visible, .little-app .ks-track:focus-visible, .little-app .ks-plate:focus-visible { outline: 4px solid #ffd23f; outline-offset: 3px; }
+.little-app .ks-track { position: relative; flex: 1; min-width: 0; height: clamp(120px, 22vw, 176px); touch-action: pan-y; border-radius: 20px; }
+.little-app .ks-plate {
+  --gap: clamp(78px, 21vw, 168px);
+  --ad: max(var(--d), calc(-1 * var(--d)));
+  position: absolute; left: 50%; top: 50%; width: clamp(96px, 20vw, 156px); aspect-ratio: 1; padding: 0; border: 0; background: none; cursor: pointer;
+  transform: translate(calc(-50% + var(--d) * var(--gap)), -50%) scale(calc(1 - min(1, var(--ad)) * .3));
+  opacity: calc(1 - var(--ad) * .22);
+  z-index: calc(10 - var(--ad));
+  transition: transform 520ms cubic-bezier(.3, .7, .25, 1), opacity 520ms ease;
+}
+.little-app .ks-dish {
+  display: block; width: 100%; height: 100%; overflow: hidden; border-radius: 50%; border: 8px solid #fff;
+  background: #fff; box-shadow: 0 0 0 3px #2d1b0f, 0 10px 0 #2d1b0f33;
+}
+.little-app .ks-dish img { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.little-app .ks-plate.is-center .ks-dish { box-shadow: 0 0 0 3px #2d1b0f, 0 0 0 9px #ffd23f, 0 12px 0 #2d1b0f33; }
+.little-app .ks-tag {
+  position: absolute; left: 50%; bottom: -8px; transform: translateX(-50%) rotate(-4deg); padding: 2px 10px; border: 3px solid #2d1b0f; border-radius: 999px;
+  font-family: "Fredoka", sans-serif; font-weight: 700; font-size: 14px; white-space: nowrap; box-shadow: 0 3px 0 #2d1b0f;
+}
+.little-app .ks-new { background: #ffd23f; color: #2d1b0f; }
+.little-app .ks-made { background: #fff; color: #0b7f8a; }
+.little-app .ks-pick { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; }
+.little-app .ks-name { display: flex; flex-direction: column; margin: 0; min-width: 0; }
+.little-app .ks-name strong { font-family: "Fredoka", sans-serif; font-size: clamp(22px, 3vw, 28px); line-height: 1.1; color: #2d1b0f; }
+.little-app .ks-name span { font-weight: 700; color: #6a4c38; }
+.little-app .ks-go {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 56px; padding: 10px 26px; border: 0; border-radius: 18px;
+  background: #c9431f; color: #fff; font-family: "Fredoka", sans-serif; font-weight: 700; font-size: 21px; box-shadow: 0 6px 0 #8f2e14; cursor: pointer;
+}
+.little-app .ks-go:active { transform: translateY(5px); box-shadow: 0 1px 0 #8f2e14; }
+.little-app .km-all-title { margin: 6px 0 0; font-size: 26px; }
+@media (max-width: 560px) {
+  .little-app .ks-talk { padding: 4px 8px 0 12px; }
+  .little-app .ks-bubble { margin-bottom: 54px; padding: 12px 14px; }
+  .little-app .ks-shelf { display: none; }
+  .little-app .ks-arrow { width: 46px; height: 46px; }
+  .little-app .ks-go { width: 100%; justify-content: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .little-app .ks-plate { transition: none; }
+  .little-app .ks-bubble p { animation: none; }
+}
+/* Plates stay inside the counter area so they never cover the arrow buttons. */
+.little-app .ks-track { overflow: hidden; height: clamp(140px, 24vw, 196px); }
+.little-app .ks-plate { top: 46%; }
+.little-app .ks-arrow { position: relative; z-index: 20; }
+
+/* Sprig stands tall on the right of the kitchen, like a host (sized on the figure itself). */
+.little-app .ks-sprig .sprig-poke { height: clamp(150px, 24vw, 290px); }
+.little-app .ks-bubble { margin-bottom: clamp(40px, 8vw, 110px); }
+/* On the kids' pages, "Switch profile" sits at the end of the page instead of floating over the counter. */
+body:has(.little-app) .role-switch { position: static; display: block; margin: 0 16px 28px; }
+/* Phones: fit the whole kitchen, the counter and the "Let's cook it!" button on one screen. */
+@media (max-width: 560px) {
+  .little-app .ks { gap: 10px; margin-bottom: 18px; }
+  .little-app .ks-banner { margin-top: 10px; }
+  .little-app .ks-banner span { padding: 4px 22px 6px; font-size: 24px; }
+  .little-app .ks-talk { gap: 4px; }
+  .little-app .ks-bubble { margin-bottom: 34px; padding: 10px 12px; border-radius: 20px; }
+  .little-app .ks-bubble h1 { font-size: 21px; margin-bottom: 4px; }
+  .little-app .ks-bubble p { font-size: 14px; }
+  .little-app .ks-sprig .sprig-poke { height: 140px; }
+  .little-app .ks-counter { padding: 10px 6px 12px; }
+  .little-app .ks-track { height: 132px; }
+  .little-app .ks-plate { width: 104px; --gap: 84px; }
+  .little-app .ks-pick { gap: 8px; }
+  .little-app .ks-name strong { font-size: 20px; }
+  .little-app .ks-go { min-height: 52px; font-size: 19px; }
+}
+@media (max-width: 560px) {
+  .little-app .ks-banner { margin-top: 8px; }
+  .little-app .ks-banner span { font-size: 22px; }
+  .little-app .ks-bubble { margin-bottom: 28px; }
+  .little-app .ks-sprig .sprig-poke { height: 118px; }
+  .little-app .ks-track { height: 116px; }
+  .little-app .ks-plate { width: 94px; --gap: 78px; }
+  .little-app .ks-name span { display: none; }
+}
+
+/* "See all dishes" sits in the kitchen's top corner. */
+.little-app .ks-all {
+  position: absolute; top: 12px; right: 12px; z-index: 6; display: inline-flex; align-items: center; gap: 6px;
+  min-height: 44px; padding: 6px 14px; border: 3px solid #2d1b0f; border-radius: 999px; background: #fff; color: #2d1b0f;
+  font-weight: 800; font-size: 15px; box-shadow: 0 4px 0 #2d1b0f; cursor: pointer;
+}
+.little-app .ks-all:hover { background: #fff1cf; }
+.little-app .ks-all:active { transform: translateY(3px); box-shadow: 0 1px 0 #2d1b0f; }
+.little-app .ks-all:focus-visible { outline: 4px solid #0b7f8a; outline-offset: 3px; }
+.little-app .ks-shelf { top: 82px; }
+/* The banner moves down a little on phones so it never sits under the corner button. */
+@media (max-width: 560px) {
+  .little-app .ks-all { top: 10px; right: 10px; padding: 4px 12px; font-size: 14px; }
+  .little-app .ks-banner { margin-top: 62px; }
+}
+/* The All dishes page */
+.little-app .km-all-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; margin-bottom: 4px; }
+.little-app .km-all-head h1 { margin: 0; }
+.little-app .km-back {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 48px; padding: 8px 18px; border: 3px solid #2d1b0f;
+  border-radius: 999px; background: #fff; color: #2d1b0f; font-weight: 800; cursor: pointer;
+}
+.little-app .km-back:hover { background: #fff1cf; }
+.little-app .km-home { padding-bottom: 0; }
+@media (max-width: 560px) {
+  /* Ribbon on the left, "See all dishes" on the right, sharing one row. */
+  .little-app .ks-banner { justify-content: flex-start; margin: 10px 0 0 12px; }
+  .little-app .ks-banner span { font-size: 20px; padding: 4px 16px 6px; }
+  .little-app .ks-all { top: 10px; }
+}
+@media (max-width: 350px) {
+  .little-app .ks-banner span { font-size: 17px; padding: 3px 10px 5px; }
+  .little-app .ks-all { font-size: 13px; padding: 3px 10px; }
+}
+
+/* =================== Cooking game: the Kitchen Friends redesign ===================
+   Pastel pink wall with polka dots, a mint scalloped awning, star progress, round
+   pink buttons and smiling ingredient bowls. Loaded last, so it wins over the older sheets. */
+.ck-app {
+  --ck-bg: #fff9ef;
+  --ck-sage: #ffe6ee;
+  --ck-ink: #5a2d3d;
+  --ck-muted: #7d4d5d;
+  --ck-green: #d6336c;          /* primary action (white text passes 6:1) */
+  --ck-green-dark: #a3214f;
+  --ck-card: #ffffff;
+  --ck-shadow: 0 8px 0 #f3c9d4;
+  --kf-pink: #ff9db5;
+  --kf-pink-soft: #ffd3df;
+  --kf-mint: #8fd6c8;
+  --kf-mint-dark: #5fb3a2;
+  color: var(--ck-ink);
+  background:
+    radial-gradient(circle, #ffd3df 2.6px, transparent 3.2px) 0 0 / 28px 28px,
+    linear-gradient(180deg, #ffe3ec 0, #ffecf2 160px, #fff9ef 300px);
+}
+.ck-app h1, .ck-app h2, .ck-app .ck-step-title, .ck-app .ck-title, .ck-app .ck-question { color: var(--ck-ink); }
+/* Mint scalloped awning along the top. */
+.ck-app .ck-top { position: relative; padding-top: max(26px, calc(env(safe-area-inset-top) + 20px)); }
+.ck-app .ck-top::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 24px; pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 0, var(--kf-mint) 0 13px, #fff 13.5px 14px, transparent 14.5px) 0 4px / 30px 22px repeat-x,
+    linear-gradient(var(--kf-mint), var(--kf-mint)) 0 0 / 100% 8px no-repeat;
+}
+.ck-app .ck-title { font-size: clamp(17px, 2.3vw, 23px); }
+/* Round white buttons with a pink edge. */
+.ck-app .ck-icon-btn {
+  width: 46px; height: 46px; border: 3px solid var(--kf-pink); border-radius: 50%; background: #fff; color: var(--ck-green);
+  box-shadow: 0 4px 0 #f3c9d4;
+}
+.ck-app .ck-icon-btn:hover { background: #fff3f6; }
+.ck-app .ck-icon-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #f3c9d4; }
+/* Progress is a row of stars: gold for done, pink for the step in progress. */
+.ck-app .ck-progress { justify-content: center; gap: 3px; }
+.ck-app .ck-progress li {
+  flex: 0 1 22px; height: 22px; max-width: 22px; border-radius: 0; background: #f3c9d4;
+  clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 92%, 50% 71%, 21% 92%, 32% 57%, 2% 35%, 39% 35%);
+}
+.ck-app .ck-progress li.done { background: #ffc22e; }
+.ck-app .ck-progress li.current { background: var(--ck-green); }
+/* Hint and Undo pills */
+.ck-app .ck-pill { border: 3px solid var(--kf-pink); border-radius: 999px; background: #fff; color: var(--ck-ink); box-shadow: 0 3px 0 #f3c9d4; }
+.ck-app .ck-pill:disabled { border-color: #f3dbe2; color: #b98f9c; box-shadow: none; }
+.ck-app .ck-hint { background: #fff; border: 3px solid var(--kf-pink-soft); color: var(--ck-ink); }
+/* The dish sits on a cream counter framed like a picture. */
+.ck-app .ck-stage { border-radius: 26px; background: #fff9ef; border: 4px solid #fff; box-shadow: 0 8px 0 #f3c9d4, 0 14px 30px rgb(214 51 108 / 12%); }
+.ck-app .ck-hot.marker { background: var(--ck-green); color: #fff; border: 3px solid #fff; box-shadow: 0 4px 0 var(--ck-green-dark); }
+.ck-app .ck-hot[aria-label^="Mash"] { background: #ff9f5a; }
+.ck-app .ck-hot.armed { outline-color: #ffc22e; }
+.ck-app .ck-hot:focus-visible { outline-color: var(--ck-green); }
+/* Chunky round buttons */
+.ck-app .ck-primary {
+  border: 0; border-radius: 999px; background: var(--ck-green); color: #fff; font-weight: 800;
+  box-shadow: 0 6px 0 var(--ck-green-dark);
+}
+.ck-app .ck-primary:hover:not(:disabled) { background: #c42a60; }
+.ck-app .ck-primary:active:not(:disabled) { transform: translateY(5px); box-shadow: 0 1px 0 var(--ck-green-dark); }
+.ck-app .ck-primary:disabled { background: #f6dde5; color: #a07a86; box-shadow: none; }
+.ck-app .ck-secondary { border: 3px solid var(--kf-pink); border-radius: 999px; background: #fff; color: var(--ck-ink); box-shadow: 0 4px 0 #f3c9d4; }
+.ck-app .ck-link { color: var(--ck-green-dark); }
+.ck-app button:focus-visible { outline: 4px solid #2f8f80; outline-offset: 3px; }
+/* Heat meter: a warm bar with a heart */
+.ck-app .ck-meter { height: 16px; border: 3px solid #ffb6c9; border-radius: 999px; background: #fff; }
+.ck-app .ck-meter i { border-radius: 999px; background: linear-gradient(90deg, #ffb35c, #ff7a45); }
+.ck-app .ck-note { color: var(--ck-muted); }
+
+/* ---- the tray: one smiling bowl per ingredient ---- */
+.ck-app .ck-chip {
+  width: 96px; padding: 4px 4px 6px; border: 3px solid transparent; border-radius: 22px; background: transparent; box-shadow: none;
+  color: var(--ck-ink); font-size: 12.5px;
+}
+.ck-app .ck-chip:hover:not(:disabled) { transform: translateY(-3px); background: rgb(255 255 255 / 55%); }
+.ck-app .ck-chip.selected { transform: translateY(-6px); outline: none; border: 3px dashed #ffc22e; background: #fff3b8; box-shadow: none; }
+.ck-app .ck-bowl { position: relative; display: block; width: 84px; height: 72px; margin: 0 auto; }
+.ck-app .ck-bowl-back {
+  position: absolute; left: 4px; right: 4px; top: 30px; height: 16px; border-radius: 50%;
+  background: color-mix(in srgb, var(--bowl) 45%, #4a2834); border: 2.5px solid color-mix(in srgb, var(--bowl) 55%, #fff);
+}
+.ck-app .ck-bowl-food { position: absolute; left: 50%; top: -2px; transform: translateX(-50%); }
+.ck-app .ck-bowl-food .ck-icon { display: block; width: 56px; height: 56px; filter: drop-shadow(0 3px 2px rgb(74 40 52 / 25%)); }
+.ck-app .ck-bowl-front { position: absolute; left: 0; bottom: 0; width: 100%; height: auto; }
+.ck-app .ck-tool { color: var(--ck-muted); }
+
+/* ---- quiz popup, overlays and finish screen ---- */
+.ck-app .ck-quiz-card, .ck-app .ck-quiz-card::before { border-color: var(--kf-pink); }
+.ck-app .ck-quiz-card { border-radius: 26px; box-shadow: 0 8px 0 #f3c9d4; }
+.ck-app .ck-quiz-who { color: #2f8f80; }
+.ck-app .ck-answer { border: 3px solid var(--kf-pink-soft); border-radius: 999px; background: #fff; color: var(--ck-ink); box-shadow: 0 3px 0 #f3c9d4; }
+.ck-app .ck-answer.right { border-color: var(--kf-mint-dark); background: #e3f7f1; }
+.ck-app .ck-overlay { background: rgb(90 45 61 / 45%); }
+.ck-app .ck-card { border: 4px solid var(--kf-pink-soft); border-radius: 28px; }
+.ck-app.ck-finale { background:
+    radial-gradient(circle, #ffd3df 2.6px, transparent 3.2px) 0 0 / 28px 28px,
+    linear-gradient(180deg, #ffe3ec 0, #fff9ef 360px); }
+.ck-app .ck-frame { border: 4px solid #fff; border-radius: 32px; box-shadow: 0 10px 0 #f3c9d4, 0 18px 40px rgb(214 51 108 / 16%); }
+.ck-app .ck-kicker { color: var(--ck-green-dark); }
+@media (max-aspect-ratio: 5/4), (max-width: 640px) {
+  .ck-app .ck-chip { width: 88px; }
+  .ck-app .ck-bowl { width: 78px; height: 66px; }
+  .ck-app .ck-bowl-food .ck-icon { width: 52px; height: 52px; }
+  .ck-app .ck-bowl-back { top: 27px; }
+}
+@media (max-height: 560px) and (min-aspect-ratio: 5/4) {
+  .ck-app .ck-top { padding-top: 22px; }
+}
+
+/* Kids' home kitchen in the Kitchen Friends style: pink dotted wall, mint awning, cream counter. */
+.little-app .ks-scene {
+  border: 4px solid #fff; border-radius: 32px; box-shadow: 0 10px 0 #f3c9d4, 0 18px 36px rgb(214 51 108 / 14%);
+  background-color: #ffe6ee;
+  background-image: radial-gradient(circle, #ffd3df 2.6px, transparent 3.2px);
+  background-size: 28px 28px;
+}
+.little-app .ks-scene::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 26px; z-index: 1; pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 0, #8fd6c8 0 14px, #fff 14.5px 15px, transparent 15.5px) 0 4px / 32px 24px repeat-x,
+    linear-gradient(#8fd6c8, #8fd6c8) 0 0 / 100% 8px no-repeat;
+}
+.little-app .ks-banner { margin-top: 34px; }
+.little-app .ks-banner span { background: #d6336c; border: 3px solid #fff; border-radius: 999px; box-shadow: 0 5px 0 #a3214f; }
+.little-app .ks-all { top: 34px; border-color: #ff9db5; color: #5a2d3d; box-shadow: 0 4px 0 #f3c9d4; }
+.little-app .ks-all:hover { background: #fff3f6; }
+.little-app .ks-shelf { top: 92px; border-bottom-color: #f6cfa0; }
+.little-app .ks-shelf i { border-color: #c98e9f; }
+.little-app .ks-bubble { border-color: #ff9db5; border-radius: 26px; box-shadow: 0 6px 0 #f3c9d4; }
+.little-app .ks-bubble::after { border-color: #ff9db5; }
+.little-app .ks-bubble h1 { color: #5a2d3d; }
+.little-app .ks-bubble p { color: #7d4d5d; }
+.little-app .ks-counter {
+  border-top: 6px solid #ffffff;
+  background-color: #fff9ef;
+  background-image: radial-gradient(circle, #ffd3df 2.4px, transparent 3px), linear-gradient(180deg, #fff9ef 0 82%, #a9e3d6 82%);
+  background-size: 26px 26px, 100% 100%;
+}
+.little-app .ks-arrow { background: #d6336c; border-color: #fff; box-shadow: 0 5px 0 #a3214f; }
+.little-app .ks-arrow:active { box-shadow: 0 1px 0 #a3214f; }
+.little-app .ks-dish { border-color: #fff; box-shadow: 0 0 0 3px #8fd6c8, 0 8px 0 #f3c9d4; }
+.little-app .ks-plate.is-center .ks-dish { box-shadow: 0 0 0 3px #8fd6c8, 0 0 0 9px #ffc22e, 0 10px 0 #f3c9d4; }
+.little-app .ks-tag { border-color: #fff; box-shadow: 0 3px 0 #f3c9d4; }
+.little-app .ks-made { color: #2f8f80; }
+.little-app .ks-name strong { color: #5a2d3d; }
+.little-app .ks-name span { color: #7d4d5d; }
+.little-app .ks-go { border-radius: 999px; background: #d6336c; box-shadow: 0 6px 0 #a3214f; }
+.little-app .ks-go:active { box-shadow: 0 1px 0 #a3214f; }
+@media (max-width: 560px) {
+  .little-app .ks-banner { margin: 34px 0 0 12px; }
+  .little-app .ks-all { top: 34px; }
+}
+@media (min-width: 561px) { .little-app .ks-sprig .sprig-poke { height: clamp(150px, 20vw, 220px); } .little-app .ks-banner { margin-top: 30px; } }
+/* Kids' header in the Kitchen Friends colours */
+.little-app::before { background: #ffd3df; }
+.little-app .child-nav button { border-color: #ff9db5; color: #5a2d3d; box-shadow: 0 3px 0 #f3c9d4; }
+.little-app .child-nav button:hover { background: #fff3f6; }
+.little-app .child-nav button[aria-current="page"] { background: #d6336c; border-color: #d6336c; color: #fff; box-shadow: 0 4px 0 #a3214f; }
+.little-app .little-brand b { background: #d6336c; }
+.little-app .little-brand svg { color: #d6336c; }
+.little-app .little-header > button { border-color: #ff9db5 !important; color: #5a2d3d !important; }
+
+/* ===== Kids' home as one continuous scene (no separate card) =====
+   The pink polka-dot wall runs behind the header and Sprig, the mint awning spans the top of
+   the page, and the cream counter runs edge to edge down to the bottom of the screen. */
+.little-app:has(.km-home) {
+  background-color: #ffe6ee;
+  background-image: radial-gradient(circle, #ffd3df 2.6px, transparent 3.2px);
+  background-size: 28px 28px;
+}
+.little-app:has(.km-home)::before {
+  /* the corner sun becomes the awning */
+  inset: 0 0 auto 0; width: auto; height: 26px; border-radius: 0; z-index: 2;
+  background:
+    radial-gradient(circle at 50% 0, #8fd6c8 0 14px, #fff 14.5px 15px, transparent 15.5px) 0 4px / 32px 24px repeat-x,
+    linear-gradient(#8fd6c8, #8fd6c8) 0 0 / 100% 8px no-repeat;
+}
+.little-app:has(.km-home) .little-header { padding-top: 26px; }
+.little-app .km-home { padding-bottom: 0; }
+.little-app .km-home .ks { margin-bottom: 0; gap: 0; }
+.little-app .km-home .ks-scene {
+  overflow: visible; border: 0; border-radius: 0; box-shadow: none; background: none;
+}
+.little-app .km-home .ks-scene::before { display: none; }
+.little-app .km-home .ks-banner { margin-top: 4px; }
+.little-app .km-home .ks-all { top: 0; }
+.little-app .km-home .ks-shelf { top: 52px; }
+/* Counter: full width, and its cream colour continues to the bottom of the page. */
+.little-app .km-home .ks-counter {
+  z-index: 0; width: 100vw; margin-left: calc(50% - 50vw); padding-inline: max(10px, calc(50vw - 590px));
+  box-shadow: 0 0 0 100vmax #fff9ef; clip-path: inset(0 -100vmax -100vmax -100vmax);
+  background-image: radial-gradient(circle, #ffd3df 2.4px, transparent 3px);
+  background-size: 26px 26px; background-color: #fff9ef;
+}
+.little-app .km-home .ks-pick { position: relative; z-index: 1; padding: 14px 0 10px; }
+.little-app:has(.km-home) .little-footnote { position: relative; z-index: 1; }
+body:has(.km-home) .role-switch { position: relative; z-index: 1; }
+@media (max-width: 560px) {
+  .little-app .km-home .ks-banner { margin: 4px 0 0 4px; }
+  .little-app .km-home .ks-talk { padding-inline: 4px; }
+}
+body:has(.little-app) .role-switch { border-color: #ff9db5; color: #5a2d3d; background: #fff; box-shadow: 0 4px 0 #f3c9d4; }
+
+/* ===== Finish screen: make it pretty, then a food-photo reveal ===== */
+/* The dish sits on a pink gingham placemat inside the white frame. */
+.ck-app .ck-hero-creation .ck-frame {
+  background-color: #fff;
+  background-image:
+    linear-gradient(90deg, rgb(255 157 181 / 35%) 50%, transparent 50%),
+    linear-gradient(rgb(255 157 181 / 35%) 50%, transparent 50%);
+  background-size: 26px 26px;
+}
+.ck-app .ck-frame-art.ck-plating { position: relative; border-radius: 22px; transform-origin: 50% 70%; transition: transform 900ms cubic-bezier(.3, .7, .25, 1), box-shadow 900ms ease; }
+/* Pieces glide from where the child dropped them into the tidy arrangement. */
+.ck-app .ck-plating .ck-item { transition: transform 900ms cubic-bezier(.3, .7, .25, 1); }
+.ck-app .ck-finale-layer { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+/* The reveal: a gentle camera tilt and warm light, like a food photo. */
+.ck-app .ck-frame-art.ck-plating::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit; opacity: 0; transition: opacity 900ms ease;
+  background: radial-gradient(120% 90% at 50% 35%, rgb(255 236 200 / 0%) 45%, rgb(255 190 120 / 22%) 75%, rgb(120 50 40 / 28%) 100%),
+              linear-gradient(160deg, rgb(255 250 230 / 45%) 0%, rgb(255 250 230 / 0%) 40%);
+}
+.ck-app .ck-frame-art.ck-plating.is-revealed { transform: perspective(1100px) rotateX(9deg) scale(1.02); box-shadow: 0 22px 30px -18px rgb(90 45 61 / 45%); }
+.ck-app .ck-frame-art.ck-plating.is-revealed::after { opacity: 1; }
+.ck-app .ck-garnish { transform-box: fill-box; transform-origin: center; animation: ck-garnish-in 520ms cubic-bezier(.2, .9, .3, 1.3) both; }
+@keyframes ck-garnish-in { from { opacity: 0; transform: translateY(-30px) scale(.4); } to { opacity: 1; transform: none; } }
+.ck-app .ck-sparkle { transform-box: fill-box; transform-origin: center; opacity: 0; animation: ck-twinkle 1200ms ease-in-out 3 both; }
+@keyframes ck-twinkle { 0%, 100% { opacity: 0; scale: .3; } 45% { opacity: 1; scale: 1; } 70% { opacity: .8; scale: .85; } }
+.ck-app .ck-garnish-btn { border-color: #ffc22e; background: #fff8d6; box-shadow: 0 4px 0 #f0c64a; gap: 8px; }
+.ck-app .ck-garnish-btn:hover { background: #fff1b0; }
+@media (prefers-reduced-motion: reduce) {
+  .ck-app .ck-frame-art.ck-plating, .ck-app .ck-plating .ck-item { transition: none; }
+  .ck-app .ck-sparkle { display: none; }
+}
+
+/* ===== Finish screen: the drawing turns into the real dish photo ===== */
+.ck-app .ck-plating .ck-scene { transition: opacity 700ms ease, filter 700ms ease, transform 900ms cubic-bezier(.3, .7, .25, 1); }
+.ck-app .ck-morph-photo {
+  position: absolute; inset: 0; border-radius: inherit; overflow: hidden; pointer-events: none; z-index: 2;
+  opacity: 0; clip-path: circle(0% at 50% 55%); filter: blur(14px) saturate(.5) brightness(1.4); transform: scale(.82) rotate(-6deg);
+  transition: clip-path 1100ms cubic-bezier(.5, 0, .2, 1) 250ms, opacity 500ms ease 250ms, filter 1100ms ease 250ms, transform 1100ms cubic-bezier(.3, 1.4, .4, 1) 250ms;
+}
+.ck-app .ck-morph-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ck-app .ck-frame-art.is-real { transform: none; }
+.ck-app .ck-frame-art.is-real .ck-morph-photo { opacity: 1; clip-path: circle(75% at 50% 55%); filter: none; transform: none; }
+.ck-app .ck-frame-art.is-real .ck-scene { opacity: 0; filter: blur(8px) brightness(1.6); transform: scale(1.08) rotate(4deg); }
+.ck-app .ck-frame-art.is-real .ck-finale-layer { opacity: 0; transition: opacity 400ms ease; }
+.ck-app .ck-frame-art.is-real::after { opacity: .55; z-index: 3; }
+/* A white "poof" of light that hides the swap. */
+.ck-app .ck-morph-burst {
+  position: absolute; left: 50%; top: 55%; width: 30%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; z-index: 4; pointer-events: none;
+  background: radial-gradient(circle, #fff 0%, rgb(255 255 255 / 90%) 30%, rgb(255 226 120 / 60%) 55%, rgb(255 157 181 / 0%) 72%);
+  animation: ck-poof 1000ms ease-out both;
+}
+@keyframes ck-poof { 0% { opacity: 0; scale: .2; } 30% { opacity: 1; scale: 1.6; } 100% { opacity: 0; scale: 4.2; } }
+.ck-app .ck-morph-toggle {
+  display: block; margin: 10px auto 0; padding: 8px 16px; border-radius: 999px; border: 2px solid #ff9db5; background: #fff;
+  color: #a3214f; font: inherit; font-weight: 800; box-shadow: 0 3px 0 #f3c9d4; cursor: pointer; min-height: 44px;
+}
+.ck-app .ck-morph-toggle:hover { background: #fff0f4; }
+@media (prefers-reduced-motion: reduce) {
+  .ck-app .ck-morph-photo, .ck-app .ck-plating .ck-scene { transition: opacity 200ms linear; }
+  .ck-app .ck-morph-burst { display: none; }
+}

@@ -53,9 +53,9 @@ function Item({ asset, x, y, rot = 0, scale = 1, pitch = 1, landed, chocolate }:
   const art = ART[asset];
   if (!art) return null;
   return (
-    <g transform={`translate(${x} ${y})`}>
+    <g className="ck-item" style={{ transform: `translate(${x}px, ${y}px)` }}>
       <g className={landed ? "ck-drop" : undefined}>
-        <g transform={`rotate(${rot}) scale(${scale})`}>{art.draw({ pitch, chocolate })}</g>
+        <g transform={`rotate(${rot}) scale(${scale})`} filter="url(#fa-paint)">{art.draw({ pitch, chocolate })}</g>
       </g>
     </g>
   );
@@ -67,9 +67,7 @@ function Counter() {
   return (
     <g>
       <rect x="-10" y="-10" width="820" height="520" fill="url(#fa-counter)" />
-      {Array.from({ length: 9 }, (_, i) => (
-        <path key={i} d={`M -10 ${40 + i * 56} Q 400 ${34 + i * 56 + (i % 2) * 8} 810 ${42 + i * 56}`} stroke="#e6d9bd" strokeWidth="1.2" opacity=".45" fill="none" />
-      ))}
+      <rect x="-10" y="-10" width="820" height="520" fill="url(#fa-dots)" />
     </g>
   );
 }
@@ -404,9 +402,9 @@ function BowlScene({ recipe, plan, dish, step, fx, presenting }: SceneProps & { 
     <g>
       <Counter />
       <ellipse cx={BOWL.cx} cy={BOWL.cy + 190} rx="212" ry="26" fill="url(#fa-shadow)" />
-      <circle cx={BOWL.cx} cy={BOWL.cy + 6} r="200" fill="#dccdb2" />
+      <circle cx={BOWL.cx} cy={BOWL.cy + 6} r="200" fill="#7cc7b8" />
       <circle cx={BOWL.cx} cy={BOWL.cy} r="198" fill="url(#fa-ceramic)" />
-      <circle cx={BOWL.cx} cy={BOWL.cy} r={BOWL.rx + 4} fill="#e4d6bd" />
+      <circle cx={BOWL.cx} cy={BOWL.cy} r={BOWL.rx + 4} fill="#bfe9df" />
       <circle cx={BOWL.cx} cy={BOWL.cy + 3} r={BOWL.rx} fill="url(#fa-ceramic-in)" />
       <circle cx={BOWL.cx} cy={BOWL.cy} r={BOWL.rx - 14} fill="none" stroke="#c9b690" strokeWidth="16" opacity=".28" />
       <circle cx={BOWL.cx} cy={BOWL.cy} r={BOWL.rx} fill="none" stroke="#cdbb98" strokeWidth="4" opacity=".6" />
@@ -469,9 +467,9 @@ function Plate({ r = 192 }: { r?: number }) {
   return (
     <g>
       <ellipse cx={PITA.cx} cy={PITA.cy + r - 8} rx={r + 12} ry="26" fill="url(#fa-shadow)" />
-      <circle cx={PITA.cx} cy={PITA.cy + 5} r={r} fill="#dccdb2" />
-      <circle cx={PITA.cx} cy={PITA.cy} r={r} fill="url(#fa-ceramic)" stroke="#e6d9c2" strokeWidth="2" />
-      <circle cx={PITA.cx} cy={PITA.cy} r={r - 24} fill="none" stroke="#e4d6bd" strokeWidth="3" />
+      <circle cx={PITA.cx} cy={PITA.cy + 5} r={r} fill="#7cc7b8" />
+      <circle cx={PITA.cx} cy={PITA.cy} r={r} fill="url(#fa-ceramic)" stroke="#6fb8a9" strokeWidth="2" />
+      <circle cx={PITA.cx} cy={PITA.cy} r={r - 24} fill="none" stroke="#9fdccd" strokeWidth="3" />
     </g>
   );
 }
@@ -662,9 +660,9 @@ function PancakePlate() {
     <g>
       <Counter />
       <ellipse cx="400" cy="440" rx="214" ry="22" fill="url(#fa-shadow)" />
-      <ellipse cx="400" cy="342" rx="206" ry="106" fill="#dccdb2" />
-      <ellipse cx="400" cy="334" rx="206" ry="106" fill="url(#fa-ceramic)" stroke="#e6d9c2" strokeWidth="2" />
-      <ellipse cx="400" cy="334" rx="168" ry="84" fill="none" stroke="#e4d6bd" strokeWidth="3" />
+      <ellipse cx="400" cy="342" rx="206" ry="106" fill="#7cc7b8" />
+      <ellipse cx="400" cy="334" rx="206" ry="106" fill="url(#fa-ceramic)" stroke="#6fb8a9" strokeWidth="2" />
+      <ellipse cx="400" cy="334" rx="168" ry="84" fill="none" stroke="#9fdccd" strokeWidth="3" />
       <ellipse cx="400" cy="372" rx="122" ry="26" fill="url(#fa-shadow)" />
       {layers.map((i) => {
         const y = 330 - i * 38, rx = 116 - i * 3, x = 400 + (i === 1 ? -7 : i === 2 ? 5 : 0);
@@ -693,9 +691,9 @@ function PlateScene({ plan, dish, step, fx }: SceneProps & { fx: Fx }) {
     <g>
       <Counter />
       <ellipse cx={PLATE.cx} cy={PLATE.cy + PLATE.ry - 4} rx={PLATE.rx + 12} ry="24" fill="url(#fa-shadow)" />
-      <ellipse cx={PLATE.cx} cy={PLATE.cy + 6} rx={PLATE.rx} ry={PLATE.ry} fill="#dccdb2" />
-      <ellipse cx={PLATE.cx} cy={PLATE.cy} rx={PLATE.rx} ry={PLATE.ry} fill="url(#fa-ceramic)" stroke="#e6d9c2" strokeWidth="2" />
-      <ellipse cx={PLATE.cx} cy={PLATE.cy} rx={PLATE.rx - 26} ry={PLATE.ry - 26} fill="none" stroke="#e4d6bd" strokeWidth="3" />
+      <ellipse cx={PLATE.cx} cy={PLATE.cy + 6} rx={PLATE.rx} ry={PLATE.ry} fill="#7cc7b8" />
+      <ellipse cx={PLATE.cx} cy={PLATE.cy} rx={PLATE.rx} ry={PLATE.ry} fill="url(#fa-ceramic)" stroke="#6fb8a9" strokeWidth="2" />
+      <ellipse cx={PLATE.cx} cy={PLATE.cy} rx={PLATE.rx - 26} ry={PLATE.ry - 26} fill="none" stroke="#9fdccd" strokeWidth="3" />
       {/* the little hummus bowl sits in the middle of the plate */}
       <g>
         <circle cx={PLATE.cx} cy={PLATE.cy + 8} r="76" fill="#d9cbb0" />

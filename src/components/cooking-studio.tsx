@@ -6,8 +6,10 @@ import {
   type MouseEvent as ReactMouseEvent, type PointerEvent as ReactPointerEvent,
 } from "react";
 import {
-  IconArrowBackUp, IconArrowLeft, IconBulb, IconPlayerPause, IconPlayerPlay, IconVolume, IconVolumeOff,
+  IconArrowBackUp, IconArrowLeft, IconBulb, IconPlayerPause, IconPlayerPlay, IconSparkles, IconVolume, IconVolumeOff,
 } from "@tabler/icons-react";
+import { garnishFor, garnishSpot, plateDish } from "@/lib/plating";
+import { Garnish, Sparkles, Steam } from "./finale-garnish";
 import type { LittleRecipe } from "@/lib/little-kitchen";
 import { recipeChallenges } from "@/lib/chef-challenges";
 import {
@@ -23,6 +25,7 @@ import {
 import { SOUND_KEY, playSound, type SoundName } from "@/lib/sound";
 import { AssetIcon, ASSET_LABEL } from "./food-art";
 import { CookingScene, noFx, ToolIcon, type Fx } from "./cooking-scene";
+import { InteractiveSprig, Sprig, sprigGrowth, type SprigMood } from "./sprig";
 
 type Rect = { x: number; y: number; w: number; h: number };
 type Hotspot = {
@@ -48,6 +51,31 @@ const sourcePoint = (s: Step, tall = false): Point => s.kind === "scoop" && s.in
   : s.kind === "scoop" && s.into === "bowl" ? { x: 205, y: 404 }
     : s.kind === "scoop" ? { x: 205, y: 396 } : { x: 205, y: 90 };
 
+/** Kitchen Friends bowl colours, one per ingredient in the tray. */
+const BOWL_COLORS = ["#ff9db5", "#8fd6c8", "#ffe08a", "#c7b4f0", "#9fd0ff", "#ffb38a"];
+/**
+ * A smiling bowl that holds one ingredient in the tray. The food sits in the bowl's mouth,
+ * so every ingredient reads as one clear item, never a crowded pile.
+ */
+function TrayBowl({ index, children }: { index: number; children: React.ReactNode }) {
+  const c = BOWL_COLORS[index % BOWL_COLORS.length];
+  return (
+    <span className="ck-bowl" style={{ ["--bowl" as string]: c }}>
+      <span className="ck-bowl-back" aria-hidden="true" />
+      <span className="ck-bowl-food">{children}</span>
+      <svg className="ck-bowl-front" viewBox="0 0 120 56" aria-hidden="true" focusable="false">
+        <path d="M4 4 C6 34 30 52 60 52 C90 52 114 34 116 4 Q60 22 4 4Z" fill={c} stroke="rgb(74 40 52 / 55%)" strokeWidth="3" strokeLinejoin="round" />
+        <path d="M16 20 C20 32 28 40 38 44" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" opacity=".5" />
+        <ellipse cx="42" cy="34" rx="5.5" ry="3.4" fill="#ff7f9a" opacity=".55" />
+        <ellipse cx="78" cy="34" rx="5.5" ry="3.4" fill="#ff7f9a" opacity=".55" />
+        <circle cx="50" cy="28" r="3.6" fill="#4a2c22" /><circle cx="70" cy="28" r="3.6" fill="#4a2c22" />
+        <circle cx="49" cy="26.8" r="1.2" fill="#fff" /><circle cx="69" cy="26.8" r="1.2" fill="#fff" />
+        <path d="M56 33 Q60 37.5 64 33" fill="none" stroke="#4a2c22" strokeWidth="2.4" strokeLinecap="round" />
+      </svg>
+    </span>
+  );
+}
+
 function useReducedMotion() {
   const [reduced, setReduced] = useState(false);
   useEffect(() => {
@@ -72,7 +100,7 @@ function useTallView() {
 }
 
 export function CookingStudio({
-  recipe, onBack, onSettings, onComplete, onSave, onCollection, chefAge, saved, avoid = [],
+  recipe, onBack, onSettings, onComplete, onSave, onCollection, chefAge, saved, avoid = [], sprigDishes = 0,
 }: {
   recipe: LittleRecipe;
   /** The child's allergy choices; optional extras containing them are never offered. */
@@ -83,6 +111,8 @@ export function CookingStudio({
   onSave: (dish: DishState) => void;
   onCollection: () => void;
   chefAge: number;
+  /** Dishes finished before this one; Sprig, the companion, grows with them. */
+  sprigDishes?: number;
   saved: boolean;
 }) {
   const plan = useMemo(() => planFor(recipe), [recipe]);
@@ -540,6 +570,8 @@ export function CookingStudio({
   const ar = view.w / view.h;
   const question = step?.kind === "quiz" ? questions[step.index] : null;
   const pretendSeconds = simulatedSeconds(plan);
+  // Sprig reacts to what is happening: a finished step, an open hint or a gentle nudge.
+  const sprigMood: SprigMood = advancing ? "cheer" : nudge ? "encourage" : hintOpen || step?.kind === "quiz" ? "think" : "hello";
 
   if (finished) {
     return (
@@ -547,11 +579,12 @@ export function CookingStudio({
         recipe={recipe} plan={plan} dish={dish} view={view} ar={ar} saved={saved}
         pretendSeconds={pretendSeconds}
         onAgain={onBack}
-        onSave={() => onSave(dish)}
+        onSave={(finished) => onSave(finished)}
         onCollection={onCollection}
         onRecipe={() => setShowRecipe(true)}
         showRecipe={showRecipe} closeRecipe={() => setShowRecipe(false)}
         stars={mistakes ? 1 : 2}
+        sprigDishes={sprigDishes}
       />
     );
   }
@@ -588,6 +621,8 @@ export function CookingStudio({
           )}
         </div>
         <div className="ck-stage-wrap">
+          {/* Sprig stands right beside the dish on larger screens (big, never over the food). */}
+          {!question && <InteractiveSprig className="ck-dish-sprig ck-dish-sprig-side" mood={sprigMood} dishes={sprigDishes} size={190} />}
           <div ref={stageRef} className={stageClass} style={{ aspectRatio: ar, "--ar": ar } as React.CSSProperties} onPointerDown={stageDown} data-armed={selected ? "true" : undefined}>
             <div className="ck-scene-fade" key={surface}>
               <CookingScene recipe={recipe} plan={plan} dish={dish} step={step} surface={surface} fx={fx} view={view} />
@@ -615,8 +650,14 @@ export function CookingStudio({
           </div>
         </div>
         <div className={`ck-tray${question ? " ck-quiz-tray" : ""}`}>
+          {/* On phones the dish uses the full width, so Sprig stands just below it, beside the tray. */}
+          {!question && <InteractiveSprig className="ck-dish-sprig ck-dish-sprig-tray" mood={sprigMood} dishes={sprigDishes} size={104} />}
           {question && step?.kind === "quiz" ? (
-            <div className="ck-quiz" key={step.id}>
+            // Sprig pops in from the side and asks the question in a speech-bubble card.
+            <div className="ck-quiz ck-quiz-pop" key={step.id} role="group" aria-label="Sprig asks a question">
+              <InteractiveSprig className="ck-quiz-sprig" mood={quiz.right ? "cheer" : quiz.wrong.length ? "encourage" : "think"} dishes={sprigDishes} size={104} />
+              <div className="ck-quiz-card">
+              <p className="ck-quiz-who">Sprig asks</p>
               <p className="ck-question">{question.question}</p>
               <div className="ck-answers">
                 {question.answers.map((answer, i) => {
@@ -646,6 +687,7 @@ export function CookingStudio({
                 </button>
                 {!quiz.right && <button type="button" className="ck-link" onClick={() => { setMistakes((m) => m + 1); setIndex((i) => i + 1); setQuiz({ wrong: [], right: false }); }}>Skip question</button>}
               </div>
+              </div>
             </div>
           ) : step?.kind === "cook" ? (
             <div className="ck-cook">
@@ -660,7 +702,7 @@ export function CookingStudio({
             </div>
           ) : (
             <div className="ck-chips">
-              {tray.map((item) => (
+              {tray.map((item, i) => (
                 <button
                   key={item.asset}
                   type="button"
@@ -673,7 +715,7 @@ export function CookingStudio({
                   onPointerCancel={() => { drag.current = null; setGhost(null); }}
                   onClick={() => { if (suppressClick.current) return; setSelected((s) => (s === item.asset ? null : item.asset)); say("pick"); }}
                 >
-                  <AssetIcon asset={item.asset} size={64} chocolate={recipe.id === "brownies"} />
+                  <TrayBowl index={i}><AssetIcon asset={item.asset} size={64} chocolate={recipe.id === "brownies"} /></TrayBowl>
                   <span>{ASSET_LABEL[item.asset] ?? item.asset}{item.left > 1 ? ` ×${item.left}` : ""}</span>
                 </button>
               ))}
@@ -718,35 +760,94 @@ export function CookingStudio({
 // ------------------------------------------------------------------ finale --
 
 function Finale({
-  recipe, plan, dish, view, ar, saved, pretendSeconds, onAgain, onSave, onCollection, onRecipe, showRecipe, closeRecipe, stars,
+  recipe, plan, dish, view, ar, saved, pretendSeconds, onAgain, onSave, onCollection, onRecipe, showRecipe, closeRecipe, stars, sprigDishes = 0,
 }: {
   recipe: LittleRecipe; plan: Step[]; dish: DishState; view: ViewBox; ar: number; saved: boolean; pretendSeconds: number;
-  onAgain: () => void; onSave: () => void; onCollection: () => void; onRecipe: () => void;
-  showRecipe: boolean; closeRecipe: () => void; stars: number;
+  onAgain: () => void; onSave: (finished: DishState) => void; onCollection: () => void; onRecipe: () => void;
+  showRecipe: boolean; closeRecipe: () => void; stars: number; sprigDishes?: number;
 }) {
-  // The child's own arrangement is the hero, exactly as they made it. A real photo
-  // appears only in the grown-up recipe card, clearly labelled as the real-kitchen version.
+  // The reveal: the dish appears as the child left it, the pieces slide into a tidy arrangement
+  // ("make it pretty"), then the camera tilts into a warm food-photo shot. The child can add
+  // one finishing touch. Everything the child chose (toppings and how many) is kept.
+  const reduced = useReducedMotion();
+  const plated = useMemo(() => plateDish(recipe, plan, dish), [recipe, plan, dish]);
+  const [phase, setPhase] = useState(0);
+  const [garnished, setGarnished] = useState(false);
+  // Phase 3: the drawing turns into the real dish photo (the same one on the dish card).
+  // The child can flip back and forth between "mine" and "the real one".
+  const [photoReady, setPhotoReady] = useState(false);
   const [photoFailed, setPhotoFailed] = useState(false);
+  const [showReal, setShowReal] = useState(false);
+  const hasPhoto = Boolean(recipe.image) && !photoFailed;
+  useEffect(() => {
+    if (reduced) { setPhase(2); return; }
+    const a = window.setTimeout(() => setPhase(1), 700);
+    const b = window.setTimeout(() => setPhase(2), 1800);
+    return () => { window.clearTimeout(a); window.clearTimeout(b); };
+  }, [reduced]);
+  useEffect(() => {
+    if (phase < 2 || !hasPhoto || !photoReady) return;
+    const t = window.setTimeout(() => { setPhase(3); setShowReal(true); }, reduced ? 0 : 1600);
+    return () => window.clearTimeout(t);
+  }, [phase, hasPhoto, photoReady, reduced]);
+  const real = showReal && hasPhoto && photoReady;
+  const shown = phase >= 1 ? plated : dish;
+  const garnish = garnishFor(recipe.id);
+  const spot = garnishSpot(recipe, plan, plated);
+  const hot = recipe.game !== "assembly";
   return (
     <div className="ck-app ck-finale">
       <main className="ck-finale-main">
         <figure className="ck-hero ck-hero-creation">
           <div className="ck-frame">
-            <div className="ck-frame-art" style={{ aspectRatio: ar, "--ar": ar } as React.CSSProperties}>
-              <CookingScene recipe={recipe} plan={plan} dish={dish} step={null} surface={finalSurface(recipe)} presenting view={view} />
+            <div className={`ck-frame-art ck-plating${phase >= 2 ? " is-revealed" : ""}${real ? " is-real" : ""}`} style={{ aspectRatio: ar, "--ar": ar } as React.CSSProperties}>
+              <CookingScene recipe={recipe} plan={plan} dish={shown} step={null} surface={finalSurface(recipe)} presenting view={view} />
+              <svg className="ck-finale-layer" viewBox={`${view.x} ${view.y} ${view.w} ${view.h}`} preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+                {phase >= 2 && hot && <Steam spot={spot} />}
+                {garnished && <Garnish kind={garnish.kind} spot={spot} />}
+                {phase >= 2 && <Sparkles spot={spot} />}
+              </svg>
+              {hasPhoto && (
+                <div className="ck-morph-photo" aria-hidden={!real}>
+                  {/* eslint-disable-next-line @next/next/no-img-element -- local dish photo, same as the dish card */}
+                  <img src={recipe.image} alt={real ? `Your ${recipe.title.toLowerCase()}, ready to eat` : ""} decoding="async"
+                    ref={(el) => { if (el?.complete && el.naturalWidth) setPhotoReady(true); }}
+                    onLoad={() => setPhotoReady(true)} onError={() => setPhotoFailed(true)} />
+                </div>
+              )}
+              {phase >= 3 && <span key={real ? "real" : "mine"} className="ck-morph-burst" aria-hidden="true" />}
             </div>
           </div>
-          <figcaption>Made by you, just the way you arranged it</figcaption>
+          <figcaption>{real ? "Ta-da! Your dish, ready to eat" : "Made by you, just the way you arranged it"}</figcaption>
+          {phase >= 3 && (
+            <button type="button" className="ck-morph-toggle" onClick={() => setShowReal((v) => !v)} aria-pressed={real}>
+              {real ? "See how I arranged it" : "See the real dish"}
+            </button>
+          )}
         </figure>
         <section className="ck-finale-text" aria-live="polite">
           <p className="ck-kicker">Your {recipe.title.toLowerCase()}</p>
           <h1>Look what you made!</h1>
+          {(() => {
+            // Sprig talks the child through the reveal, then says what this dish grew.
+            const before = sprigGrowth(sprigDishes), after = sprigGrowth(sprigDishes + 1);
+            const news = after.pod && !before.pod ? "Look, I grew a bean pod!" : after.flower && !before.flower ? "Wow, I grew a flower!"
+              : after.leaves > before.leaves ? "Yum! You helped me grow a new leaf!" : "That looks so yummy!";
+            const line = phase < 2 ? "Let’s make it look yummy!" : phase < 3 && hasPhoto ? "Ooh, watch this… magic!"
+              : real ? (garnished ? news : "Poof! It turned into the real thing!") : garnished ? news : "Want to add a finishing touch?";
+            return <Sprig mood={phase < 2 ? "think" : "cheer"} dishes={sprigDishes + 1} size={72}>{line}</Sprig>;
+          })()}
           <p className="ck-finale-benefit">{recipe.benefit} You earned {stars} chef {stars === 1 ? "star" : "stars"}.</p>
           <div className="ck-actions">
+            {phase >= 2 && !garnished && !real && (phase >= 3 || !hasPhoto) && (
+              <button type="button" className="ck-secondary ck-garnish-btn" onClick={() => setGarnished(true)}>
+                <IconSparkles size={20} aria-hidden="true" /> {garnish.label}
+              </button>
+            )}
             <button type="button" className="ck-primary" onClick={onAgain}>Make another</button>
             {saved
               ? <button type="button" className="ck-secondary" onClick={onCollection}>Saved! Open my cookbook</button>
-              : <button type="button" className="ck-secondary" onClick={onSave}>Save to my cookbook</button>}
+              : <button type="button" className="ck-secondary" onClick={() => onSave(plated)}>Save to my cookbook</button>}
             <button type="button" className="ck-secondary" onClick={onRecipe}>Make it with a grown-up</button>
           </div>
         </section>
