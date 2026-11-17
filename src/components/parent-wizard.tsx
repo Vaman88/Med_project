@@ -4,24 +4,20 @@ import { useId, useState, type FormEvent, type KeyboardEvent } from "react";
 import { PIN_PATTERN, createParentPin, hasParentPin } from "@/lib/parent-lock";
 import {
   allergyChoices,
-  apronChoices,
   dietaryChoices,
   equipmentChoices,
   familySchema,
-  hairChoices,
   pantryFoods,
-  skinChoices,
   type Family,
 } from "@/lib/little-kitchen";
+import {
+  LAST_SETUP_STEP as last,
+  PROFILE_STEP,
+  SETUP_STEPS as steps,
+  keptChefFields,
+  validChildAge,
+} from "@/lib/family-setup";
 import { ChefAvatar } from "./chef-avatar";
-
-const steps = [
-  "Meet your chef",
-  "Your pantry",
-  "Foods to avoid",
-  "Family details",
-];
-const defaultAvatar = { skin: "tan", hair: "curly", apron: "coral" } as const;
 
 function PantryPicker({
   selected,
@@ -154,9 +150,9 @@ export function ParentWizard({
   onCancel: () => void;
 }) {
   const [step, setStep] = useState(startStep);
-  const [nickname, setNickname] = useState(initial?.nickname ?? "");
   const [age, setAge] = useState(initial?.age.toString() ?? "");
-  const [avatar, setAvatar] = useState(initial?.avatar ?? defaultAvatar);
+  // Every child gets the chef companion automatically; there is no naming or look step.
+  const chef = keptChefFields(initial);
   const [pantry, setPantry] = useState<Family["pantry"]>(initial?.pantry ?? []);
   const [allergies, setAllergies] = useState<Family["allergies"]>(
     initial?.allergies ?? [],
@@ -190,49 +186,39 @@ export function ParentWizard({
   const [pinAgain, setPinAgain] = useState("");
 
   function advance() {
-    if (
-      step === 0 &&
-      (!nickname.trim() ||
-        !Number.isInteger(Number(age)) ||
-        Number(age) < 5 ||
-        Number(age) > 17)
-    ) {
-      setError("Add a chef nickname and an age from 5 to 17.");
-      return;
-    }
-    if (step === 2 && !confirmed) {
+    if (step === PROFILE_STEP.avoid && !confirmed) {
       setError("Please check the allergy information before continuing.");
       return;
     }
     setError("");
-    setStep((current) => Math.min(3, current + 1));
+    setStep((current) => Math.min(last, current + 1));
   }
   async function submit(event: FormEvent) {
     event.preventDefault();
-    if (step < 3) {
+    if (step < last) {
       advance();
       return;
     }
     await saveChanges();
   }
   async function saveChanges() {
-    if (!nickname.trim() || !Number.isInteger(Number(age)) || Number(age) < 5 || Number(age) > 17) {
-      setStep(0);
-      setError("Add a chef nickname and an age from 5 to 17.");
+    if (!validChildAge(age)) {
+      setStep(last);
+      setError("Add the child’s age, from 5 to 17.");
       return;
     }
     if (!confirmed) {
-      setStep(2);
+      setStep(PROFILE_STEP.avoid);
       setError("Please check the allergy information before saving.");
       return;
     }
     if (!parent) {
-      setStep(3);
+      setStep(last);
       setError("Confirm you are a parent or guardian before saving.");
       return;
     }
     if (needsPin && (!PIN_PATTERN.test(pin) || pin !== pinAgain)) {
-      setStep(3);
+      setStep(last);
       setError(
         PIN_PATTERN.test(pin)
           ? "The two Parent PINs do not match. Type the same PIN twice."
@@ -252,8 +238,8 @@ export function ParentWizard({
     const parsed = familySchema.safeParse({
       version: 1,
       age: Number(age),
-      nickname: nickname.trim(),
-      avatar,
+      // No naming step any more: an older saved nickname and look are kept, otherwise Chef Seedy.
+      ...chef,
       pantry,
       allergies,
       otherAllergies: other,
@@ -324,11 +310,11 @@ export function ParentWizard({
           <span className="little-kicker">For grown-ups</span>
           <h1>Let’s make room for a little chef.</h1>
           <p>
-            Four short steps help us choose playful recipes from the foods and
+            Three short steps help us choose playful recipes from the foods and
             equipment your family has.
           </p>
           <div className="wizard-chef-preview">
-            <ChefAvatar avatar={avatar} />
+            <ChefAvatar avatar={chef.avatar!} />
           </div>
           <p className="wizard-privacy">
             Saved on this device. Food settings and budget stay in the parent
@@ -336,98 +322,26 @@ export function ParentWizard({
           </p>
         </aside>
         <form className="wizard-card" onSubmit={submit}>
-          <div className="wizard-count">Step {step + 1} of 4</div>
+          <div className="wizard-count">Step {step + 1} of {steps.length}</div>
           <div
             className="wizard-progress"
             role="progressbar"
             aria-label="Setup progress"
             aria-valuemin={1}
-            aria-valuemax={4}
+            aria-valuemax={steps.length}
             aria-valuenow={step + 1}
           >
-            <span style={{ width: `${(step + 1) * 25}%` }} />
+            <span style={{ width: `${((step + 1) / steps.length) * 100}%` }} />
           </div>
           <h2>{steps[step]}</h2>
-          {step === 0 && (
-            <div className="wizard-fields">
-              <label>
-                Chef nickname
-                <input
-                  value={nickname}
-                  maxLength={20}
-                  onChange={(e) => setNickname(e.target.value)}
-                  placeholder="Chef Sunny"
-                />
-              </label>
-              <label>
-                Child’s age
-                <input
-                  type="number"
-                  min="5"
-                  max="17"
-                  value={age}
-                  onChange={(e) => setAge(e.target.value)}
-                />
-              </label>
-              <p>Choose a look for your chef:</p>
-              <label>
-                Skin tone
-                <select
-                  value={avatar.skin}
-                  onChange={(e) =>
-                    setAvatar({
-                      ...avatar,
-                      skin: e.target.value as typeof avatar.skin,
-                    })
-                  }
-                >
-                  {skinChoices.map((choice) => (
-                    <option key={choice}>{choice}</option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                Hair style
-                <select
-                  value={avatar.hair}
-                  onChange={(e) =>
-                    setAvatar({
-                      ...avatar,
-                      hair: e.target.value as typeof avatar.hair,
-                    })
-                  }
-                >
-                  {hairChoices.map((choice) => (
-                    <option key={choice}>{choice}</option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                Apron color
-                <select
-                  value={avatar.apron}
-                  onChange={(e) =>
-                    setAvatar({
-                      ...avatar,
-                      apron: e.target.value as typeof avatar.apron,
-                    })
-                  }
-                >
-                  {apronChoices.map((choice) => (
-                    <option key={choice}>{choice}</option>
-                  ))}
-                </select>
-              </label>
-            </div>
-          )}
-          {step === 1 && (
+          {step === PROFILE_STEP.pantry && (
             <fieldset>
               <legend>What’s in your pantry?</legend>
               <p>Add foods you have today. You can change these later.</p>
               <PantryPicker selected={pantry} onChange={setPantry} />
             </fieldset>
           )}
-          {step === 2 && (
+          {step === PROFILE_STEP.avoid && (
             <fieldset>
               <legend>Food allergies and exclusions</legend>
               <p>
@@ -511,10 +425,20 @@ export function ParentWizard({
               </div>
             </fieldset>
           )}
-          {step === 3 && (
+          {step === last && (
             <div className="wizard-fields">
+              <label>
+                Child’s age
+                <input
+                  type="number"
+                  min="5"
+                  max="17"
+                  value={age}
+                  onChange={(e) => setAge(e.target.value)}
+                />
+              </label>
               <p>
-                These details are for parents and stay out of the cooking game.
+                The other details are for parents and stay out of the cooking game.
               </p>
               <label>
                 Weekly grocery budget (optional, dollars)
@@ -634,14 +558,14 @@ export function ParentWizard({
                 Previous
               </button>
             )}
-            <button className={initial && step < 3 ? undefined : "little-primary"} type="submit">
-              {step === 3
+            <button className={initial && step < last ? undefined : "little-primary"} type="submit">
+              {step === last
                 ? initial
                   ? "Save kitchen"
                   : "Create kitchen"
                 : "Continue →"}
             </button>
-            {initial && step < 3 && (
+            {initial && step < last && (
               <button className="little-primary" type="button" onClick={() => void saveChanges()}>
                 Save changes
               </button>

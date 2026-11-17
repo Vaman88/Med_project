@@ -1,6 +1,7 @@
 import { test, expect, type Page, type TestInfo } from "@playwright/test";
 import { recipeChallenges } from "../../src/lib/chef-challenges";
 import { littleRecipes } from "../../src/lib/little-kitchen";
+import { createParentPin } from "../../src/lib/parent-lock";
 
 const kidsCount = littleRecipes.length;
 const PIN = "2468";
@@ -22,9 +23,8 @@ async function setup(page: Page, age = 7, allergy?: string, info?: TestInfo) {
       path: info.outputPath("parent-wizard.png"),
       fullPage: true,
     });
-  await page.getByRole("textbox", { name: "Chef nickname" }).fill("Sunny");
-  await page.getByRole("spinbutton", { name: "Child’s age" }).fill(String(age));
-  await page.getByRole("button", { name: /Continue/ }).click();
+  // There is no chef naming step: setup opens on the pantry and every child gets Chef Seedy.
+  await expect(page.getByRole("textbox", { name: /nickname/i })).toHaveCount(0);
   const pantry = page.getByRole("group", { name: "What’s in your pantry?" });
   const search = pantry.getByRole("combobox", { name: "Search for a food" });
   for (const food of [
@@ -57,6 +57,7 @@ async function setup(page: Page, age = 7, allergy?: string, info?: TestInfo) {
     })
     .check();
   await page.getByRole("button", { name: /Continue/ }).click();
+  await page.getByRole("spinbutton", { name: "Child’s age" }).fill(String(age));
   await page
     .getByRole("checkbox", { name: "I am a parent or guardian", exact: false })
     .check();
@@ -72,7 +73,7 @@ async function setup(page: Page, age = 7, allergy?: string, info?: TestInfo) {
   if (age < 13)
     await expect(page.locator(".km-card")).toHaveCount(allergy ? kidsCount - 4 : kidsCount);
   else
-    await expect(page.getByRole("heading", { name: /Hey, Chef Sunny/ })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Hey, Chef Seedy/ })).toBeVisible();
 }
 async function start(page: Page, title: string) {
   await page
@@ -106,10 +107,10 @@ test("parent settings ask for the Parent PIN, then open the planner and keep its
   await page.getByRole("button", { name: "Meal Ideas" }).click();
   await expect(page.getByRole("heading", { name: "A few useful meals." })).toBeVisible();
   await page.getByRole("button", { name: "Back to child kitchen" }).click();
-  await expect(page.getByRole("heading", { name: /Hey, Chef Sunny/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Hey, Chef Seedy/ })).toBeVisible();
   await page.reload();
   await asChild(page);
-  await expect(page.getByRole("heading", { name: /Hey, Chef Sunny/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Hey, Chef Seedy/ })).toBeVisible();
   await page.getByRole("button", { name: "Parent settings" }).click();
   await unlock(page);
   await expect(page.locator(".pantry-list").getByText("Carrots", { exact: true })).toBeVisible();
@@ -284,7 +285,6 @@ test("allergy and pantry edits keep their safety rules without hiding the fun", 
   await expect(page.getByRole("heading", { name: "Fudgy bean brownies" })).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "Banana oat pancakes" })).toHaveCount(0);
   await openSettings(page);
-  await page.getByRole("button", { name: /Continue/ }).click();
   await page.getByRole("button", { name: "Remove Tomato" }).click();
   await page.getByRole("button", { name: /Continue/ }).click();
   await page.getByRole("button", { name: /Continue/ }).click();
@@ -298,17 +298,19 @@ test("allergy and pantry edits keep their safety rules without hiding the fun", 
   await expect(pizza.getByRole("button", { name: "Cook this" })).toBeEnabled();
 });
 test("an unlocked parent can save existing profile changes", async ({ page }) => {
-  await setup(page);
+  // A profile saved before the naming step was removed keeps its old chef name (and has a Parent PIN).
+  await seedFamily(page, { nickname: "River" });
+  await expect(page.getByRole("heading", { name: /Hey, Chef River/ })).toBeVisible();
   await openSettings(page);
-  await page.getByRole("textbox", { name: "Chef nickname" }).fill("River");
   await page.getByRole("button", { name: "Save changes" }).click();
   await expect(page.getByRole("heading", { name: /Hey, Chef River/ })).toBeVisible();
 
   await page.reload();
   await asChild(page);
   await openSettings(page);
-  for (let step = 0; step < 3; step++)
+  for (let step = 0; step < 2; step++)
     await page.getByRole("button", { name: /Continue/ }).click();
+  await expect(page.getByRole("spinbutton", { name: "Child’s age" })).toHaveValue("7");
   await page.getByRole("spinbutton", { name: /Weekly grocery budget/ }).fill("75");
   await page.getByRole("button", { name: "Save kitchen" }).click();
   await expect(page.getByRole("heading", { name: /Hey, Chef River/ })).toBeVisible();
@@ -372,7 +374,7 @@ test("teens get the kids' kitchen and can still open the original planner", asyn
   await expect(page.locator(".km-card").first()).toBeVisible();
   await page.reload();
   await asChild(page);
-  await expect(page.getByRole("heading", { name: /Hey, Chef Sunny/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Hey, Chef Seedy/ })).toBeVisible();
   await page.getByRole("button", { name: "Switch profile" }).click();
   // The chooser comes first; the planner holds the teen's food settings, so it asks for the PIN.
   await page.getByRole("button", { name: /Continue as an adult/ }).click();
@@ -383,7 +385,7 @@ test("teens get the kids' kitchen and can still open the original planner", asyn
 });
 test("age twelve sees the child cooking game", async ({ page }) => {
   await setup(page, 12);
-  await expect(page.getByRole("heading", { name: /Hey, Chef Sunny/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Hey, Chef Seedy/ })).toBeVisible();
   await start(page, "Rainbow mini pizzas");
 });
 test("dark mode and reduced motion keep the cooking workspace in one screen", async ({
@@ -410,12 +412,13 @@ test("the role chooser sends a child and an adult to the right place", async ({ 
   await expect(page.getByRole("button", { name: /Continue as an adult/ })).toBeVisible();
   // No child profile yet: the child choice opens the parent setup.
   await asChild(page);
-  await expect(page.getByRole("textbox", { name: "Chef nickname" })).toBeVisible();
+  await expect(page.getByRole("group", { name: "What’s in your pantry?" })).toBeVisible();
+  await expect(page.getByRole("textbox", { name: /nickname/i })).toHaveCount(0);
   await setup(page);
   await page.getByRole("button", { name: "Switch profile" }).click();
   await expect(page.getByRole("heading", { name: "Who is cooking today?" })).toBeVisible();
   await asChild(page);
-  await expect(page.getByRole("heading", { name: /Hey, Chef Sunny/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Hey, Chef Seedy/ })).toBeVisible();
   await page.getByRole("button", { name: "Switch profile" }).click();
   // A child profile exists, so the adult choice asks for the Parent PIN first.
   await page.getByRole("button", { name: /Continue as an adult/ }).click();
@@ -472,7 +475,7 @@ test("a wrong Parent PIN keeps the parent area closed and waits after repeated m
   await expect(page.getByRole("button", { name: "Open parent area" })).toBeDisabled();
   // Back returns to the child kitchen without opening anything.
   await page.getByRole("button", { name: "Back", exact: true }).click();
-  await expect(page.getByRole("heading", { name: /Hey, Chef Sunny/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Hey, Chef Seedy/ })).toBeVisible();
 });
 
 test("an older profile with no Parent PIN must create one before the parent area opens", async ({ page }) => {
@@ -539,12 +542,10 @@ test("a grown-up who sets up a teen from the planner is not asked for the new PI
   await page.goto("/");
   await page.getByRole("button", { name: /Continue as an adult/ }).click();
   await page.getByRole("button", { name: "Set up a child’s kitchen" }).click();
-  await page.getByRole("textbox", { name: "Chef nickname" }).fill("Sunny");
-  await page.getByRole("spinbutton", { name: "Child’s age" }).fill("14");
-  await page.getByRole("button", { name: /Continue/ }).click();
   await page.getByRole("button", { name: /Continue/ }).click();
   await page.getByRole("checkbox", { name: "I confirm there are no known food allergies." }).check();
   await page.getByRole("button", { name: /Continue/ }).click();
+  await page.getByRole("spinbutton", { name: "Child’s age" }).fill("14");
   await page.getByRole("checkbox", { name: "I am a parent or guardian", exact: false }).check();
   await page.getByLabel("Parent PIN (4–8 digits)").fill(PIN);
   await page.getByLabel("Type the Parent PIN again").fill(PIN);
@@ -557,10 +558,102 @@ test("an idle lock keeps unsaved settings edits for after the PIN", async ({ pag
   await page.clock.install();
   await setup(page);
   await openSettings(page);
-  await page.getByRole("textbox", { name: "Chef nickname" }).fill("River");
+  for (let step = 0; step < 2; step++) await page.getByRole("button", { name: /Continue/ }).click();
+  const budget = page.getByRole("spinbutton", { name: /Weekly grocery budget/ });
+  await budget.fill("88");
   await page.clock.fastForward("05:01");
   await expect(page.getByRole("heading", { name: "Grown-ups only" })).toBeVisible();
-  await expect(page.getByRole("textbox", { name: "Chef nickname" })).toHaveCount(0);
+  await expect(budget).toHaveCount(0);
   await unlock(page);
-  await expect(page.getByRole("textbox", { name: "Chef nickname" })).toHaveValue("River");
+  await expect(budget).toHaveValue("88");
+});
+
+/** Seeds a saved child profile once, so reloads keep later edits. */
+async function seedFamily(page: Page, extra: Record<string, unknown> = {}) {
+  const pin = await createParentPin(PIN);
+  await page.addInitScript((fields) => {
+    if (!localStorage.getItem("healthy-steps-family-v1"))
+      localStorage.setItem("healthy-steps-family-v1", JSON.stringify({
+        version: 1, age: 7, pantry: ["Banana"], allergies: [], otherAllergies: "",
+        allergyConfirmed: true, parentConfirmed: true, ...fields,
+      }));
+  }, { ...pin, ...extra });
+  await page.goto("/");
+  await asChild(page);
+}
+async function openChildProfile(page: Page) {
+  await page.getByRole("button", { name: "Parent settings" }).click();
+  await unlock(page);
+  await page.getByRole("button", { name: "Child profile", exact: true }).click();
+}
+const savedFamily = (page: Page) =>
+  page.evaluate(() => JSON.parse(localStorage.getItem("healthy-steps-family-v1") ?? "{}"));
+
+test("the last setup step only accepts a child age from 5 to 17", async ({ page }) => {
+  await page.goto("/");
+  await asChild(page);
+  await expect(page.getByRole("heading", { name: "Your pantry" })).toBeVisible();
+  await page.getByRole("button", { name: /Continue/ }).click();
+  await page.getByRole("checkbox", { name: "I confirm there are no known food allergies." }).check();
+  await page.getByRole("button", { name: /Continue/ }).click();
+  await expect(page.getByRole("heading", { name: "Family details" })).toBeVisible();
+  await page.getByRole("checkbox", { name: "I am a parent or guardian", exact: false }).check();
+  for (const age of ["", "4", "18"]) {
+    await page.getByRole("spinbutton", { name: "Child’s age" }).fill(age);
+    await page.getByRole("button", { name: "Create kitchen", exact: true }).click();
+    await expect(page.locator("[role=alert]:not(#__next-route-announcer__)")).toContainText("Add the child’s age, from 5 to 17.");
+    await expect(page.getByRole("heading", { name: "Family details" })).toBeVisible();
+  }
+  expect(await page.evaluate(() => localStorage.getItem("healthy-steps-family-v1"))).toBeNull();
+  await page.getByRole("spinbutton", { name: "Child’s age" }).fill("8");
+  await page.getByLabel("Parent PIN (4–8 digits)").fill(PIN);
+  await page.getByLabel("Type the Parent PIN again").fill(PIN);
+  await page.getByRole("button", { name: "Create kitchen", exact: true }).click();
+  await expect(page.getByRole("heading", { name: /Hey, Chef Seedy/ })).toBeVisible();
+  const saved = await savedFamily(page);
+  expect(saved.age).toBe(8);
+  expect(saved.nickname).toBeUndefined();
+  expect(saved.avatar).toEqual({ skin: "tan", hair: "curly", apron: "coral" });
+});
+
+test("each child profile Edit button opens the matching setup step", async ({ page }) => {
+  await seedFamily(page);
+  await openChildProfile(page);
+  for (const [button, heading] of [
+    ["Edit pantry", "Your pantry"],
+    ["Edit foods to avoid", "Foods to avoid"],
+    ["Edit family details", "Family details"],
+  ] as const) {
+    await page.getByRole("button", { name: button }).click();
+    await expect(page.getByRole("heading", { level: 2, name: heading })).toBeVisible();
+    if (heading === "Family details")
+      await expect(page.getByRole("spinbutton", { name: "Child’s age" })).toHaveValue("7");
+    await page.getByRole("button", { name: "Back", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Chef Seedy" })).toBeVisible();
+  }
+  // A Seedy profile has nothing to reset.
+  await expect(page.getByRole("button", { name: "Reset chef to Seedy" })).toHaveCount(0);
+});
+
+test("an older custom chef keeps its look through edits and a grown-up can reset it to Seedy", async ({ page }) => {
+  const avatar = { skin: "deep", hair: "buns", apron: "mint" };
+  await seedFamily(page, { nickname: "Eli", avatar });
+  await expect(page.getByRole("heading", { name: /Hey, Chef Eli/ })).toBeVisible();
+  await openChildProfile(page);
+  await page.getByRole("button", { name: "Edit everything" }).click();
+  await page.getByRole("button", { name: "Save changes" }).click();
+  await expect(page.getByRole("heading", { name: /Hey, Chef Eli/ })).toBeVisible();
+  expect((await savedFamily(page)).avatar).toEqual(avatar);
+
+  await openChildProfile(page);
+  await expect(page.getByRole("heading", { name: "Chef Eli" })).toBeVisible();
+  await page.getByRole("button", { name: "Reset chef to Seedy" }).click();
+  await expect(page.getByRole("heading", { name: "Chef Seedy" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Reset chef to Seedy" })).toHaveCount(0);
+  const saved = await savedFamily(page);
+  expect(saved.nickname).toBeUndefined();
+  expect(saved.avatar).toBeUndefined();
+  await page.reload();
+  await asChild(page);
+  await expect(page.getByRole("heading", { name: /Hey, Chef Seedy/ })).toBeVisible();
 });

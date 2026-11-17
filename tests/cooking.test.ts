@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { littleRecipes } from "../src/lib/little-kitchen";
-import { chefTitle } from "../src/lib/chef-name";
+import { chefTitle, DEFAULT_CHEF_NAME } from "../src/lib/chef-name";
+import { familySchema } from "../src/lib/little-kitchen";
 import {
   answerAsset, completeDish, dishSchema, doCut, doFlip, doMash, doPaint, doScoop, doStir, dropItem,
   emptyDish, finalSurface, placedCount, planFor, setHeat, stepDone, stepProgress, totalScoops, trayItems,
@@ -21,8 +22,23 @@ test("chef names never repeat the title", () => {
   assert.equal(chefTitle("Chef Eli"), "Chef Eli");
   assert.equal(chefTitle("  chef   Eli "), "Chef Eli");
   assert.equal(chefTitle("Chefa"), "Chef Chefa");
-  assert.equal(chefTitle(""), "Chef Friend");
-  assert.equal(chefTitle(undefined), "Chef Friend");
+  assert.equal(chefTitle(""), "Chef Seedy");
+  assert.equal(chefTitle("   "), "Chef Seedy");
+  assert.equal(chefTitle(undefined), "Chef Seedy");
+  assert.equal(DEFAULT_CHEF_NAME, "Seedy");
+});
+
+test("saved profiles load with or without an old custom chef name", () => {
+  const base = {
+    version: 1, age: 7, pantry: ["Banana"], allergies: [], otherAllergies: "",
+    allergyConfirmed: true, parentConfirmed: true,
+  };
+  const named = familySchema.parse({ ...base, nickname: "Eli" });
+  assert.equal(chefTitle(named.nickname), "Chef Eli");
+  const unnamed = familySchema.parse(base);
+  assert.equal(chefTitle(unnamed.nickname), "Chef Seedy");
+  // New profiles are saved without a nickname at all.
+  assert.ok(familySchema.safeParse({ ...base, nickname: undefined }).success);
 });
 
 test("every recipe has a playable plan that finishes with two learning moments", () => {
