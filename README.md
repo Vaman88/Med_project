@@ -2,7 +2,7 @@
 
 A family cooking website with an adult meal planner and a child Cooking Studio. The opening screen lets you choose an adult or child experience.
 
-Adults can search pantry foods, enter amounts and a budget, and explore meal ideas with ingredients, instructions and dish-specific photos. Children create a chef, explore recipes and play through cooking activities. A parent PIN protects the family settings and parent area. The child game can be played without the recipe ingredients in the real pantry.
+Adults can search pantry foods, enter amounts and a budget, and explore meal ideas with ingredients, instructions and dish-specific photos. Children create a chef, explore recipes and play through cooking activities. A Parent PIN keeps children out of the parent area on a shared device (see [Parent PIN](#parent-pin)). The child game can be played without the recipe ingredients in the real pantry.
 
 ## Run locally
 
@@ -15,6 +15,19 @@ npm run dev
 ```
 
 Open http://localhost:3000. Browser-saved pantry, budget and child profiles remain available without an account. Anyone sharing that browser can access its saved information; the parent PIN is a local family control, not a separate authenticated child account.
+
+## Parent PIN
+
+The Parent PIN is a **family control for a shared device, not security**. It keeps a child from opening the meal planner, changing allergies and food restrictions, or deleting the child profile through the ordinary screens.
+
+- A parent creates a 4–8 digit PIN when setting up a child's kitchen. Profiles saved before PINs existed are asked to create one the first time the parent area is opened.
+- The PIN is stored only in this browser as a salted PBKDF2 hash. After three wrong PINs, each further miss starts a wait that doubles from 30 seconds up to 15 minutes.
+- The parent area locks again when someone switches profile or returns to the child kitchen, and after 5 minutes without activity.
+- Anyone with access to the browser's storage, developer tools or site-data settings can get around it. Clearing this site's data resets a forgotten PIN and also deletes the saved child profile. It is not a separate authenticated child account; real child accounts would need server-side authorization.
+
+## Recipe library
+
+The Recipes tab and the "More recipes with your food" row search TheMealDB, an outside community library. These recipes are **not filtered** by the family's food settings and are labelled "Not checked against your food settings". Opening a recipe compares its ingredient names with the saved allergies and restrictions and lists any known conflicts first. Ingredients it cannot recognize are marked as not verified; finding no conflicts never means a recipe is safe, so check every label.
 
 ## Supabase
 

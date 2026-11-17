@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState, type FormEvent, type KeyboardEvent } from "react";
+import { PIN_PATTERN, createParentPin, hasParentPin } from "@/lib/parent-lock";
 import {
   allergyChoices,
   apronChoices,
@@ -183,6 +184,10 @@ export function ParentWizard({
     initial?.favorites ?? [],
   );
   const [error, setError] = useState("");
+  // A brand-new kitchen (or an older one saved before PINs) gets its Parent PIN here.
+  const needsPin = !hasParentPin(initial);
+  const [pin, setPin] = useState("");
+  const [pinAgain, setPinAgain] = useState("");
 
   function advance() {
     if (
@@ -226,6 +231,24 @@ export function ParentWizard({
       setError("Confirm you are a parent or guardian before saving.");
       return;
     }
+    if (needsPin && (!PIN_PATTERN.test(pin) || pin !== pinAgain)) {
+      setStep(3);
+      setError(
+        PIN_PATTERN.test(pin)
+          ? "The two Parent PINs do not match. Type the same PIN twice."
+          : "Create a Parent PIN of 4 to 8 digits before saving.",
+      );
+      return;
+    }
+    let lockFields: { pinSalt: string; pinHash: string };
+    try {
+      lockFields = needsPin
+        ? await createParentPin(pin)
+        : { pinSalt: initial!.pinSalt!, pinHash: initial!.pinHash! };
+    } catch {
+      setError("This browser could not create a Parent PIN. Try another browser.");
+      return;
+    }
     const parsed = familySchema.safeParse({
       version: 1,
       age: Number(age),
@@ -242,6 +265,7 @@ export function ParentWizard({
       store,
       dietary,
       favorites: favorites.filter((food) => pantry.includes(food)),
+      ...lockFields,
     });
     if (!parsed.success) {
       setError(
@@ -559,6 +583,38 @@ export function ParentWizard({
                 I am a parent or guardian, age 18+, and agree to save these
                 settings on this device.
               </label>
+              {needsPin && (
+                <fieldset className="wizard-pin">
+                  <legend>Parent PIN</legend>
+                  <p>
+                    Children will need this PIN to open the meal planner, change food settings or
+                    delete the profile. It is a family control for a shared device, not a
+                    password: it is stored only in this browser.
+                  </p>
+                  <label>
+                    Parent PIN (4–8 digits)
+                    <input
+                      type="password"
+                      inputMode="numeric"
+                      autoComplete="new-password"
+                      maxLength={8}
+                      value={pin}
+                      onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))}
+                    />
+                  </label>
+                  <label>
+                    Type the Parent PIN again
+                    <input
+                      type="password"
+                      inputMode="numeric"
+                      autoComplete="new-password"
+                      maxLength={8}
+                      value={pinAgain}
+                      onChange={(e) => setPinAgain(e.target.value.replace(/\D/g, ""))}
+                    />
+                  </label>
+                </fieldset>
+              )}
             </div>
           )}
           {error && (

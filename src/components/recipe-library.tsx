@@ -1,6 +1,8 @@
 'use client';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { IconArrowRight, IconCheck, IconExternalLink, IconPlayerPlay, IconSearch, IconShoppingBag, IconX } from '@tabler/icons-react';
+import { IconAlertTriangle, IconArrowRight, IconCheck, IconExternalLink, IconHelpCircle, IconPlayerPlay, IconSearch, IconShoppingBag, IconX } from '@tabler/icons-react';
+import type { HouseholdProfile } from '@/lib/domain';
+import { checkLibraryRecipe, type LibraryRecipeCheck } from '@/lib/library-check';
 import { amountCheck, dishThumb, formatMeasure, pantryHas, simpleFoodName, type LibraryDish, type LibraryRecipe, type PantryAmount } from '@/lib/recipe-library';
 
 type Status = 'idle' | 'loading' | 'done' | 'error';
@@ -20,6 +22,27 @@ async function searchLibrary(q: string): Promise<LibraryDish[]> {
 /** Library search keeps only letters, numbers and simple punctuation, matching the API. */
 const cleanQuery = (value: string) => value.replace(/[^\p{L}\p{N} ,'&-]/gu, ' ').replace(/\s+/g, ' ').trim().slice(0, 60);
 
+/** Library recipes come from outside the app and are never filtered by the family's food rules. */
+const UNCHECKED = 'Not checked against your food settings';
+
+/** Known conflicts first, then what could not be checked. Never implies the recipe is safe. */
+function SafetySummary({ check }: { check: LibraryRecipeCheck }) {
+  const unverifiedNames = check.unverified.map(item => item.name);
+  if (!check.hasSettings) return <div className="library-safety" role="note">
+    <strong><IconHelpCircle size={18} aria-hidden="true" />{UNCHECKED}</strong>
+    <p>No allergies or food needs are saved, so nothing was compared. Check every label before cooking.</p>
+  </div>;
+  return <div className={`library-safety${check.conflicts.length ? ' has-conflicts' : ''}`} role="note" aria-label="Check against your food settings">
+    {check.conflicts.length > 0 ? <>
+      <strong><IconAlertTriangle size={18} aria-hidden="true" />Known conflicts with your food settings</strong>
+      <ul>{check.conflicts.map(item => <li key={item.name}><b>{item.name}</b>: {item.reasons.join('; ')}</li>)}</ul>
+    </> : <strong><IconHelpCircle size={18} aria-hidden="true" />No known conflicts found, but this recipe is not verified</strong>}
+    {unverifiedNames.length > 0 && <p>Not verified: {unverifiedNames.join(', ')}. We could not fully check {unverifiedNames.length === 1 ? 'this ingredient' : 'these ingredients'}; read the labels.</p>}
+    {check.nameOnlySettings.length > 0 && <p>Matched by name only: {check.nameOnlySettings.join(', ')}.</p>}
+    <p>This compares ingredient names only. Packaged foods can contain allergens or cross-contact that names do not show.</p>
+  </div>;
+}
+
 /** One dish card: photo first, name in serif, quiet metadata. */
 function DishCard({ dish, onOpen }: { dish: LibraryDish; onOpen: (dish: LibraryDish) => void }) {
   return <button type="button" className="library-card" onClick={() => onOpen(dish)} aria-label={`Open recipe: ${dish.name}`}>
@@ -27,11 +50,12 @@ function DishCard({ dish, onOpen }: { dish: LibraryDish; onOpen: (dish: LibraryD
     <img src={dishThumb(dish.image)} alt="" loading="lazy" width={500} height={500} />
     <span className="library-card-meta">{[dish.area, dish.category].filter(Boolean).join(' · ') || 'Recipe'}</span>
     <strong>{dish.name}</strong>
+    <small className="library-unchecked">{UNCHECKED}</small>
   </button>;
 }
 
 /** Full recipe in a dialog: photo, ingredients (marked when already in the pantry) and steps. */
-function RecipeDialog({ dish, pantry, amounts, onClose }: { dish: LibraryDish | null; pantry: string[]; amounts: PantryAmount[]; onClose: () => void }) {
+function RecipeDialog({ dish, pantry, amounts, profile, onClose }: { dish: LibraryDish | null; pantry: string[]; amounts: PantryAmount[]; profile?: HouseholdProfile; onClose: () => void }) {
   const ref = useRef<HTMLDialogElement>(null);
   const [recipe, setRecipe] = useState<LibraryRecipe | null>(null);
   const [status, setStatus] = useState<Status>('idle');
@@ -56,6 +80,7 @@ function RecipeDialog({ dish, pantry, amounts, onClose }: { dish: LibraryDish | 
   const checks = recipe ? recipe.ingredients.map(item => amountCheck(item, amounts)) : [];
   const shortCount = checks.filter(check => check?.status === 'short').length;
   const assumedCount = checks.filter(check => check?.status === 'assumed').length;
+  const safety = recipe ? checkLibraryRecipe(recipe.ingredients.map(item => item.name), profile) : null;
   return <dialog ref={ref} className="library-dialog" aria-labelledby="library-dialog-title" onClose={onClose} onClick={event => { if (event.target === ref.current) ref.current?.close(); }}>
     {dish && <div className="library-dialog-inner">
       <button type="button" className="library-close" onClick={() => ref.current?.close()} aria-label="Close recipe"><IconX size={20} aria-hidden="true" /></button>
@@ -68,16 +93,18 @@ function RecipeDialog({ dish, pantry, amounts, onClose }: { dish: LibraryDish | 
         <h2 id="library-dialog-title">{dish.name}</h2>
         {status === 'loading' && <p role="status">Loading the recipe…</p>}
         {status === 'error' && <p role="alert">This recipe could not be loaded. Close it and try again.</p>}
-        {recipe && <>
+        {recipe && safety && <>
+          <SafetySummary check={safety} />
           {pantry.length > 0 && <p className="library-have">You have {have.length} of {recipe.ingredients.length} ingredients.</p>}
           {have.length > 0 && <p className="library-amount-note">{shortCount ? `With your amounts, ${shortCount} ${shortCount === 1 ? 'food runs' : 'foods run'} short for the full recipe. Make a smaller batch or top up.` : assumedCount ? 'Foods without an amount are assumed to be a typical package — usually enough for this recipe.' : 'Your amounts cover everything you have for this recipe.'}</p>}
           <h3>Ingredients</h3>
           <ul className="library-ingredients">{recipe.ingredients.map((item, index) => {
             const owned = pantryHas(pantry, item.name);
             const check = checks[index];
-            return <li key={item.name + item.measure} className={owned ? check?.status === 'short' ? 'owned short' : 'owned' : undefined}>
+            const fit = safety.items[index];
+            return <li key={item.name + item.measure} className={[owned ? check?.status === 'short' ? 'owned short' : 'owned' : '', fit.status === 'conflict' ? 'conflict' : ''].filter(Boolean).join(' ') || undefined}>
               {owned ? <IconCheck size={16} aria-label="In your kitchen" /> : <IconShoppingBag size={16} aria-label="To buy" />}
-              <span>{item.name}{check?.status === 'short' && <em>you have {formatMeasure(check.have!, check.unit!)} · need {formatMeasure(check.missing!, check.unit!)} more</em>}{check?.status === 'enough' && <em>you have {formatMeasure(check.have!, check.unit!)} · enough</em>}</span>
+              <span>{item.name}{check?.status === 'short' && <em>you have {formatMeasure(check.have!, check.unit!)} · need {formatMeasure(check.missing!, check.unit!)} more</em>}{check?.status === 'enough' && <em>you have {formatMeasure(check.have!, check.unit!)} · enough</em>}{fit.status === 'conflict' && <em className="library-fit conflict">Conflicts with your food settings</em>}{fit.status === 'unverified' && safety.hasSettings && <em className="library-fit unverified">Not verified</em>}</span>
               <small>{item.measure}</small>
             </li>;
           })}</ul>
@@ -87,7 +114,7 @@ function RecipeDialog({ dish, pantry, amounts, onClose }: { dish: LibraryDish | 
             {recipe.video && <a className="button secondary" href={recipe.video} target="_blank" rel="noopener noreferrer"><IconPlayerPlay size={17} aria-hidden="true" />Watch video</a>}
             {recipe.source && <a className="text-button" href={recipe.source} target="_blank" rel="noopener noreferrer">Original recipe<IconExternalLink size={15} aria-hidden="true" /></a>}
           </div>
-          <small>Recipe and photo from TheMealDB, a free community recipe library. Check labels for allergens; these recipes are not reviewed for your family’s food needs.</small>
+          <small>Recipe and photo from TheMealDB, a free community recipe library. These recipes are not reviewed for your family’s food needs; check every label for allergens.</small>
         </>}
       </div>
     </div>}
@@ -98,7 +125,7 @@ function RecipeDialog({ dish, pantry, amounts, onClose }: { dish: LibraryDish | 
  * Search a large recipe library by food or dish name. Every result has a photo; choosing one
  * opens its ingredients and steps. `compact` shows a short row with no search box (home page).
  */
-export function RecipeLibrary({ pantry, amounts = [], initialQuery, compact = false, limit, onSeeAll }: { pantry: string[]; amounts?: PantryAmount[]; initialQuery?: string; compact?: boolean; limit?: number; onSeeAll?: () => void }) {
+export function RecipeLibrary({ pantry, amounts = [], profile, initialQuery, compact = false, limit, onSeeAll }: { pantry: string[]; amounts?: PantryAmount[]; profile?: HouseholdProfile; initialQuery?: string; compact?: boolean; limit?: number; onSeeAll?: () => void }) {
   // Simple food names from the pantry ("Ready-to-eat cooked rice" -> "rice"), most recent first.
   const terms = [...new Set([...pantry].reverse().map(simpleFoodName).map(cleanQuery).filter(Boolean))];
   const termKey = terms.join('|');
@@ -149,6 +176,7 @@ export function RecipeLibrary({ pantry, amounts = [], initialQuery, compact = fa
       </form>
       {suggestions.length > 0 && <div className="library-suggest"><span>From your kitchen:</span>{suggestions.map(item => <button type="button" key={item} className={`chip-button${item.toLowerCase() === searched.toLowerCase() ? ' on' : ''}`} onClick={() => { setQuery(item); setSearched(item); }}>{item}</button>)}</div>}
     </>}
+    <p className="library-unchecked-note"><IconHelpCircle size={16} aria-hidden="true" /><span><strong>{UNCHECKED}.</strong> These come from an outside recipe library and are not filtered for allergies or food needs. Open a recipe to see any known conflicts.</span></p>
     {status === 'loading' && <p className="library-status" role="status">Finding recipes…</p>}
     {status === 'error' && <p className="library-status" role="alert">The recipe library is not answering right now. Check your connection and try again.</p>}
     {status === 'done' && !shown.length && <p className="library-status">No recipes found for “{searched}”. Try a single food, like chicken, rice or beans.</p>}
@@ -156,6 +184,6 @@ export function RecipeLibrary({ pantry, amounts = [], initialQuery, compact = fa
       {!compact && <p className="library-status">{dishes.length} {dishes.length === 1 ? 'recipe' : 'recipes'} for “{searched}”. Choose one to see ingredients and steps.</p>}
       <div className="library-grid">{shown.map(dish => <DishCard key={dish.id} dish={dish} onOpen={setOpen} />)}</div>
     </>}
-    <RecipeDialog dish={open} pantry={pantry} amounts={amounts} onClose={() => setOpen(null)} />
+    <RecipeDialog dish={open} pantry={pantry} amounts={amounts} profile={profile} onClose={() => setOpen(null)} />
   </section>;
 }

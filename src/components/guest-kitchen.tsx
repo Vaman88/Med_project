@@ -176,11 +176,11 @@ function GuestKitchenView({ storageKey = GUEST_STORAGE_KEY, initialKitchen, user
               <small>{!plan.shoppingItems.length ? 'Nothing to buy' : servingsPossible >= 1 ? `Makes ${servingsPossible} of ${profile.householdSize} servings with your amounts` : `Needs: ${plan.shoppingItems.map(item => item.name).join(', ')}`}</small>
             </button>)}</div> : <p className="empty-note">Add a few foods and meal ideas will show up here.</p>}
           </section>
-          <RecipeLibrary compact pantry={knownLabels} amounts={pantryAmounts} limit={8} onSeeAll={() => go('recipes')} />
+          <RecipeLibrary compact pantry={knownLabels} amounts={pantryAmounts} profile={profile} limit={8} onSeeAll={() => go('recipes')} />
         </>}
         {view === 'recipes' && <>
           <div className="page-heading"><h1>Find a recipe.</h1><p>Search by food or dish name. Every recipe comes with a photo, ingredients and step-by-step instructions, and shows which ingredients you already have.</p></div>
-          <RecipeLibrary pantry={pantryLabels} amounts={pantryAmounts} />
+          <RecipeLibrary pantry={pantryLabels} amounts={pantryAmounts} profile={profile} />
         </>}
         {view === 'meals' && <>
           <div className="page-heading meal-heading"><h1>A few useful meals.</h1><p>Ideas that start with your kitchen and make room for your budget.</p><div className="meal-context"><span><IconWallet size={18} aria-hidden="true" />{formatMoney(profile.weeklyBudgetCents)} for additions</span><span><IconUsers size={18} aria-hidden="true" />{profile.householdSize} people</span><button className="text-button" onClick={() => go('kitchen')}>Edit pantry and budget</button></div><small>Meal ideas assume you keep pantry basics like cooking oil, salt, pepper and dried spices, and that foods without an amount are enough for one meal. These prototype recipes are unreviewed; check labels and preparation. Images are illustrative.</small></div>

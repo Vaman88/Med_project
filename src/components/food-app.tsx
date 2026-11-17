@@ -1,6 +1,8 @@
 "use client";
 import { GuestKitchen } from "./guest-kitchen";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { ParentGate } from "./parent-gate";
+import { INACTIVITY_LOCK_MS } from "@/lib/parent-lock";
 import { LittleKitchen } from "./little-kitchen";
 import { ParentWizard } from "./parent-wizard";
 import { RoleChooser } from "./role-chooser";
@@ -25,6 +27,33 @@ export function FoodApp() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [setupStep, setSetupStep] = useState<ProfileStep>(0);
   const [notice, setNotice] = useState("");
+  // Parent PIN gate: a shared-device family control, not authentication (see README).
+  const [unlocked, setUnlocked] = useState(false);
+  const [gate, setGate] = useState<{ reason: string; then: () => void } | null>(null);
+  const lock = useCallback(() => {
+    setUnlocked(false);
+    setGate(null);
+  }, []);
+  // Lock again after a stretch without taps or key presses.
+  const idleTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  useEffect(() => {
+    if (!unlocked) return;
+    const restart = () => {
+      clearTimeout(idleTimer.current);
+      idleTimer.current = setTimeout(lock, INACTIVITY_LOCK_MS);
+    };
+    restart();
+    const events = ["pointerdown", "keydown", "wheel", "touchstart"] as const;
+    events.forEach((name) => window.addEventListener(name, restart, { passive: true }));
+    return () => {
+      clearTimeout(idleTimer.current);
+      events.forEach((name) => window.removeEventListener(name, restart));
+    };
+  }, [unlocked, lock]);
+  function requireParent(reason: string, then: () => void) {
+    if (unlocked) then();
+    else setGate({ reason, then });
+  }
   useEffect(() => {
     try {
       const raw = localStorage.getItem(FAMILY_KEY);
@@ -43,7 +72,7 @@ export function FoodApp() {
     }
     setLoaded(true);
   }, []);
-  function save(value: Family) {
+  function persist(value: Family) {
     try {
       // Keep measured pantry and budget edits while carrying family food constraints forward.
       const seed = childPlannerSnapshot(value);
@@ -85,6 +114,11 @@ export function FoodApp() {
       );
     }
     setFamily(value);
+  }
+  function save(value: Family) {
+    persist(value);
+    // Returning to the child kitchen is a role change, so the parent area locks again.
+    if (role !== "adult" || value.age < 13) lock();
     setSetup(false);
     setParentArea(false);
     setProfileOpen(false);
@@ -94,25 +128,46 @@ export function FoodApp() {
     setSetup(true);
   }
   function chooseChild() {
+    lock();
     setRole("child");
     if (!family) setSetup(true);
   }
   function chooseAdult() {
-    setRole("adult");
-    // No Parent PIN for now: a grown-up goes straight to the parent area.
-    if (family) setParentArea(true);
+    // With a child profile saved, the planner holds the child's food settings: ask for the PIN.
+    if (family)
+      requireParent("open the meal planner and family settings", () => {
+        setRole("adult");
+        setParentArea(true);
+      });
+    else setRole("adult");
   }
   function switchProfile() {
+    lock();
     setRole(null);
     setSetup(false);
     setParentArea(false);
     setProfileOpen(false);
   }
   function openSettings() {
-    if (family) { setRole("adult"); setParentArea(true); }
+    if (family)
+      requireParent("open Parent settings", () => {
+        setRole("adult");
+        setParentArea(true);
+      });
     else setSetup(true);
   }
+  function backToChildKitchen() {
+    lock();
+    setParentArea(false);
+    setProfileOpen(false);
+    setRole("child");
+  }
   function forget() {
+    // Deleting child data is parent-only; the views that offer it are behind the gate too.
+    if (family && !unlocked) requireParent("delete the child profile", clearChildData);
+    else clearChildData();
+  }
+  function clearChildData() {
     try {
       localStorage.removeItem(CHILD_PLANNER_KEY);
       localStorage.removeItem(FAMILY_KEY);
@@ -128,6 +183,7 @@ export function FoodApp() {
     setParentArea(false);
     setProfileOpen(false);
     setRole(null);
+    lock();
     setNotice("Child profile cleared from this browser.");
   }
   if (!loaded)
@@ -136,6 +192,14 @@ export function FoodApp() {
         Opening your kitchen…
       </div>
     );
+  // Views that show or change the child's food settings, or can delete them, are parent-only.
+  const parentView =
+    !!family &&
+    (setup ||
+      profileOpen ||
+      parentArea ||
+      (!!role && role !== "child" && family.age >= 13));
+  const showGate = !!family && (!!gate || (parentView && !unlocked));
   return (
     <>
       {notice && (
@@ -143,7 +207,29 @@ export function FoodApp() {
           {notice}
         </p>
       )}
-      {!role && !setup ? (
+      {showGate && family ? (
+        <ParentGate
+          key={gate?.reason ?? "locked"}
+          family={family}
+          reason={gate?.reason ?? "keep using the parent area"}
+          onCreatePin={(pin) => {
+            persist({ ...family, ...pin });
+            setUnlocked(true);
+            gate?.then();
+            setGate(null);
+          }}
+          onUnlock={() => {
+            setUnlocked(true);
+            gate?.then();
+            setGate(null);
+          }}
+          onCancel={() => {
+            // A requested action is simply dropped; a parent view that locked itself closes.
+            if (gate) setGate(null);
+            else switchProfile();
+          }}
+        />
+      ) : !role && !setup ? (
         <RoleChooser
           hasChildProfile={!!family}
           onChild={chooseChild}
@@ -183,7 +269,7 @@ export function FoodApp() {
             <span>Parent area · Meal planner</span>
             <div className="parent-area-actions">
               <button onClick={() => setProfileOpen(true)}>Child profile</button>
-              <button onClick={() => { setParentArea(false); setRole("child"); }}>Back to child kitchen</button>
+              <button onClick={backToChildKitchen}>Back to child kitchen</button>
               <button onClick={switchProfile}>Switch profile</button>
             </div>
           </div>
