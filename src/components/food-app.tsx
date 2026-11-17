@@ -5,6 +5,7 @@ import { LittleKitchen } from "./little-kitchen";
 import { ParentWizard } from "./parent-wizard";
 import { RoleChooser } from "./role-chooser";
 import { ChildProfile, type ProfileStep } from "./child-profile";
+import { resetChef } from "@/lib/family-setup";
 import { CHILD_PROGRESS_KEY } from "@/lib/child-progress";
 import {
   FAMILY_KEY,
@@ -43,7 +44,8 @@ export function FoodApp() {
     }
     setLoaded(true);
   }, []);
-  function save(value: Family) {
+  /** Stores the family and its child planner seed without changing which screen is open. */
+  function persist(value: Family) {
     try {
       // Keep measured pantry and budget edits while carrying family food constraints forward.
       const seed = childPlannerSnapshot(value);
@@ -85,6 +87,9 @@ export function FoodApp() {
       );
     }
     setFamily(value);
+  }
+  function save(value: Family) {
+    persist(value);
     setSetup(false);
     setParentArea(false);
     setProfileOpen(false);
@@ -174,6 +179,7 @@ export function FoodApp() {
         <ChildProfile
           family={family}
           onEdit={editProfile}
+          onResetChef={() => persist(resetChef(family))}
           onBack={() => setProfileOpen(false)}
           onDelete={forget}
         />

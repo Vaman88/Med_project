@@ -9,12 +9,14 @@ import {
   pantryFoods,
   type Family,
 } from "@/lib/little-kitchen";
+import {
+  LAST_SETUP_STEP as last,
+  PROFILE_STEP,
+  SETUP_STEPS as steps,
+  keptChefFields,
+  validChildAge,
+} from "@/lib/family-setup";
 import { ChefAvatar } from "./chef-avatar";
-
-const steps = ["Your pantry", "Foods to avoid", "Family details"];
-const last = steps.length - 1;
-/** Every child gets this chef companion automatically; there is no naming or look step. */
-const defaultAvatar = { skin: "tan", hair: "curly", apron: "coral" } as const;
 
 function PantryPicker({
   selected,
@@ -148,7 +150,8 @@ export function ParentWizard({
 }) {
   const [step, setStep] = useState(startStep);
   const [age, setAge] = useState(initial?.age.toString() ?? "");
-  const avatar = initial?.avatar ?? defaultAvatar;
+  // Every child gets the chef companion automatically; there is no naming or look step.
+  const chef = keptChefFields(initial);
   const [pantry, setPantry] = useState<Family["pantry"]>(initial?.pantry ?? []);
   const [allergies, setAllergies] = useState<Family["allergies"]>(
     initial?.allergies ?? [],
@@ -178,7 +181,7 @@ export function ParentWizard({
   const [error, setError] = useState("");
 
   function advance() {
-    if (step === 1 && !confirmed) {
+    if (step === PROFILE_STEP.avoid && !confirmed) {
       setError("Please check the allergy information before continuing.");
       return;
     }
@@ -194,13 +197,13 @@ export function ParentWizard({
     await saveChanges();
   }
   async function saveChanges() {
-    if (!Number.isInteger(Number(age)) || Number(age) < 5 || Number(age) > 17) {
+    if (!validChildAge(age)) {
       setStep(last);
       setError("Add the child’s age, from 5 to 17.");
       return;
     }
     if (!confirmed) {
-      setStep(1);
+      setStep(PROFILE_STEP.avoid);
       setError("Please check the allergy information before saving.");
       return;
     }
@@ -212,9 +215,8 @@ export function ParentWizard({
     const parsed = familySchema.safeParse({
       version: 1,
       age: Number(age),
-      // No naming step any more: an older saved nickname is kept, otherwise the chef is Seedy.
-      nickname: initial?.nickname,
-      avatar,
+      // No naming step any more: an older saved nickname and look are kept, otherwise Chef Seedy.
+      ...chef,
       pantry,
       allergies,
       otherAllergies: other,
@@ -288,7 +290,7 @@ export function ParentWizard({
             equipment your family has.
           </p>
           <div className="wizard-chef-preview">
-            <ChefAvatar avatar={avatar} />
+            <ChefAvatar avatar={chef.avatar!} />
           </div>
           <p className="wizard-privacy">
             Saved on this device. Food settings and budget stay in the parent
@@ -308,14 +310,14 @@ export function ParentWizard({
             <span style={{ width: `${((step + 1) / steps.length) * 100}%` }} />
           </div>
           <h2>{steps[step]}</h2>
-          {step === 0 && (
+          {step === PROFILE_STEP.pantry && (
             <fieldset>
               <legend>What’s in your pantry?</legend>
               <p>Add foods you have today. You can change these later.</p>
               <PantryPicker selected={pantry} onChange={setPantry} />
             </fieldset>
           )}
-          {step === 1 && (
+          {step === PROFILE_STEP.avoid && (
             <fieldset>
               <legend>Food allergies and exclusions</legend>
               <p>
