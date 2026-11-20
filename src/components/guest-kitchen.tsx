@@ -31,6 +31,8 @@ export function GuestKitchen(props: GuestKitchenProps = {}) {
   // A family's planner (the parent account) can also sign in to save its planner online.
   const allowCloud = cloudConfigured;
   const [user, setUser] = useState<User | null | undefined>(allowCloud ? undefined : null);
+  // Kept here, not in the view, so signing in or out (which remounts the view) leaves the Account panel open.
+  const [accountOpen, setAccountOpen] = useState(false);
   useEffect(() => {
     if (!allowCloud) return;
     const client = browserCloud();
@@ -46,10 +48,10 @@ export function GuestKitchen(props: GuestKitchenProps = {}) {
     return () => { active = false; subscription.unsubscribe(); };
   }, [allowCloud]);
   if (user === undefined) return <div className="cloud-account-loading" role="status">Opening your kitchen…</div>;
-  return <GuestKitchenView key={user?.id ?? 'guest'} {...props} user={user} />;
+  return <GuestKitchenView key={user?.id ?? 'guest'} {...props} user={user} accountOpen={accountOpen} setAccountOpen={setAccountOpen} />;
 }
 
-function GuestKitchenView({ storageKey = GUEST_STORAGE_KEY, initialKitchen, user }: GuestKitchenProps & { user: User | null }) {
+function GuestKitchenView({ storageKey = GUEST_STORAGE_KEY, initialKitchen, user, accountOpen, setAccountOpen }: GuestKitchenProps & { user: User | null; accountOpen: boolean; setAccountOpen: (update: (open: boolean) => boolean) => void }) {
   // A family planner always lives on this device (signing in only adds Save online); a plain signed-in kitchen lives online.
   const familyPlanner = !!initialKitchen;
   const onlineOnly = !!user && !familyPlanner;
@@ -59,7 +61,6 @@ function GuestKitchenView({ storageKey = GUEST_STORAGE_KEY, initialKitchen, user
   const [foods,setFoods]=useState<KitchenFood[]>(initialKitchen?.foods??[]);
   const [view,setView]=useState<'kitchen'|'meals'|'recipes'|'help'>('kitchen');
   const [settingsOpen,setSettingsOpen]=useState(false);
-  const [accountOpen,setAccountOpen]=useState(!!user);
   const [label,setLabel]=useState('');
   const [amount,setAmount]=useState('');
   const [unit,setUnit]=useState<Unit>('g');
