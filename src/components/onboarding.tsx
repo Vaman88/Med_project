@@ -13,7 +13,6 @@ import {
   HOUSEHOLD_CHOICES,
   MAJOR_ALLERGENS,
   ONBOARDING_DRAFT_KEY,
-  QUICK_PANTRY,
   addAvoidFood,
   draftToFamily,
   emptyDraft,
@@ -290,15 +289,10 @@ export function Onboarding({
       break;
     case "pantry":
       question = "What food do you have at home right now?";
-      hint = "Tap what you have, or search for more. The kids’ dishes and your meal ideas start from these foods.";
+      hint = "Search and add each food you have. The kids’ dishes and your meal ideas start from these foods.";
       mood = "encourage";
       body = (
         <>
-          <div className="ob-grid" role="group" aria-label="Common foods">
-            {QUICK_PANTRY.map((food) => (
-              <Choice key={food} pressed={draft.pantry.includes(food)} onClick={() => update({ pantry: toggle(draft.pantry, food) })}>{food}</Choice>
-            ))}
-          </div>
           <div className="ob-pantry-search">
             <PantryPicker selected={draft.pantry} onChange={(pantry) => update({ pantry })} />
           </div>

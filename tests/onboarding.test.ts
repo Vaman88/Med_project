@@ -5,6 +5,7 @@ import {
   parseDraft, removeOtherFood, stepProblem, type OnboardingDraft,
 } from "../src/lib/onboarding";
 import { childPlannerSnapshot, recipeChoices } from "../src/lib/little-kitchen";
+import { pantryMatches } from "../src/lib/family-setup";
 import { chefTitle } from "../src/lib/chef-name";
 
 const lock = { pinSalt: "ab".repeat(16), pinHash: "cd".repeat(32) };
@@ -107,4 +108,21 @@ test("a saved draft restores, and broken drafts are ignored", () => {
   assert.equal(parseDraft("{"), null);
   assert.equal(parseDraft(JSON.stringify({ ...d, step: "chef-name" })), null);
   assert.equal(parseDraft(null), null);
+});
+
+test("pantry type-ahead matches anywhere in the name, any case, starts-with first, and allows custom foods", () => {
+  const { matches, custom } = pantryMatches("BEAN", []);
+  assert.ok(matches.length > 0 && matches.length <= 8);
+  assert.ok(matches.every((food) => food.toLowerCase().includes("bean")));
+  assert.ok(matches.includes("Black beans"));
+  assert.equal(custom, "BEAN");
+  // Names that start with the text come first.
+  assert.equal(pantryMatches("app", []).matches[0], "Apple");
+  // Foods already added are not offered again, and an exact known name is not a custom food.
+  assert.ok(!pantryMatches("banana", ["Banana"]).matches.includes("Banana"));
+  assert.equal(pantryMatches("banana", []).custom, null);
+  assert.equal(pantryMatches("banana", ["Banana"]).custom, null);
+  // Nothing in the list: no matches, but the typed food can still be added.
+  assert.deepEqual(pantryMatches("dragonfruit", []), { matches: [], custom: "dragonfruit" });
+  assert.deepEqual(pantryMatches("   ", []), { matches: [], custom: null });
 });

@@ -602,10 +602,31 @@ test("sign-up asks one question at a time, checks each answer and keeps answers 
   await next(page);
   await page.getByRole("button", { name: "3", exact: true }).click();
   await next(page);
-  // The pantry cannot be skipped.
+  // The pantry cannot be skipped. It is a type-ahead search (no grid of food cards).
   await next(page);
   await expect(alert).toContainText("Add at least one food");
-  await page.getByRole("group", { name: "Common foods" }).getByRole("button", { name: "Banana" }).click();
+  await expect(page.getByRole("group", { name: "Common foods" })).toHaveCount(0);
+  const search = page.getByRole("combobox", { name: "Search for a food" });
+  await expect(search).toHaveAttribute("placeholder", "Search for a food…");
+  await search.fill("BAN");
+  await expect(search).toHaveAttribute("aria-expanded", "true");
+  const options = page.getByRole("listbox").getByRole("option");
+  await expect(options.first()).toHaveText("Banana");
+  // Arrow keys move the highlight (aria-activedescendant) and Enter adds it.
+  await search.press("ArrowDown");
+  await expect(search).toHaveAttribute("aria-activedescendant", /.+/);
+  await search.press("Enter");
+  await expect(page.getByRole("button", { name: "Remove Banana" })).toBeVisible();
+  await expect(search).toHaveValue("");
+  // Escape closes the list; an unknown food gets a friendly message and can still be added.
+  await search.fill("dragonfr");
+  await expect(page.getByText("No foods in our list match “dragonfr”.", { exact: false })).toBeVisible();
+  await search.press("Escape");
+  await expect(page.getByRole("listbox")).toHaveCount(0);
+  await expect(search).toHaveAttribute("aria-expanded", "false");
+  await search.fill("dragonfruit");
+  await page.getByRole("option", { name: "Add “dragonfruit”" }).click();
+  await page.getByRole("button", { name: "Remove dragonfruit" }).click();
   await next(page);
   await next(page);
   // Foods to avoid: an explicit "none", or a list the grown-up confirms.

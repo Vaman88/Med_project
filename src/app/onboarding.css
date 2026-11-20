@@ -251,3 +251,9 @@ html:has(.ob-app) { scroll-padding-bottom: 150px; }
 .ob-pantry-search .pantry-options { position: static; margin-top: 6px; }
 .ob-pantry-search .pantry-search, .ob-pantry-search .pantry-search input, .ob-pantry-search .pantry-picker > label { margin: 0; }
 .ob-warn { margin: 0; padding: 12px 14px; border-radius: 14px; background: #fff1c7; border: 2px solid #f0c64a; color: #5a3d00; font-weight: 700; line-height: 1.4; }
+
+/* Pantry search: no-match message, and with the phone keyboard open the Continue bar stops
+   floating so it never covers the suggestions. */
+.ob-pantry-search .pantry-no-match { margin: 0; padding: 10px 12px; border-radius: 12px; background: #fff; border: 2px dashed var(--ob-line); color: var(--ob-muted); font-weight: 700; }
+.ob-pantry-search .pantry-options button { min-height: 48px; font-size: 1.02rem; }
+.ob-app:has(.ob-pantry-search input:focus) .ob-footer { position: static; background: none; }

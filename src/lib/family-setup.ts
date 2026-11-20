@@ -1,4 +1,4 @@
-import type { Family } from "./little-kitchen";
+import { pantryFoods, type Family } from "./little-kitchen";
 
 /** Parent setup steps, in order. There is no chef naming step: every child gets Chef Seedy. */
 export const SETUP_STEPS = ["Your pantry", "Foods to avoid", "Family details"] as const;
@@ -40,4 +40,22 @@ export function hasCustomChef(family: Family): boolean {
 export function resetChef(family: Family): Family {
   const { nickname: _nickname, avatar: _avatar, ...rest } = family;
   return rest;
+}
+
+/**
+ * Type-ahead pantry search: foods from the app's list whose name contains the typed text anywhere
+ * (any case), names that start with it first, at most 8, skipping foods already added. `custom` is
+ * the typed text when it is not a known food and not added yet, so it can be saved as a custom food.
+ */
+export function pantryMatches(query: string, selected: readonly string[]): { matches: string[]; custom: string | null } {
+  const term = query.trim();
+  const lower = term.toLowerCase();
+  if (!term) return { matches: [], custom: null };
+  const added = (food: string) => selected.some((item) => item.toLowerCase() === food.toLowerCase());
+  const matches = pantryFoods
+    .filter((food) => food.toLowerCase().includes(lower) && !added(food))
+    .sort((a, b) => Number(b.toLowerCase().startsWith(lower)) - Number(a.toLowerCase().startsWith(lower)))
+    .slice(0, 8);
+  const known = pantryFoods.some((food) => food.toLowerCase() === lower);
+  return { matches, custom: term.length <= 80 && !known && !added(term) ? term : null };
 }

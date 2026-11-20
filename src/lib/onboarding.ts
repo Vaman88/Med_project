@@ -4,7 +4,6 @@ import {
   dietaryChoices,
   equipmentChoices,
   familySchema,
-  pantryFoods,
   type Family,
 } from "./little-kitchen";
 import { keptChefFields } from "./family-setup";
@@ -42,13 +41,6 @@ export const HOUSEHOLD_CHOICES = Array.from({ length: 12 }, (_, i) => i + 1);
 export const BUDGET_CHOICES = [25, 50, 75, 100, 150] as const;
 /** The nine major allergens, shown as big cards. Other foods can be typed. */
 export const MAJOR_ALLERGENS = allergyChoices.slice(0, 9);
-/** Everyday foods offered as one-tap cards on the pantry screen; search finds the rest. */
-export const QUICK_PANTRY = [
-  "Banana", "Apple", "Strawberries", "Carrots", "Tomato", "Spinach",
-  "Egg", "Milk", "Plain yogurt", "Oats", "Brown rice", "Pasta",
-  "Whole wheat bread", "Black beans", "Chicken", "Peanut butter",
-] as const satisfies readonly (typeof pantryFoods)[number][];
-
 const draftSchema = z.object({
   step: z.enum(ONBOARDING_STEPS),
   parentName: z.string().max(40),

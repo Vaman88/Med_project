@@ -121,7 +121,8 @@ async function signUpToAccountStep(page: Page) {
   await next(page);
   await page.getByRole('button', { name: '3', exact: true }).click();
   await next(page);
-  await page.getByRole('group', { name: 'Common foods' }).getByRole('button', { name: 'Oats' }).click();
+  await page.getByRole('combobox', { name: 'Search for a food' }).fill('oats');
+  await page.getByRole('option', { name: 'Oats', exact: true }).click();
   await next(page);
   await next(page);
   await page.getByRole('group', { name: 'Foods to avoid' }).getByRole('button', { name: 'Peanut' }).click();

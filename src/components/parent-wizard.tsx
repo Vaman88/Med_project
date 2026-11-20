@@ -7,7 +7,6 @@ import {
   dietaryChoices,
   equipmentChoices,
   familySchema,
-  pantryFoods,
   type Family,
 } from "@/lib/little-kitchen";
 import {
@@ -15,6 +14,7 @@ import {
   PROFILE_STEP,
   SETUP_STEPS as steps,
   keptChefFields,
+  pantryMatches,
   validChildAge,
 } from "@/lib/family-setup";
 import { ChefAvatar } from "./chef-avatar";
@@ -31,25 +31,10 @@ export function PantryPicker({
   const [active, setActive] = useState(-1);
   const listId = useId();
   const term = query.trim();
-  const matches = term
-    ? pantryFoods
-        .filter(
-          (food) =>
-            food.toLowerCase().includes(term.toLowerCase()) &&
-            !selected.some((item) => item.toLowerCase() === food.toLowerCase()),
-        )
-        .sort((a, b) =>
-          Number(b.toLowerCase().startsWith(term.toLowerCase())) -
-          Number(a.toLowerCase().startsWith(term.toLowerCase())),
-        )
-        .slice(0, 8)
-    : [];
-  const custom =
-    term.length > 0 &&
-    term.length <= 80 &&
-    !pantryFoods.some((food) => food.toLowerCase() === term.toLowerCase()) &&
-    !selected.some((food) => food.toLowerCase() === term.toLowerCase());
-  const options = [...matches, ...(custom ? [term] : [])];
+  const { matches, custom: customFood } = pantryMatches(query, selected);
+  const custom = customFood !== null;
+  const options = [...matches, ...(customFood !== null ? [customFood] : [])];
+  const alreadyAdded = !!term && selected.some((food) => food.toLowerCase() === term.toLowerCase());
   function add(food: string) {
     if (selected.length >= 100) return;
     if (!selected.some((item) => item.toLowerCase() === food.toLowerCase()))
@@ -59,7 +44,10 @@ export function PantryPicker({
     setActive(-1);
   }
   function keyDown(event: KeyboardEvent<HTMLInputElement>) {
-    if (event.key === "Escape") setOpen(false);
+    if (event.key === "Escape") {
+      setOpen(false);
+      setActive(-1);
+    }
     if (event.key === "ArrowDown" && options.length) {
       event.preventDefault();
       setOpen(true);
@@ -88,7 +76,8 @@ export function PantryPicker({
           aria-activedescendant={open && active >= 0 ? `${listId}-${active}` : undefined}
           value={query}
           maxLength={80}
-          placeholder="Start typing, for example apple"
+          placeholder="Search for a food…"
+          enterKeyHint="done"
           autoComplete="off"
           onChange={(event) => {
             setQuery(event.target.value);
@@ -108,6 +97,8 @@ export function PantryPicker({
                 type="button"
                 role="option"
                 aria-selected={active === index}
+                tabIndex={-1}
+                ref={active === index ? (node) => node?.scrollIntoView({ block: "nearest" }) : undefined}
                 onMouseDown={(event) => event.preventDefault()}
                 onClick={() => add(food)}
               >
@@ -117,6 +108,13 @@ export function PantryPicker({
           </div>
         )}
       </div>
+      {open && term && !matches.length && (
+        <p className="pantry-no-match" role="status">
+          {alreadyAdded
+            ? `${term} is already in your list.`
+            : `No foods in our list match “${term}”. Tap Add “${term}” to save it anyway.`}
+        </p>
+      )}
       <p className="pantry-help">Choose a suggestion or add your own food. Recipes appear when their ingredients are selected. Up to 100 foods can be saved.</p>
       <div className="pantry-selected" aria-label="Foods in your pantry">
         {selected.map((food) => (
