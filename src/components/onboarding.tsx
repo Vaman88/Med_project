@@ -289,7 +289,7 @@ export function Onboarding({
       break;
     case "pantry":
       question = "What food do you have at home right now?";
-      hint = "Search and add each food you have. The kids’ dishes and your meal ideas start from these foods.";
+      hint = "Start typing a food and pick it from the list. The kids’ dishes and your meal ideas start from these foods.";
       mood = "encourage";
       body = (
         <>
