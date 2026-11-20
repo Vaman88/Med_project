@@ -2,7 +2,7 @@
 
 A family cooking website with an adult meal planner and a child Cooking Studio. The opening screen lets you choose an adult or child experience.
 
-Adults can search pantry foods, enter amounts and a budget, and explore meal ideas with ingredients, instructions and dish-specific photos. Children create a chef, explore recipes and play through cooking activities. A Parent PIN keeps children out of the parent area on a shared device (see [Parent PIN](#parent-pin)). The child game can be played without the recipe ingredients in the real pantry.
+Adults can search pantry foods, enter amounts and a budget, and explore meal ideas with ingredients, instructions and dish-specific photos. Children cook alongside Chef Seedy, explore recipes and play through cooking activities. One guided sign-up (see [docs/little-kitchen.md](docs/little-kitchen.md)) sets up both sides, then a chooser opens the Child account or the PIN-protected Parent account. A Parent PIN keeps children out of the parent area on a shared device (see [Parent PIN](#parent-pin)). The child game can be played without the recipe ingredients in the real pantry.
 
 ## Run locally
 

@@ -1,0 +1,253 @@
+/*
+ * Sign-up and onboarding: one question per screen, Seedy asking in a speech bubble, big answer
+ * cards and one chunky Continue button. Uses the kids-side "Fruit Stand" palette from
+ * theme-refresh.css (cream page, brown ink outlines, teal, orange and sun yellow). Mobile first.
+ */
+.ob-app {
+  --ob-ink: #2d1b0f;
+  --ob-muted: #6a4c38;
+  --ob-cream: #fff6e5;
+  --ob-card: #fffaf0;
+  --ob-teal: #0b7f8a;
+  --ob-teal-dark: #075f68;
+  --ob-teal-soft: #dff3f1;
+  --ob-orange: #c9431f;
+  --ob-sun: #ffd23f;
+  --ob-line: #e7d9bf;
+  color-scheme: light;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--ob-cream);
+  color: var(--ob-ink);
+  font-family: var(--font-kitchen), "Nunito Sans", system-ui, sans-serif;
+  padding: max(10px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
+  /* Screens slide in from the side; never let that widen the page. */
+  overflow-x: clip;
+}
+.ob-app :focus-visible { outline: 3px solid var(--ob-orange); outline-offset: 3px; }
+
+/* Back arrow and progress bar */
+.ob-top {
+  display: flex; align-items: center; gap: 12px;
+  width: min(640px, 100%); margin: 0 auto; padding: 6px 0 4px;
+}
+.ob-back, .ob-back-space { flex: none; width: 44px; height: 44px; }
+.ob-back {
+  display: grid; place-items: center; border: 0; border-radius: 14px;
+  background: transparent; color: var(--ob-muted); cursor: pointer;
+}
+.ob-back:hover { background: #f3e5c8; color: var(--ob-ink); }
+.ob-progress {
+  flex: 1; height: 16px; border-radius: 999px; background: #ecdcbc; overflow: hidden;
+}
+.ob-progress span {
+  display: block; height: 100%; border-radius: inherit; background: var(--ob-teal);
+  box-shadow: inset 0 -4px 0 #00000026, inset 0 4px 0 #ffffff40;
+  transition: width 420ms cubic-bezier(.34, 1.56, .64, 1);
+}
+.ob-progress.is-done span { background: var(--ob-sun); }
+
+/* One screen */
+.ob-screen {
+  flex: 1; display: flex; flex-direction: column; gap: 18px;
+  width: min(640px, 100%); margin: 0 auto; padding-top: 14px;
+}
+.ob-in-fwd { animation: ob-in-fwd 360ms cubic-bezier(.34, 1.4, .64, 1) both; }
+.ob-in-back { animation: ob-in-back 360ms cubic-bezier(.34, 1.4, .64, 1) both; }
+@keyframes ob-in-fwd { from { opacity: 0; transform: translateX(36px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes ob-in-back { from { opacity: 0; transform: translateX(-36px) scale(.98); } to { opacity: 1; transform: none; } }
+
+/* Seedy and the speech bubble */
+.ob-seedy { display: flex; align-items: flex-end; gap: 10px; }
+.ob-seedy-art {
+  flex: none; width: 92px; height: 104px;
+  animation: ob-hop 700ms cubic-bezier(.34, 1.56, .64, 1) 120ms both;
+}
+.ob-seedy-art svg { width: 100%; height: 100%; display: block; overflow: visible; }
+@keyframes ob-hop {
+  0% { transform: translateY(14px) scale(.9); }
+  55% { transform: translateY(-8px) scale(1.04); }
+  100% { transform: none; }
+}
+.ob-bubble {
+  position: relative; flex: 1; min-width: 0; margin-bottom: 26px;
+  padding: 14px 16px; border-radius: 20px;
+  background: var(--ob-card); border: 3px solid var(--ob-ink); box-shadow: 4px 4px 0 var(--ob-ink);
+}
+.ob-bubble::before {
+  /* The bubble's tail points at Seedy. */
+  content: ""; position: absolute; left: -13px; bottom: 16px; width: 18px; height: 18px;
+  background: var(--ob-card); border-left: 3px solid var(--ob-ink); border-bottom: 3px solid var(--ob-ink);
+  transform: rotate(45deg); border-bottom-left-radius: 4px;
+}
+.ob-bubble h1 {
+  margin: 0; font-family: "Fredoka", var(--font-kitchen), sans-serif; font-weight: 700;
+  font-size: clamp(1.3rem, 5.4vw, 1.75rem); line-height: 1.15; letter-spacing: -.005em;
+}
+.ob-bubble h1:focus { outline: none; }
+.ob-bubble h1:focus-visible { outline: 3px solid var(--ob-orange); outline-offset: 4px; border-radius: 6px; }
+.ob-bubble p { margin: 6px 0 0; color: var(--ob-muted); font-size: .98rem; line-height: 1.4; }
+
+.ob-seedy-big { flex-direction: column; align-items: center; text-align: center; padding-top: 4vh; }
+.ob-seedy-big .ob-seedy-art { width: 170px; height: 190px; order: 2; }
+.ob-seedy-big .ob-bubble { margin: 0 0 18px; }
+.ob-seedy-big .ob-bubble::before { left: calc(50% - 9px); bottom: -13px; transform: rotate(-45deg); }
+.ob-seedy-big .ob-bubble h1 { font-size: clamp(1.9rem, 8vw, 2.6rem); }
+
+/* Answer cards */
+.ob-body { display: flex; flex-direction: column; gap: 14px; }
+.ob-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.ob-grid-two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.ob-grid-numbers { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.ob-choice {
+  position: relative; display: flex; align-items: center; justify-content: center;
+  min-height: 58px; padding: 12px 14px; border-radius: 16px;
+  border: 2px solid var(--ob-line); border-bottom-width: 5px;
+  background: #fff; color: var(--ob-ink); font: inherit; font-weight: 800; font-size: 1.02rem;
+  text-align: center; cursor: pointer; touch-action: manipulation;
+  transition: transform 120ms ease, border-color 120ms ease, background-color 120ms ease;
+}
+.ob-choice:hover { background: #fffdf7; border-color: #d4c19c; }
+.ob-choice:active { transform: translateY(3px); border-bottom-width: 2px; margin-top: 3px; min-height: 55px; }
+.ob-choice.is-on {
+  border-color: var(--ob-teal); background: var(--ob-teal-soft); color: var(--ob-teal-dark);
+  animation: ob-pop 260ms cubic-bezier(.34, 1.56, .64, 1);
+}
+.ob-choice-small { min-height: 56px; font-size: 1.25rem; padding: 8px; }
+.ob-choice-wide { width: 100%; }
+.ob-tick { position: absolute; top: 6px; right: 7px; color: var(--ob-teal); }
+.ob-choice-small .ob-tick { display: none; }
+@keyframes ob-pop { 0% { transform: scale(.94); } 60% { transform: scale(1.04); } 100% { transform: none; } }
+
+/* Text fields */
+.ob-field { display: flex; flex-direction: column; gap: 6px; font-weight: 800; }
+.ob-field input, .ob-add input {
+  width: 100%; min-height: 54px; padding: 12px 14px; border-radius: 14px;
+  border: 2px solid var(--ob-line); background: #fff; color: var(--ob-ink);
+  font: inherit; font-weight: 600; font-size: 1.1rem;
+}
+.ob-field input:focus, .ob-add input:focus { border-color: var(--ob-teal); }
+.ob-field-short input { max-width: 260px; letter-spacing: .1em; }
+.ob-add label { display: block; margin-bottom: 6px; font-weight: 800; }
+.ob-add > div { display: flex; gap: 8px; }
+.ob-add button, .ob-secondary {
+  flex: none; min-height: 54px; padding: 0 16px; border-radius: 14px;
+  border: 2px solid var(--ob-line); border-bottom-width: 5px; background: #fff;
+  color: var(--ob-teal-dark); font: inherit; font-weight: 800; cursor: pointer;
+}
+.ob-add button:disabled { opacity: .5; cursor: default; }
+.ob-check {
+  display: flex; gap: 12px; align-items: flex-start; padding: 14px; border-radius: 14px;
+  background: #fff; border: 2px solid var(--ob-line); font-weight: 700; line-height: 1.35; cursor: pointer;
+}
+.ob-check input { flex: none; width: 24px; height: 24px; margin: 0; accent-color: var(--ob-teal); }
+.ob-tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.ob-tags li {
+  display: inline-flex; align-items: center; gap: 4px; padding: 4px 4px 4px 12px;
+  border-radius: 999px; background: var(--ob-teal-soft); color: var(--ob-teal-dark); font-weight: 800;
+}
+.ob-tags button {
+  width: 32px; height: 32px; border: 0; border-radius: 50%; background: transparent;
+  color: inherit; font-size: 1.2rem; cursor: pointer;
+}
+.ob-note { margin: 0; color: var(--ob-muted); font-size: .9rem; }
+.ob-success { margin: 0; padding: 14px; border-radius: 14px; background: var(--ob-teal-soft); color: var(--ob-teal-dark); font-weight: 700; }
+.ob-account { display: flex; flex-direction: column; gap: 12px; }
+.ob-link {
+  align-self: flex-start; padding: 8px 2px; border: 0; background: none; color: var(--ob-teal-dark);
+  font: inherit; font-weight: 800; text-decoration: underline; cursor: pointer;
+}
+
+/* The pantry search reuses the setup PantryPicker; give it this screen's look. */
+.ob-pantry-search .pantry-picker { display: flex; flex-direction: column; gap: 8px; }
+.ob-pantry-search .pantry-picker > label { font-weight: 800; }
+.ob-pantry-search .pantry-search { position: relative; }
+.ob-pantry-search .pantry-search input {
+  width: 100%; min-height: 54px; padding: 12px 14px; border-radius: 14px;
+  border: 2px solid var(--ob-line); background: #fff; color: var(--ob-ink); font: inherit; font-size: 1.05rem;
+}
+.ob-pantry-search .pantry-help { margin: 0; color: var(--ob-muted); font-size: .9rem; }
+
+/* Continue */
+.ob-footer {
+  position: sticky; bottom: 0; z-index: 2; margin-top: auto;
+  display: flex; flex-direction: column; gap: 10px;
+  padding: 14px 0 max(4px, env(safe-area-inset-bottom));
+  background: linear-gradient(to top, var(--ob-cream) 78%, #fff6e500);
+}
+.ob-continue {
+  width: 100%; min-height: 56px; border-radius: 18px; border: 0;
+  background: var(--ob-teal); color: #fff; box-shadow: 0 5px 0 var(--ob-teal-dark);
+  font-family: "Fredoka", var(--font-kitchen), sans-serif; font-weight: 700; font-size: 1.2rem;
+  letter-spacing: .02em; text-transform: uppercase; cursor: pointer; touch-action: manipulation;
+  transition: transform 100ms ease, box-shadow 100ms ease, background-color 160ms ease;
+}
+.ob-continue:hover { background: #0a8d99; }
+.ob-continue:active { transform: translateY(5px); box-shadow: 0 0 0 var(--ob-teal-dark); }
+.ob-continue.is-waiting { background: #d9cbb0; color: #5d4634; box-shadow: 0 5px 0 #bba98a; }
+.ob-continue:disabled { cursor: progress; }
+.ob-error {
+  margin: 0; padding: 10px 14px; border-radius: 14px; background: #fde4dc; color: #8a2a10; font-weight: 800;
+  animation: ob-nudge 320ms ease;
+}
+@keyframes ob-nudge { 0%, 100% { transform: none; } 30% { transform: translateX(-5px); } 60% { transform: translateX(5px); } }
+.ob-fine { margin: 0; text-align: center; color: var(--ob-muted); font-size: .88rem; }
+
+/* Account chooser */
+.ob-accounts { display: grid; gap: 14px; }
+.ob-account-card {
+  display: grid; grid-template-columns: 84px 1fr; grid-template-rows: auto auto auto;
+  column-gap: 14px; row-gap: 4px; align-items: center;
+  padding: 16px; border-radius: 22px; border: 3px solid var(--ob-ink); box-shadow: 0 6px 0 var(--ob-ink);
+  font: inherit; text-align: left; cursor: pointer; touch-action: manipulation;
+  transition: transform 140ms cubic-bezier(.34, 1.56, .64, 1), box-shadow 140ms ease;
+}
+/* Hover changes colour only: lifting the card could move it out from under a resting pointer and flicker. */
+.ob-account-card:hover { box-shadow: 0 6px 0 var(--ob-orange); }
+.ob-account-card:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--ob-ink); }
+.ob-account-art {
+  grid-row: 1 / span 3; display: grid; place-items: center; width: 84px; height: 92px;
+  border-radius: 20px; background: #fff;
+}
+.ob-account-art svg { width: 76px; height: 84px; overflow: visible; }
+.ob-account-title { font-family: "Fredoka", var(--font-kitchen), sans-serif; font-weight: 700; font-size: 1.45rem; line-height: 1.1; }
+.ob-account-text { font-size: .95rem; line-height: 1.35; }
+.ob-account-go {
+  justify-self: start; display: inline-flex; align-items: center; gap: 6px; margin-top: 6px;
+  padding: 6px 14px; border-radius: 999px; font-weight: 800; font-size: .92rem;
+}
+.ob-account-child { background: var(--ob-teal); color: #fff; }
+.ob-account-child .ob-account-art { border: 4px solid var(--ob-sun); }
+.ob-account-child .ob-account-go { background: #fff; color: var(--ob-ink); }
+.ob-account-parent { background: var(--ob-card); color: var(--ob-ink); }
+.ob-account-parent .ob-account-art { background: #f3e5c8; }
+.ob-account-parent .ob-account-text { color: var(--ob-muted); }
+.ob-account-parent .ob-account-go { background: #7a1f2b; color: #fff; }
+
+@media (min-width: 560px) {
+  .ob-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .ob-grid-two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ob-grid-numbers { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .ob-seedy-art { width: 120px; height: 136px; }
+}
+@media (min-width: 760px) {
+  .ob-app { padding-top: 24px; }
+  .ob-screen { padding-top: 28px; gap: 24px; }
+  .ob-accounts { grid-template-columns: 1fr 1fr; }
+  .ob-account-card { grid-template-columns: 1fr; grid-template-rows: auto; justify-items: center; text-align: center; padding: 24px 20px 22px; }
+  .ob-account-art { grid-row: auto; width: 120px; height: 130px; }
+  .ob-account-art svg { width: 108px; height: 120px; }
+  .ob-account-go { justify-self: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ob-app *, .ob-app *::before { animation: none !important; transition: none !important; }
+}
+
+/* Keep focused fields and open suggestion lists clear of the sticky Continue bar. */
+html:has(.ob-app) { scroll-padding-bottom: 150px; }
+.ob-body { padding-bottom: 8px; }
+.ob-pantry-search .pantry-options { position: static; margin-top: 6px; }
+.ob-pantry-search .pantry-search, .ob-pantry-search .pantry-search input, .ob-pantry-search .pantry-picker > label { margin: 0; }
+.ob-warn { margin: 0; padding: 12px 14px; border-radius: 14px; background: #fff1c7; border: 2px solid #f0c64a; color: #5a3d00; font-weight: 700; line-height: 1.4; }

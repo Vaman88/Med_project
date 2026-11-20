@@ -28,7 +28,8 @@ function newId(): string {
 }
 type GuestKitchenProps = { storageKey?: string; initialKitchen?: {profile:HouseholdProfile;foods:KitchenFood[]} };
 export function GuestKitchen(props: GuestKitchenProps = {}) {
-  const allowCloud = cloudConfigured && !props.initialKitchen;
+  // A family's planner (the parent account) can also sign in to save its planner online.
+  const allowCloud = cloudConfigured;
   const [user, setUser] = useState<User | null | undefined>(allowCloud ? undefined : null);
   useEffect(() => {
     if (!allowCloud) return;
@@ -45,17 +46,20 @@ export function GuestKitchen(props: GuestKitchenProps = {}) {
     return () => { active = false; subscription.unsubscribe(); };
   }, [allowCloud]);
   if (user === undefined) return <div className="cloud-account-loading" role="status">Opening your kitchen…</div>;
-  return <GuestKitchenView key={user?.id ?? 'guest'} {...props} initialKitchen={user ? undefined : props.initialKitchen} user={user} />;
+  return <GuestKitchenView key={user?.id ?? 'guest'} {...props} user={user} />;
 }
 
 function GuestKitchenView({ storageKey = GUEST_STORAGE_KEY, initialKitchen, user }: GuestKitchenProps & { user: User | null }) {
+  // A family planner always lives on this device (signing in only adds Save online); a plain signed-in kitchen lives online.
+  const familyPlanner = !!initialKitchen;
+  const onlineOnly = !!user && !familyPlanner;
   const [started,setStarted]=useState(!!initialKitchen || !!user);
   const [loaded,setLoaded]=useState(false);
   const [profile,setProfile]=useState<HouseholdProfile>(initialKitchen?.profile??guestProfile);
   const [foods,setFoods]=useState<KitchenFood[]>(initialKitchen?.foods??[]);
   const [view,setView]=useState<'kitchen'|'meals'|'recipes'|'help'>('kitchen');
   const [settingsOpen,setSettingsOpen]=useState(false);
-  const [accountOpen,setAccountOpen]=useState(false);
+  const [accountOpen,setAccountOpen]=useState(!!user);
   const [label,setLabel]=useState('');
   const [amount,setAmount]=useState('');
   const [unit,setUnit]=useState<Unit>('g');
@@ -70,16 +74,16 @@ function GuestKitchenView({ storageKey = GUEST_STORAGE_KEY, initialKitchen, user
   const [picked,setPicked]=useState<CatalogFood|null>(null);
   const input=useRef<HTMLInputElement>(null);
   useEffect(()=>{
-    if(user){setLoaded(true);return;}
+    if(onlineOnly){setLoaded(true);return;}
     try { const raw=localStorage.getItem(storageKey);if(raw){const saved=guestKitchenSchema.safeParse(JSON.parse(raw));if(saved.success){setProfile(saved.data.profile);setFoods(saved.data.foods);setStarted(true);}else setNotice('Saved information could not be restored. You can start again.');} }
     catch {setSaveError('Browser saving is unavailable. You can still plan during this visit.');}
     setLoaded(true);
-  },[storageKey,user]);
+  },[storageKey,onlineOnly]);
   useEffect(()=>{
-    if(user||!loaded||!started)return;
+    if(onlineOnly||!loaded||!started)return;
     try { localStorage.setItem(storageKey,JSON.stringify({version:1,profile,foods}));setSaveError(''); }
     catch {setSaveError('Changes could not be saved in this browser. Keep this page open while planning.');}
-  },[loaded,started,profile,foods,storageKey,user]);
+  },[loaded,started,profile,foods,storageKey,onlineOnly]);
   useEffect(()=>{if(!notice)return;const timer=window.setTimeout(()=>setNotice(''),5000);return()=>window.clearTimeout(timer);},[notice]);
   const matches=started?kitchenMeals(profile,foods):[];
   const groupRank={now:0,extras:1,later:2} as const;
@@ -102,7 +106,7 @@ function GuestKitchenView({ storageKey = GUEST_STORAGE_KEY, initialKitchen, user
   }
   function edit(food:KitchenFood){setPicked(null);setLabel(food.label);setAmount(food.quantity?String(food.quantity):'');setUnit(food.unit);setFoodState(food.foodState);setStorage(food.storage);setBestBy(food.bestByDate??'');setEditing(food.id);input.current?.focus();}
   function printMeals(){const details=Array.from(document.querySelectorAll<HTMLDetailsElement>('.kitchen-app details'));const states=details.map(detail=>detail.open);details.forEach(detail=>{detail.open=true;});window.addEventListener('afterprint',()=>details.forEach((detail,index)=>{detail.open=states[index];}),{once:true});window.print();}
-  function clear(){try{if(!user)localStorage.removeItem(storageKey);}catch{setSaveError('Browser storage could not be cleared. Clear site data in your browser settings.');return;}setFoods([]);setProfile(guestProfile());setStarted(!!user);setView('kitchen');setEditing(null);setLabel('');setAmount('');setNotice(user ? 'Current kitchen cleared. Your online save is unchanged until you choose Save online.' : 'Your saved kitchen information was cleared.');setClearConfirm(false);setChecked([]);}
+  function clear(){try{if(!onlineOnly)localStorage.removeItem(storageKey);}catch{setSaveError('Browser storage could not be cleared. Clear site data in your browser settings.');return;}setFoods([]);setProfile(familyPlanner&&initialKitchen?initialKitchen.profile:guestProfile());setStarted(onlineOnly||familyPlanner);setView('kitchen');setEditing(null);setLabel('');setAmount('');setNotice(onlineOnly ? 'Current kitchen cleared. Your online save is unchanged until you choose Save online.' : 'Your saved kitchen information was cleared.');setClearConfirm(false);setChecked([]);}
   const budgetControls = <>
     <div className="budget-fields">
       <NumberField live label="Weekly grocery budget (USD)" decimal value={profile.weeklyBudgetCents / 100} onChange={value => setProfile(current => ({...current, weeklyBudgetCents: Math.round(value * 100)}))} />
@@ -125,10 +129,10 @@ function GuestKitchenView({ storageKey = GUEST_STORAGE_KEY, initialKitchen, user
       {started ? <nav className="simple-nav" aria-label="Main navigation">
         {([['kitchen', 'My Kitchen', IconBasket], ['meals', 'Meal Ideas', IconChefHat], ['recipes', 'Recipes', IconSearch], ['help', 'Find Food Help', IconHeartHandshake]] as const).map(([id, name, Icon]) => <button key={id} aria-current={view === id ? 'page' : undefined} className={view === id ? 'active' : ''} onClick={() => go(id)}><Icon size={19} aria-hidden="true" />{name}</button>)}
       </nav> : <span className="header-note">Made for everyday family meals</span>}
-      {started && !initialKitchen && <button type="button" className="header-settings" aria-expanded={accountOpen} aria-controls="kitchen-account" onClick={() => setAccountOpen(open => !open)}><IconSettings size={19} aria-hidden="true" /><span>Account</span></button>}
+      {started && (!familyPlanner || cloudConfigured) && <button type="button" className="header-settings" aria-expanded={accountOpen} aria-controls="kitchen-account" onClick={() => setAccountOpen(open => !open)}><IconSettings size={19} aria-hidden="true" /><span>Account</span></button>}
     </header>
     <main id="main-content" tabIndex={-1}>
-      {!initialKitchen && (!started || accountOpen) && <div id="kitchen-account"><CloudAccount user={user} kitchen={{version:1,profile,foods}} storageKey={storageKey} onLoad={saved => {setProfile(saved.profile);setFoods(saved.foods);setStarted(true);setEditing(null);setPicked(null);setLabel('');setAmount('');setChecked([]);setView('kitchen');}} /></div>}
+      {(!started || accountOpen) && <div id="kitchen-account"><CloudAccount user={user} kitchen={{version:1,profile,foods}} storageKey={storageKey} onLoad={saved => {setProfile(current => familyPlanner ? keepHardLimits(current, saved.profile) : saved.profile);setFoods(saved.foods);setStarted(true);setEditing(null);setPicked(null);setLabel('');setAmount('');setChecked([]);setView('kitchen');}} /></div>}
       {!started ? <>
         <section className="guest-hero">
           <div className="hero-copy">
@@ -205,13 +209,25 @@ function GuestKitchenView({ storageKey = GUEST_STORAGE_KEY, initialKitchen, user
           </section>
         </>}
         {view === 'help' && <section id="food-help"><div className="page-heading"><h1>Support for your next meal.</h1><p>Use the official locators to search by ZIP. No precise location permission is needed here. Call providers before traveling.</p></div><div className="resource-grid">{foodResources.map(resource => <article className="resource-card" key={resource.id}><IconHeartHandshake className="resource-icon" size={30} aria-hidden="true" /><span className="eyebrow">{resource.publisher}</span><h2>{resource.title}</h2><p>{resource.description}</p><div className="actions"><a className="button secondary" href={resource.url} target="_blank" rel="noopener noreferrer">Open resource<IconArrowRight size={17} aria-hidden="true" /></a>{resource.phone && <a className="button" href={`tel:${resource.phone}`}>Call {resource.phone}</a>}</div></article>)}</div></section>}
-        <div className="guest-storage-note welcome-footnote"><span><IconDeviceFloppy size={16} aria-hidden="true" />{user ? 'Account kitchen: choose Save online to keep changes. Unsaved changes are cleared when you leave or sign out.' : 'Saved on this device. Anyone using this browser can see your kitchen settings.'}</span><button className="text-button" onClick={() => setClearConfirm(true)}>{user ? 'Clear current kitchen' : 'Clear my information'}</button></div>
-        {clearConfirm && <section className="panel" aria-label="Clear saved information"><h2>Clear this kitchen?</h2><p>{user ? 'This clears the current pantry and settings. Your online save stays unchanged until you choose Save online.' : 'This removes the pantry, budget and food settings saved in this browser.'}</p><div className="actions"><button className="button danger" onClick={clear}>Clear my information now</button><button className="button secondary" onClick={() => setClearConfirm(false)}>Keep my kitchen</button></div></section>}
+        <div className="guest-storage-note welcome-footnote"><span><IconDeviceFloppy size={16} aria-hidden="true" />{onlineOnly ? 'Account kitchen: choose Save online to keep changes. Unsaved changes are cleared when you leave or sign out.' : 'Saved on this device. Anyone using this browser can see your kitchen settings.'}</span><button className="text-button" onClick={() => setClearConfirm(true)}>{onlineOnly ? 'Clear current kitchen' : 'Clear my information'}</button></div>
+        {clearConfirm && <section className="panel" aria-label="Clear saved information"><h2>Clear this kitchen?</h2><p>{onlineOnly ? 'This clears the current pantry and settings. Your online save stays unchanged until you choose Save online.' : 'This removes the pantry, budget and food settings saved in this browser.'}</p><div className="actions"><button className="button danger" onClick={clear}>Clear my information now</button><button className="button secondary" onClick={() => setClearConfirm(false)}>Keep my kitchen</button></div></section>}
       </>}
       {notice && <p role="status" className="form-feedback kitchen-toast">{notice}</p>}{saveError && <p role="alert" className="form-feedback">{saveError}</p>}
     </main>
     <footer><span className="brand">Healthy Steps</span><p>More meals from what you have.</p><small>Meal ideas support everyday planning, not individualized medical care.</small></footer>
   </div>;
+}
+
+/**
+ * Loading an online save into a family planner must never drop the child's food limits: keep every
+ * allergy, diet rule and family member from the planner that is open, and add any from the save.
+ */
+export function keepHardLimits(current: HouseholdProfile, saved: HouseholdProfile): HouseholdProfile {
+  const merge = <T,>(a: T[] = [], b: T[] = []) => [...new Set([...a, ...b])];
+  const members = [...(current.members ?? [])];
+  for (const member of saved.members ?? []) if (!members.some(item => item.id === member.id)) members.push(member);
+  return { ...saved, allergies: merge(current.allergies, saved.allergies), dietaryRestrictions: merge(current.dietaryRestrictions, saved.dietaryRestrictions),
+    excludedIngredientIds: merge(current.excludedIngredientIds, saved.excludedIngredientIds), members };
 }
 
 /** What the family's own amounts can make: servings covered and how much of each food the meal uses. */

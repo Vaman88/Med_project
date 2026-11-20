@@ -19,7 +19,7 @@ function List({ items, empty }: { items: readonly string[] | undefined; empty: s
 export function ChildProfile({ family, onEdit, onResetChef, onBack, onDelete }: {
   family: Family;
   onEdit: (step: ProfileStep) => void;
-  /** Clears a custom chef name or look saved before the naming step was removed. */
+  /** Clears a custom chef look saved before every child became Chef Seedy. */
   onResetChef: () => void;
   onBack: () => void;
   onDelete: () => void;
@@ -48,7 +48,7 @@ export function ChildProfile({ family, onEdit, onResetChef, onBack, onDelete }: 
             <p>Age {family.age} · {shown} of {littleRecipes.length} dishes shown{hidden ? ` · ${hidden} hidden by food settings` : ""}</p>
             {hasCustomChef(family) && (
               <p className="cp-note">
-                This profile still has a chef name or look from before every child became Chef Seedy.{" "}
+                This profile still has a custom chef look from before every child became Chef Seedy.{" "}
                 <button type="button" className="text-button" onClick={onResetChef}>Reset chef to Seedy</button>
               </p>
             )}
@@ -72,7 +72,8 @@ export function ChildProfile({ family, onEdit, onResetChef, onBack, onDelete }: 
 
         {section("Family details", PROFILE_STEP.details, (
           <dl className="cp-facts">
-            <div><dt>Age</dt><dd>{family.age}</dd></div>
+            <div><dt>Grown-up’s first name</dt><dd>{family.parentName || "Not set"}</dd></div>
+            <div><dt>Child’s age</dt><dd>{family.age}</dd></div>
             <div><dt>Weekly grocery budget</dt><dd>{family.weeklyBudget !== undefined ? `$${family.weeklyBudget}` : "Not set"}</dd></div>
             <div><dt>People eating</dt><dd>{family.householdSize ?? "Not set"}</dd></div>
             <div><dt>Kitchen equipment</dt><dd><List items={family.equipment} empty="Not set" /></dd></div>

@@ -16,20 +16,24 @@ export function validChildAge(age: string): boolean {
 }
 
 /**
- * Chef fields to save from the setup wizard. Profiles saved before the naming step was removed keep
- * their nickname and look; new profiles get the default look and no nickname (shown as Chef Seedy).
+ * Chef fields to save from the setup wizard. The companion is always Chef Seedy, so a nickname from
+ * an older save is dropped; an older custom look is kept until a grown-up resets it.
  */
-export function keptChefFields(initial: Family | null): Pick<Family, "nickname" | "avatar"> {
-  return { nickname: initial?.nickname, avatar: initial?.avatar ?? { ...DEFAULT_AVATAR } };
+export function keptChefFields(initial: Family | null): Pick<Family, "avatar"> {
+  return { avatar: initial?.avatar ?? { ...DEFAULT_AVATAR } };
 }
 
-/** Whether an older profile still carries a custom chef name or look that a parent may clear. */
+/** Drops a chef nickname saved by an older version of the app. Returns the same object when there is none. */
+export function withoutLegacyNickname(family: Family): Family {
+  if (!("nickname" in family)) return family;
+  const { nickname: _nickname, ...rest } = family;
+  return rest;
+}
+
+/** Whether an older profile still carries a custom chef look that a parent may reset. */
 export function hasCustomChef(family: Family): boolean {
   const look = family.avatar;
-  return (
-    !!family.nickname?.trim() ||
-    (!!look && (look.skin !== DEFAULT_AVATAR.skin || look.hair !== DEFAULT_AVATAR.hair || look.apron !== DEFAULT_AVATAR.apron))
-  );
+  return !!look && (look.skin !== DEFAULT_AVATAR.skin || look.hair !== DEFAULT_AVATAR.hair || look.apron !== DEFAULT_AVATAR.apron);
 }
 
 /** Clears a legacy custom chef so the child gets the default companion, Chef Seedy. */

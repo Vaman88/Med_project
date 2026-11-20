@@ -5,9 +5,12 @@ import { ParentGate } from "./parent-gate";
 import { INACTIVITY_LOCK_MS } from "@/lib/parent-lock";
 import { LittleKitchen } from "./little-kitchen";
 import { ParentWizard } from "./parent-wizard";
-import { RoleChooser } from "./role-chooser";
+import { Onboarding } from "./onboarding";
+import { AccountChooser } from "./account-chooser";
 import { ChildProfile, type ProfileStep } from "./child-profile";
-import { resetChef } from "@/lib/family-setup";
+import { resetChef, withoutLegacyNickname } from "@/lib/family-setup";
+import { ONBOARDING_DRAFT_KEY } from "@/lib/onboarding";
+import { saveKitchenOnline } from "@/lib/kitchen-sync";
 import { CHILD_PROGRESS_KEY } from "@/lib/child-progress";
 import {
   FAMILY_KEY,
@@ -28,6 +31,8 @@ export function FoodApp() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [setupStep, setSetupStep] = useState<ProfileStep>(0);
   const [notice, setNotice] = useState("");
+  // True right after sign-up, so the account chooser says "You're all set" instead of "Welcome back".
+  const [justFinished, setJustFinished] = useState(false);
   // Parent PIN gate: a shared-device family control, not authentication (see README).
   const [unlocked, setUnlocked] = useState(false);
   const [gate, setGate] = useState<{ reason: string; then: () => void } | null>(null);
@@ -60,7 +65,12 @@ export function FoodApp() {
       const raw = localStorage.getItem(FAMILY_KEY);
       if (raw) {
         const saved = familySchema.safeParse(JSON.parse(raw));
-        if (saved.success) setFamily(saved.data);
+        if (saved.success) {
+          // The companion is always Chef Seedy: drop a chef name saved by an older version.
+          const current = withoutLegacyNickname(saved.data);
+          if (current !== saved.data) localStorage.setItem(FAMILY_KEY, JSON.stringify(current));
+          setFamily(current);
+        }
         else
           setNotice(
             "Your child profile could not be restored. Please set up the kitchen again.",
@@ -133,19 +143,30 @@ export function FoodApp() {
     setSetupStep(step);
     setSetup(true);
   }
+  /** End of sign-up: save everything, keep the parent area locked, and show the account chooser. */
+  function finishOnboarding(value: Family, accountUserId?: string) {
+    persist(value);
+    lock();
+    setRole(null);
+    setJustFinished(true);
+    window.scrollTo({ top: 0, behavior: "instant" });
+    if (accountUserId)
+      saveKitchenOnline(accountUserId, childPlannerSnapshot(value)).catch(() =>
+        setNotice("Your kitchen is saved on this device, but the online save did not work. Use Save online in the meal planner’s Account panel."),
+      );
+  }
   function chooseChild() {
     lock();
+    setJustFinished(false);
     setRole("child");
-    if (!family) setSetup(true);
   }
   function chooseAdult() {
-    // With a child profile saved, the planner holds the child's food settings: ask for the PIN.
-    if (family)
-      requireParent("open the meal planner and family settings", () => {
-        setRole("adult");
-        setParentArea(true);
-      });
-    else setRole("adult");
+    // The parent account holds the child's food settings: it always asks for the Parent PIN.
+    requireParent("open the meal planner and family settings", () => {
+      setJustFinished(false);
+      setRole("adult");
+      setParentArea(true);
+    });
   }
   function switchProfile() {
     lock();
@@ -155,12 +176,10 @@ export function FoodApp() {
     setProfileOpen(false);
   }
   function openSettings() {
-    if (family)
-      requireParent("open Parent settings", () => {
-        setRole("adult");
-        setParentArea(true);
-      });
-    else setSetup(true);
+    requireParent("open Parent settings", () => {
+      setRole("adult");
+      setParentArea(true);
+    });
   }
   function backToChildKitchen() {
     lock();
@@ -178,6 +197,7 @@ export function FoodApp() {
       localStorage.removeItem(CHILD_PLANNER_KEY);
       localStorage.removeItem(FAMILY_KEY);
       localStorage.removeItem(CHILD_PROGRESS_KEY);
+      localStorage.removeItem(ONBOARDING_DRAFT_KEY);
     } catch {
       setNotice(
         "Could not clear saved settings. Use your browser’s site-data settings.",
@@ -197,6 +217,18 @@ export function FoodApp() {
       <div className="little-loading" role="status">
         Opening your kitchen…
       </div>
+    );
+  // New visitors (and anyone whose profile was deleted) go through the one sign-up flow.
+  if (!family)
+    return (
+      <>
+        {notice && (
+          <p className="family-notice" role="status">
+            {notice}
+          </p>
+        )}
+        <Onboarding onFinish={finishOnboarding} />
+      </>
     );
   // Views that show or change the child's food settings, or can delete them, are parent-only.
   const parentView =
@@ -239,10 +271,11 @@ export function FoodApp() {
       {/* The screen behind the gate stays mounted but hidden, so an idle lock keeps unsaved edits. */}
       <div style={{ display: showGate ? "none" : "contents" }}>
       {!role && !setup ? (
-        <RoleChooser
-          hasChildProfile={!!family}
+        <AccountChooser
+          parentName={family.parentName}
+          justFinished={justFinished}
           onChild={chooseChild}
-          onAdult={chooseAdult}
+          onParent={chooseAdult}
         />
       ) : setup ? (
         <>
@@ -276,7 +309,7 @@ export function FoodApp() {
       ) : parentArea && family ? (
         <>
           <div className="family-entry parent-area-entry">
-            <span>Parent area · Meal planner</span>
+            <span>{family.parentName ? `Hi ${family.parentName} · ` : ""}Parent area · Meal planner</span>
             <div className="parent-area-actions">
               <button onClick={() => setProfileOpen(true)}>Child profile</button>
               <button onClick={backToChildKitchen}>Back to child kitchen</button>
@@ -302,16 +335,14 @@ export function FoodApp() {
           <div className="family-entry">
             <span>Adult meal planner</span>
             <div className="parent-area-actions">
-              <button onClick={openSettings}>
-                {family ? "Parent settings" : "Set up a child’s kitchen"}
-              </button>
+              <button onClick={openSettings}>Parent settings</button>
               <button onClick={switchProfile}>Switch profile</button>
             </div>
           </div>
           <GuestKitchen
-            key={family ? JSON.stringify(family) : "guest"}
-            storageKey={family ? CHILD_PLANNER_KEY : undefined}
-            initialKitchen={family ? childPlannerSnapshot(family) : undefined}
+            key={JSON.stringify(family)}
+            storageKey={CHILD_PLANNER_KEY}
+            initialKitchen={childPlannerSnapshot(family)}
           />
         </>
       )}

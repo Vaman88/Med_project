@@ -17,11 +17,11 @@ import { awardRecipe, childProgressSchema, emptyProgress, saveCreation } from ".
 
 const parfait = littleRecipes.find((r) => r.id === "parfait")!;
 
-test("chef names never repeat the title", () => {
-  assert.equal(chefTitle("Eli"), "Chef Eli");
-  assert.equal(chefTitle("Chef Eli"), "Chef Eli");
-  assert.equal(chefTitle("  chef   Eli "), "Chef Eli");
-  assert.equal(chefTitle("Chefa"), "Chef Chefa");
+test("the companion is always Chef Seedy, whatever an older save holds", () => {
+  assert.equal(chefTitle("Eli"), "Chef Seedy");
+  assert.equal(chefTitle("Chef Eli"), "Chef Seedy");
+  assert.equal(chefTitle("  chef   Eli "), "Chef Seedy");
+  assert.equal(chefTitle("Chefa"), "Chef Seedy");
   assert.equal(chefTitle(""), "Chef Seedy");
   assert.equal(chefTitle("   "), "Chef Seedy");
   assert.equal(chefTitle(undefined), "Chef Seedy");
@@ -34,7 +34,7 @@ test("saved profiles load with or without an old custom chef name", () => {
     allergyConfirmed: true, parentConfirmed: true,
   };
   const named = familySchema.parse({ ...base, nickname: "Eli" });
-  assert.equal(chefTitle(named.nickname), "Chef Eli");
+  assert.equal(chefTitle(named.nickname), "Chef Seedy");
   const unnamed = familySchema.parse(base);
   assert.equal(chefTitle(unnamed.nickname), "Chef Seedy");
   // New profiles are saved without a nickname at all.

@@ -19,7 +19,7 @@ import {
 } from "@/lib/family-setup";
 import { ChefAvatar } from "./chef-avatar";
 
-function PantryPicker({
+export function PantryPicker({
   selected,
   onChange,
 }: {
@@ -151,6 +151,7 @@ export function ParentWizard({
 }) {
   const [step, setStep] = useState(startStep);
   const [age, setAge] = useState(initial?.age.toString() ?? "");
+  const [parentName, setParentName] = useState(initial?.parentName ?? "");
   // Every child gets the chef companion automatically; there is no naming or look step.
   const chef = keptChefFields(initial);
   const [pantry, setPantry] = useState<Family["pantry"]>(initial?.pantry ?? []);
@@ -238,7 +239,8 @@ export function ParentWizard({
     const parsed = familySchema.safeParse({
       version: 1,
       age: Number(age),
-      // No naming step any more: an older saved nickname and look are kept, otherwise Chef Seedy.
+      ...(parentName.trim() ? { parentName: parentName.trim() } : {}),
+      // The companion is always Chef Seedy: there is no chef name, only an older saved look.
       ...chef,
       pantry,
       allergies,
@@ -308,10 +310,10 @@ export function ParentWizard({
       <main className="wizard-shell">
         <aside className="wizard-intro">
           <span className="little-kicker">For grown-ups</span>
-          <h1>Let’s make room for a little chef.</h1>
+          <h1>Your family’s kitchen settings.</h1>
           <p>
-            Three short steps help us choose playful recipes from the foods and
-            equipment your family has.
+            Change the pantry, foods to avoid and family details you gave at
+            sign-up. Playful recipes come from these foods and equipment.
           </p>
           <div className="wizard-chef-preview">
             <ChefAvatar avatar={chef.avatar!} />
@@ -337,7 +339,7 @@ export function ParentWizard({
           {step === PROFILE_STEP.pantry && (
             <fieldset>
               <legend>What’s in your pantry?</legend>
-              <p>Add foods you have today. You can change these later.</p>
+              <p>The foods you have at home today.</p>
               <PantryPicker selected={pantry} onChange={setPantry} />
             </fieldset>
           )}
@@ -427,6 +429,15 @@ export function ParentWizard({
           )}
           {step === last && (
             <div className="wizard-fields">
+              <label>
+                Your first name (optional)
+                <input
+                  value={parentName}
+                  maxLength={40}
+                  autoComplete="given-name"
+                  onChange={(e) => setParentName(e.target.value)}
+                />
+              </label>
               <label>
                 Child’s age
                 <input

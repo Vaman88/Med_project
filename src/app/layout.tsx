@@ -16,6 +16,7 @@ import "./adult-planner.css";
 import "./role-chooser.css";
 import "./cloud-account.css";
 import "./theme-refresh.css";
+import "./onboarding.css";
 import { FoodDefsHost } from "@/components/food-art";
 const kitchenFont = localFont({
   src: [

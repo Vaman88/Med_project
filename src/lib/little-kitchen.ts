@@ -98,6 +98,9 @@ export const familySchema = z
     otherAllergies: z.string().trim().max(200),
     allergyConfirmed: z.literal(true),
     parentConfirmed: z.literal(true),
+    /** Grown-up's first name, asked during sign-up and used to greet them. Optional for older saves. */
+    parentName: z.string().trim().min(1).max(40).optional(),
+    /** Legacy: a chef name from before every child became Chef Seedy. Accepted on load, never shown or saved. */
     nickname: z.string().trim().min(1).max(20).optional(),
     avatar: z
       .object({
