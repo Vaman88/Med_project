@@ -54,6 +54,10 @@ export interface DragHandlers {
  * buttons inside it bubble up too), follows the drag on the window so it keeps
  * working when the finger leaves the stage, and reports whether it moved more
  * than 8 CSS px (below that it is a tap).
+ *
+ * A drag may also start in the empty band around the stage: on a small phone a
+ * tall food nearly fills the frame, and a child's downward swipe often begins just
+ * above it. Out there only drags count; a plain tap does nothing.
  */
 export function useStageDrag(host: GestureHost, handlers: DragHandlers) {
   const h = useLatest(handlers);
@@ -83,7 +87,13 @@ export function useStageDrag(host: GestureHost, handlers: DragHandlers) {
     };
     const onDown = (e: PointerEvent) => {
       if (active || e.button > 0) return;
-      const hot = !!(e.target as Element | null)?.closest?.(".ck-hot");
+      const target = e.target as Element | null;
+      const outside = !target || !stage.contains(target);
+      // Seedy and any other button beside the stage keep their own taps.
+      if (outside && target?.closest?.("button, a, input")) return;
+      // A start outside the stage is treated like a start on a labelled spot: it can
+      // become a drag, but it is never a tap on the food.
+      const hot = outside || !!target?.closest?.(".ck-hot");
       if (h.current.down(e, hostRef.current.toSvg(e), hot) === false) return;
       active = { id: e.pointerId, x: e.clientX, y: e.clientY, moved: false, hot };
       window.addEventListener("pointermove", onMove);
@@ -95,11 +105,12 @@ export function useStageDrag(host: GestureHost, handlers: DragHandlers) {
       h.current.hover?.(hostRef.current.toSvg(e));
     };
     const onLeave = (e: PointerEvent) => { if (!active && e.pointerType === "mouse") h.current.hover?.(null); };
-    stage.addEventListener("pointerdown", onDown);
+    const zone = stage.parentElement ?? stage;
+    zone.addEventListener("pointerdown", onDown);
     stage.addEventListener("pointermove", onHover);
     stage.addEventListener("pointerleave", onLeave);
     return () => {
-      stage.removeEventListener("pointerdown", onDown);
+      zone.removeEventListener("pointerdown", onDown);
       stage.removeEventListener("pointermove", onHover);
       stage.removeEventListener("pointerleave", onLeave);
       window.removeEventListener("pointermove", onMove);

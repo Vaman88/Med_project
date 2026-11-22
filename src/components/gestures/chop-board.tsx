@@ -79,7 +79,7 @@ export function ChopBoard({ step, dish, host, handleRef, onCut }: {
   const view = host.view;
   // At rest the knife lies on the board below the food, handle to the right, fully in
   // view on a 360px phone as well as on a wide screen.
-  const rest = { x: Math.min(view.x + view.w - 24, 646) - 196, y: Math.min(layout.bottom + 38, 386), rot: 84 };
+  const rest = { x: Math.min(view.x + view.w - 24, 646) - 196, y: Math.min(layout.bottom + 38, 408), rot: 84 };
 
   const shadowRef = useRef<SVGEllipseElement>(null);
   const place = (x: number, y: number, rot = 0, resting = false) => {

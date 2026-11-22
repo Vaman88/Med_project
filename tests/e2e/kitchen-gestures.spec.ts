@@ -194,6 +194,32 @@ test("tap-only for the youngest chefs: a tap anywhere chops, presses snap to lum
   await page.screenshot({ path: info.outputPath("tap-only-chopped.png") });
 });
 
+test("a swipe that starts just above the dish frame still chops a tall food", async ({ page }, info) => {
+  // Only phones have an empty band around the dish; on a wide screen the food has room inside the frame.
+  test.skip(!info.project.use.hasTouch, "The band around the dish exists on phones.");
+  await seedFamily(page);
+  await start(page, "Cozy tomato pasta");
+  await playUntil(page, "cut");
+  await expect(stepTitle(page)).toHaveText("Dice the tomato");
+  const marks = page.getByRole("button", { name: /Cut mark/ });
+  await expect(marks).toHaveCount(2);
+  const line = page.locator(".ck-chop-guide").first();
+  const x = Number(await line.getAttribute("x1")), y2 = Number(await line.getAttribute("y2"));
+  const frame = (await page.locator(".ck-stage").boundingBox())!;
+  const viewTop = Number((await page.locator(".ck-gesture-layer").getAttribute("viewBox"))!.split(/\s+/)[1]);
+  // 16 CSS px above the frame, in the empty band between the instruction and the dish.
+  const above = viewTop - (16 * Number((await page.locator(".ck-gesture-layer").getAttribute("viewBox"))!.split(/\s+/)[2])) / frame.width;
+  await drag(page, info, Array.from({ length: 10 }, (_, i) => ({ x: x + 4, y: above + ((y2 - above) * i) / 9 })));
+  await expect(marks).toHaveCount(1);
+  // A plain tap out there does nothing: no cut and no nudge.
+  const p = await toPage(page, x + 120, above);
+  await page.mouse.click(p.x, p.y);
+  await page.waitForTimeout(300);
+  await expect(marks).toHaveCount(1);
+  await expect(page.locator(".ck-hint")).toHaveCount(0);
+  await page.screenshot({ path: info.outputPath("tomato-one-cut.png") });
+});
+
 test("swiping does not scroll the page and the console stays clean", async ({ page }, info) => {
   const errors: string[] = [];
   page.on("console", (m) => { if (m.type() === "error") errors.push(m.text()); });

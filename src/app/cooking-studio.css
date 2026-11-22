@@ -596,6 +596,8 @@
 
 /* ---- Gestures: chop, mash and whisk (src/components/gestures) ---------------- */
 .ck-gesture-layer { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+/* A swipe may start in the band around the dish, so that band must not scroll the page either. */
+.ck-app[data-step-kind="cut"] .ck-stage-wrap, .ck-app[data-step-kind="mash"] .ck-stage-wrap, .ck-app[data-step-kind="stir"] .ck-stage-wrap { touch-action: none; }
 /* The tool follows a mouse pointer, so the arrow cursor is hidden over the dish. */
 .ck-app[data-step-kind="cut"] .ck-stage, .ck-app[data-step-kind="mash"] .ck-stage, .ck-app[data-step-kind="stir"] .ck-stage { cursor: none; }
 .ck-app[data-step-kind="cut"] .ck-hot.marker { cursor: pointer; }
