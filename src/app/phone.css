@@ -22,6 +22,19 @@
   .kitchen-app .header-settings { min-width: 44px; min-height: 44px; justify-content: center; }
 }
 
+/* ---------- Sign-up, settings wizard and child profile: 44px taps ---------- */
+@media (max-width: 940px), (pointer: coarse) {
+  /* Remove (x) buttons on picked-food chips: a full 44px target, tucked into the chip's padding. */
+  .pantry-selected > span { padding-block: 0; padding-right: 0; }
+  .pantry-selected button { width: 44px; height: 44px; background: transparent; }
+  .ob-tags li { padding-block: 0; padding-right: 0; }
+  .ob-tags button { width: 44px; height: 44px; }
+  /* Allergy and diet checkbox rows: the whole row is the label, at least 44px tall. */
+  .wizard-check-grid label, .wizard-card .wizard-confirm { min-height: 44px; }
+  .cp-app .cp-section-head button { min-height: 44px; }
+  .ob-link { min-height: 44px; }
+}
+
 /* ---------- Every form field: 16px text on phones so iOS does not zoom into it ---------- */
 @media (max-width: 940px) {
   html body :is(input:not([type=checkbox]):not([type=radio]):not([type=range]), select, textarea):not(.budget-fields input, .ob-field input, .ob-add input) {
