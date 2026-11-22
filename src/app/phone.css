@@ -63,3 +63,15 @@
   .kitchen-app .recipe-topline > span:first-child { font-size: 12px; }
   .guest-storage-note .text-button { font-size: 13px; }
 }
+
+/* ---------- Kids' cooking studio ---------- */
+@media (max-width: 650px) {
+  /* Long dish names wrap to two lines instead of being cut off ("Banana berry yogurt par…"). */
+  .ck-app .ck-title {
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2;
+    white-space: normal; font-size: 16px; line-height: 1.15; overflow-wrap: anywhere;
+  }
+}
+@media (max-width: 940px), (pointer: coarse) {
+  .ck-app .ck-link { display: inline-flex; align-items: center; min-height: 44px; padding-inline: 6px; }
+}
