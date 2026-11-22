@@ -11,3 +11,21 @@ test-results/
 # Third-party game screenshots used only for design study; kept locally, not redistributed.
 docs/references/cooking-game/*.jpg
 docs/references/cooking-game/*.png
+
+# Keep the repository light: no recordings, audit screenshots, reports or logs.
+# (.env.local and every other .env file except .env.example are ignored above.)
+*.mp4
+*.mov
+*.webm
+*.log
+docs/demo/
+docs/**/*-audit/
+docs/**/*.png
+docs/**/*.jpg
+docs/**/*.jpeg
+docs/**/*.webp
+lighthouse*.json
+blob-report/
+playwright/.cache/
+coverage/
+screenshots/
