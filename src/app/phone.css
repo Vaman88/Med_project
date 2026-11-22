@@ -53,7 +53,7 @@
   .kitchen-app .chip-button { min-height: 44px; }
   .kitchen-app .library-close { width: 44px; height: 44px; }
 }
-@media (max-width: 650px) {
+@media (max-width: 940px) {
   .kitchen-app .eyebrow,
   .kitchen-app .welcome-card-meta,
   .kitchen-app .library-card-meta,
@@ -74,4 +74,23 @@
 }
 @media (max-width: 940px), (pointer: coarse) {
   .ck-app .ck-link { display: inline-flex; align-items: center; min-height: 44px; padding-inline: 6px; }
+}
+/* Landscape phones: the quiz sits in the narrow right-hand column, so use the narrow-phone
+   layout (Sprig peeks over the card) instead of Sprig beside the card, which ran off screen. */
+@media (max-height: 560px) and (min-aspect-ratio: 5/4) {
+  .ck-app .ck-quiz.ck-quiz-pop { grid-template-columns: minmax(0, 1fr); padding-top: 58px; position: relative; }
+  .ck-app .ck-quiz-pop .ck-quiz-sprig { position: absolute; left: 4px; top: 0; margin: 0; --sprig-size: 80px !important; }
+  .ck-app .ck-quiz-card { padding: 12px 12px 10px; }
+  .ck-app .ck-quiz-card::before { left: 30px; top: -12px; bottom: auto; transform: rotate(135deg); }
+  .ck-app .ck-quiz-who { padding-left: 72px; }
+  .ck-app .ck-quiz-card .ck-question { font-size: 17px; }
+  .ck-app .ck-quiz-card .ck-answers { gap: 8px; }
+}
+
+/* ---------- Landscape phones and other short screens ---------- */
+@media (max-height: 500px) {
+  /* A pinned header would cover over a third of a 360px-tall screen: let it scroll away. */
+  .kitchen-app .header { position: static; }
+  /* The recipe photo no longer fills the whole dialog; the recipe starts on the first screen. */
+  .kitchen-app .library-dialog-photo img { max-height: 45dvh; width: 100%; object-fit: cover; }
 }
