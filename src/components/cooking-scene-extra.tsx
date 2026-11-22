@@ -160,7 +160,7 @@ function ExtraBowl({ recipe, plan, dish, step, fx, presenting }: P) {
         })}
       </BowlShell>
       <Steam on={oatmeal && presenting === true} at={[{ x: 340, y: 150 }, { x: 410, y: 130 }, { x: 470, y: 156 }]} />
-      {(stirring || (!oatmeal && stir && (dish.stir[stir.id] ?? 0) > 0 && !presenting)) && !presenting && <StirSpoon angle={angle} />}
+      {!stirring && !oatmeal && stir && (dish.stir[stir.id] ?? 0) > 0 && !presenting && <StirSpoon angle={angle} />}
     </g>
   );
 }
@@ -431,7 +431,6 @@ function PotMeal({ recipe, plan, dish, step, fx, presenting }: P) {
   const poured = dish.poured[oat ? "pour-milk" : pasta ? "pour-sauce" : "pour-soy"] ?? false;
   const items = dish.drops.filter((d) => d.zone === "pan");
   const glow = fx.cooking && !presenting;
-  const stirring = step?.kind === "stir";
   const center = { x: PAN.cx, y: PAN.cy };
   const waterAlpha = pasta ? 1 - ease(Math.max(0, (heat - 0.82) / 0.18)) : 0;
   const pastaDrop = items.find((d) => d.asset === "pasta:pile");
@@ -502,11 +501,7 @@ function PotMeal({ recipe, plan, dish, step, fx, presenting }: P) {
         );
       })}
       <PourFx fx={fx} presenting={presenting} />
-      {stirring && !presenting && (
-        <g style={{ transformOrigin: `${PAN.cx}px ${PAN.cy}px`, transform: `rotate(${angle}deg)`, transition: fx.stirAngle === null ? "transform 360ms ease-out" : "none" }}>
-          <g transform={`translate(${PAN.cx + 96} ${PAN.cy}) rotate(86)`}><Spoon /></g>
-        </g>
-      )}
+      {/* While stirring, the spoon follows the child's finger (see gestures/whisk-bowl). */}
       <Steam on={glow === true || (presenting === true && (oat || pasta))} at={[{ x: 330, y: 150 }, { x: 410, y: 130 }, { x: 480, y: 156 }]} />
     </g>
   );

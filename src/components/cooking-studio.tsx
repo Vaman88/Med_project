@@ -18,11 +18,15 @@ import {
   type AssetKey, type DishState, type Step,
 } from "@/lib/cooking";
 import {
-  BOARD, BOARD_FOOD, BOWL, GLASS, PAN, PITA, PLATE, viewFor,
-  angleBetween, angleDelta, cutLength, cutPositions, glassSurfaceY, paintAt, paintNext,
+  BOARD, BOWL, GLASS, PAN, PITA, PLATE, viewFor,
+  glassSurfaceY, paintAt, paintNext,
   type Point, type Surface, type ViewBox,
 } from "@/lib/cooking-geometry";
-import { SOUND_KEY, playSound, type SoundName } from "@/lib/sound";
+import { SOUND_KEY, playSound, type SoundName, type SoundOptions } from "@/lib/sound";
+import { ChopBoard, chopLayout } from "./gestures/chop-board";
+import { MashBowl, mashLumps } from "./gestures/mash-bowl";
+import { WhiskBowl, stirTool } from "./gestures/whisk-bowl";
+import type { GestureHandle, GestureHost } from "./gestures/host";
 import { AssetIcon, ASSET_LABEL } from "./food-art";
 import { CookingScene, noFx, ToolIcon, type Fx } from "./cooking-scene";
 import { InteractiveSprig, Sprig, sprigGrowth, type SprigMood } from "./sprig";
@@ -30,7 +34,8 @@ import { InteractiveSprig, Sprig, sprigGrowth, type SprigMood } from "./sprig";
 type Rect = { x: number; y: number; w: number; h: number };
 type Hotspot = {
   id: string; label: string; rect: Rect; round?: boolean; marker?: string;
-  onActivate: (point: Point | null) => void;
+  /** `viaPointer` is false when the button is pressed from the keyboard. */
+  onActivate: (point: Point | null, viaPointer?: boolean) => void;
 };
 const SPEED = { settle: 700, scoop: 1000, pour: 1300, advance: 950 };
 /** How far above a fingertip dragged food is held on touch screens, in CSS pixels. */
@@ -139,7 +144,9 @@ export function CookingStudio({
   const stageRef = useRef<HTMLDivElement>(null);
   const lockUntil = useRef(0);
   const timers = useRef<number[]>([]);
-  const gesture = useRef<{ last: Point; moved: boolean; client: Point; stirAngle?: number; pushed: boolean } | null>(null);
+  const gesture = useRef<{ moved: boolean; client: Point; pushed: boolean } | null>(null);
+  /** The active chop, mash or whisk gesture; labelled hotspots call into it. */
+  const gestureRef = useRef<GestureHandle | null>(null);
   const suppressClick = useRef(false);
   const fxKey = useRef(1);
   const completed = useRef(false);
@@ -195,7 +202,7 @@ export function CookingStudio({
     const id = window.setTimeout(fn, reduced ? Math.min(ms, 60) : ms);
     timers.current.push(id);
   }, [reduced]);
-  const say = useCallback((name: SoundName) => { if (sound) playSound(name); }, [sound]);
+  const say = useCallback((name: SoundName, opts?: SoundOptions) => { if (sound) playSound(name, opts); }, [sound]);
   const patchFx = useCallback((patch: Partial<Fx>) => setFx((f) => ({ ...f, ...patch })), []);
 
   /** Apply a change to the dish, remembering the previous one so it can be undone. */
@@ -320,50 +327,17 @@ export function CookingStudio({
     later(() => { commit((d) => doPour(d, s)); say("plop"); }, 760);
     later(() => patchFx({ spoon: null }), SPEED.pour);
   }
-  function chopAt(i: number, x: number) {
-    if (!step || step.kind !== "cut") return;
-    const before = dishRef.current;
-    if (before.cuts[step.id]?.includes(i)) return;
-    patchFx({ knife: { x, y: 150, down: true } });
-    commit((d) => doCut(d, step, i));
-    say("chop");
-    later(() => patchFx({ knife: null }), 360);
-  }
-  function tapMarker(i: number) {
-    if (!step || locked()) return;
-    if (step.kind === "cut") {
-      const x = cutPositions(step.cuts, cutLength(step.food))[i];
-      patchFx({ knife: { x, y: 150, down: false } });
-      later(() => chopAt(i, x), 130);
-    } else if (step.kind === "mash") {
-      const x = spotX(step, i);
-      if (dishRef.current.mash[step.id]?.includes(i)) return;
-      patchFx({ masher: { x, y: 196, down: false } });
-      later(() => patchFx({ masher: { x, y: 196, down: true } }), 60);
-      later(() => { commit((d) => doMash(d, step, i)); say("mash"); }, 240);
-      later(() => patchFx({ masher: null }), 520);
-    }
-  }
-  const spotX = (s: Extract<Step, { kind: "mash" }>, i: number) => {
-    const len = cutLength(s.food);
-    return BOARD_FOOD.cx - len / 2 + (len * (i + 0.5)) / s.spots;
-  };
-
   // ---- gestures on the work surface ---------------------------------------
+  // Chopping, mashing and whisking live in ./gestures; spreading stays here.
   function stageDown(e: ReactPointerEvent<HTMLDivElement>) {
-    if (!step || locked() || e.button > 0) return;
-    if (!["cut", "mash", "spread", "stir"].includes(step.kind)) return;
-    const start = toSvg(e);
-    gesture.current = {
-      last: start, moved: false, client: { x: e.clientX, y: e.clientY }, pushed: false,
-      stirAngle: step.kind === "stir" ? angleBetween({ x: BOWL.cx, y: BOWL.cy }, start) : undefined,
-    };
+    if (!step || locked() || e.button > 0 || step.kind !== "spread") return;
+    gesture.current = { moved: false, client: { x: e.clientX, y: e.clientY }, pushed: false };
     const move = (ev: PointerEvent) => {
       const g = gesture.current;
       if (!g) return;
       if (Math.hypot(ev.clientX - g.client.x, ev.clientY - g.client.y) > 8) g.moved = true;
       if (!g.moved) return;
-      stageMove(toSvg(ev), g);
+      spreadMove(toSvg(ev), g);
     };
     const up = () => {
       window.removeEventListener("pointermove", move);
@@ -371,49 +345,64 @@ export function CookingStudio({
       window.removeEventListener("pointercancel", up);
       const g = gesture.current;
       gesture.current = null;
-      if (g?.moved) {
-        suppressClick.current = true;
-        window.setTimeout(() => { suppressClick.current = false; }, 60);
-      }
-      setFx((f) => ({ ...f, pointer: null, stirAngle: null, knife: f.knife && !f.knife.down ? null : f.knife }));
+      if (g?.moved) markDragged();
+      setFx((f) => ({ ...f, pointer: null }));
     };
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", up);
     window.addEventListener("pointercancel", up);
   }
-  function stageMove(p: Point, g: NonNullable<typeof gesture.current>) {
-    if (!step) return;
-    const prev = g.last;
-    g.last = p;
-    if (step.kind === "cut") {
-      const band = p.y > 190 && p.y < 340;
-      patchFx({ knife: { x: Math.max(150, Math.min(650, p.x)), y: 150, down: band } });
-      if (!band) return;
-      cutPositions(step.cuts, cutLength(step.food)).forEach((x, i) => {
-        if (Math.min(prev.x, p.x) - 6 <= x && Math.max(prev.x, p.x) + 6 >= x) chopAt(i, x);
-      });
-    } else if (step.kind === "mash") {
-      for (let i = 0; i < step.spots; i++)
-        if (Math.hypot(p.x - spotX(step, i), p.y - BOARD_FOOD.cy) < 46) { tapMarker(i); break; }
-    } else if (step.kind === "spread") {
-      patchFx({ pointer: p });
-      const s = step;
-      const first = !g.pushed;
-      g.pushed = true;
-      commit((d) => doPaint(d, s, paintAt(d.paint[s.id] ?? [], p, s.medium === "sauce" ? 40 : 34)), !first);
-      if (Math.random() < 0.12) say("stir");
-    } else if (step.kind === "stir") {
-      const a = angleBetween({ x: BOWL.cx, y: BOWL.cy }, p);
-      if (Math.hypot(p.x - BOWL.cx, p.y - BOWL.cy) < 28) return;
-      const delta = Math.abs(angleDelta(g.stirAngle ?? a, a));
-      g.stirAngle = a;
-      const s = step;
-      const first = !g.pushed;
-      g.pushed = true;
-      commit((d) => doStir(d, s, Math.min(delta, 40)), !first);
-      patchFx({ stirAngle: (dishRef.current.stir[s.id] ?? 0) + delta });
-      if (Math.random() < 0.15) say("stir");
-    }
+  function spreadMove(p: Point, g: NonNullable<typeof gesture.current>) {
+    if (!step || step.kind !== "spread") return;
+    patchFx({ pointer: p });
+    const s = step;
+    const first = !g.pushed;
+    g.pushed = true;
+    commit((d) => doPaint(d, s, paintAt(d.paint[s.id] ?? [], p, s.medium === "sauce" ? 40 : 34)), !first);
+    if (Math.random() < 0.12) say("stir");
+  }
+  /** A drag just ended: the click that follows it must not count as a tap. */
+  function markDragged() {
+    suppressClick.current = true;
+    window.setTimeout(() => { suppressClick.current = false; }, 60);
+  }
+
+  // ---- chop, mash and whisk gestures ----------------------------------------
+  // The youngest chefs (5 and 6) get tap-only actions: no dragging needed anywhere.
+  const tapOnly = chefAge <= 6;
+  const gestureHost: GestureHost = {
+    stageRef, view, toSvg, locked, reduced, tapOnly,
+    sound: say,
+    nudge: (text) => { toast(text); say("nudge"); },
+    dragged: markDragged,
+  };
+  // How to do the current gesture, in Seedy's words (the recipe's step data is unchanged).
+  const stirWhere = surface === "pan" ? "pan" : "bowl";
+  const hintText = !step ? "" : step.kind === "cut"
+    ? (tapOnly ? "Tap the food, or tap a number, and the knife chops for you. Each cut makes a new piece."
+      : "Swipe the knife down through each dashed line, or tap a number. Each cut makes a new piece.") + " Ask a grown-up to help with real knives."
+    : step.kind === "mash"
+      ? (tapOnly ? "Tap the lumps to squash them. Keep going until the bar says Smooth!"
+        : "Press the masher on the lumps, or hold it down and scrub. Keep going until the bar says Smooth!")
+      : step.kind === "stir"
+        ? (tapOnly ? `Press and hold the ${stirWhere} and it stirs by itself. Tapping stirs a little, too.`
+          : `Draw circles in the ${stirWhere} to mix it. You can also press and hold, or tap to stir a quarter turn at a time.`)
+        : step.hint;
+  function onCut(i: number) {
+    if (!step || step.kind !== "cut" || dishRef.current.cuts[step.id]?.includes(i)) return;
+    const s = step;
+    commit((d) => doCut(d, s, i));
+    say("chop", { food: s.food });
+  }
+  function onMash(i: number) {
+    if (!step || step.kind !== "mash") return;
+    const s = step;
+    commit((d) => doMash(d, s, i));
+  }
+  function onStir(degrees: number, merge: boolean) {
+    if (!step || step.kind !== "stir") return;
+    const s = step;
+    commit((d) => doStir(d, s, Math.min(degrees, 40)), merge);
   }
 
   function activateStage(point: Point | null) {
@@ -425,7 +414,7 @@ export function CookingStudio({
     } else if (step.kind === "stir") {
       const s = step;
       commit((d) => doStir(d, s, 90));
-      say("stir");
+      say("stir", { speed: 0.6 });
     }
   }
   function zoneClick(e: ReactMouseEvent) {
@@ -480,7 +469,7 @@ export function CookingStudio({
     if (locked() || cooking) return;
     setHist((h) => (h.past.length ? { dish: h.past[h.past.length - 1], past: h.past.slice(0, -1) } : h));
     setSelected(null);
-    setFx((f) => ({ ...f, knife: null, masher: null, spoon: null }));
+    setFx((f) => ({ ...f, spoon: null }));
     say("pick");
   }
   function startOver() {
@@ -499,7 +488,7 @@ export function CookingStudio({
   function readStep() {
     if (!step || !("speechSynthesis" in window)) return;
     window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(`${step.title}. ${step.hint}`);
+    const u = new SpeechSynthesisUtterance(`${step.title}. ${hintText}`);
     u.rate = 0.9;
     window.speechSynthesis.speak(u);
   }
@@ -522,16 +511,16 @@ export function CookingStudio({
         rect: zoneRect(target), round: target === "bowl" || target === "pita", onActivate: () => undefined,
       });
     } else if (step.kind === "cut") {
-      cutPositions(step.cuts, cutLength(step.food)).forEach((x, i) => {
-        if (dish.cuts[step.id]?.includes(i)) return;
-        hotspots.push({ id: `cut-${i}`, label: `Cut mark ${i + 1} of ${step.cuts}`, rect: { x: x - 38, y: 120, w: 76, h: 76 }, round: true, marker: String(i + 1), onActivate: () => tapMarker(i) });
+      // One labelled button per uncut line, just above the food (tap and keyboard route).
+      const lay = chopLayout(step, dish);
+      lay.guides.forEach(({ index: i, x }) => {
+        hotspots.push({ id: `cut-${i}`, label: `Cut mark ${i + 1} of ${step.cuts}`, rect: { x: x - 38, y: Math.max(view.y + 6, Math.min(120, lay.top - 88)), w: 76, h: 76 }, round: true, marker: String(i + 1), onActivate: (_p, via) => gestureRef.current?.tap(i, !!via) });
       });
     } else if (step.kind === "mash") {
-      for (let i = 0; i < step.spots; i++) {
-        if (dish.mash[step.id]?.includes(i)) continue;
-        const x = spotX(step, i);
-        hotspots.push({ id: `mash-${i}`, label: `Mash spot ${i + 1} of ${step.spots}`, rect: { x: x - 38, y: BOARD_FOOD.cy - 38, w: 76, h: 76 }, round: true, marker: "●", onActivate: () => tapMarker(i) });
-      }
+      mashLumps(step).forEach((at, i) => {
+        if (dish.mash[step.id]?.includes(i)) return;
+        hotspots.push({ id: `mash-${i}`, label: `Mash spot ${i + 1} of ${step.spots}`, rect: { x: at.x - 38, y: at.y - 38, w: 76, h: 76 }, round: true, marker: "", onActivate: (_p, via) => gestureRef.current?.tap(i, !!via) });
+      });
     } else if (step.kind === "spread") {
       hotspots.push({ id: "spread", label: step.medium === "sauce" ? "Spread sauce on the pizza" : step.medium === "cheese" ? "Sprinkle cheese on the pizza" : step.title, rect: zoneRect("pita"), round: true, onActivate: () => undefined });
     } else if (step.kind === "stir") {
@@ -560,10 +549,10 @@ export function CookingStudio({
   const offLimits = new Set(step && step.kind === "drop" ? step.items.filter((i) => i.allergen && avoid.includes(i.allergen)).map((i) => i.asset) : []);
   const tray = step ? trayItems(step, dish).filter((i) => i.left > 0 && !offLimits.has(i.asset)) : [];
   const requiredLeft = step && step.kind === "drop" ? !stepDone(step, dish) : true;
-  const toolFor: Record<string, "knife" | "masher" | "spoon" | "spatula" | undefined> = {
-    cut: "knife", mash: "masher", spread: "spoon", stir: "spoon", flip: "spatula",
+  const toolFor: Record<string, "knife" | "masher" | "spoon" | "spatula" | "whisk" | undefined> = {
+    cut: "knife", mash: "masher", spread: "spoon", stir: stirTool(recipe.id, surface), flip: "spatula",
   };
-  const toolName = { knife: "Knife", masher: "Masher", spoon: "Spoon", spatula: "Spatula" } as const;
+  const toolName = { knife: "Knife", masher: "Masher", spoon: "Spoon", spatula: "Spatula", whisk: "Whisk" } as const;
   const hasPast = hist.past.length > 0 && !cooking && !advancing;
   const heatNow = step?.kind === "cook" ? dish.heat[step.id] ?? 0 : 0;
   const stageClass = `ck-stage${step && ["cut", "mash", "spread", "stir"].includes(step.kind) ? " ck-gesture" : ""}`;
@@ -615,7 +604,7 @@ export function CookingStudio({
           </div>
           {(hintOpen || nudge) && (
             <p className="ck-hint">
-              {nudge || step?.hint}
+              {nudge || hintText}
               {hintOpen && !nudge && <button type="button" className="ck-link" onClick={readStep}>Read it to me</button>}
             </p>
           )}
@@ -623,10 +612,13 @@ export function CookingStudio({
         <div className="ck-stage-wrap">
           {/* Sprig stands right beside the dish on larger screens (big, never over the food). */}
           {!question && <InteractiveSprig className="ck-dish-sprig ck-dish-sprig-side" mood={sprigMood} dishes={sprigDishes} size={190} />}
-          <div ref={stageRef} className={stageClass} style={{ aspectRatio: ar, "--ar": ar } as React.CSSProperties} onPointerDown={stageDown} data-armed={selected ? "true" : undefined}>
+          <div ref={stageRef} className={stageClass} style={{ aspectRatio: ar, "--ar": ar } as React.CSSProperties} onPointerDown={stageDown} data-armed={selected ? "true" : undefined} data-tap-only={tapOnly ? "true" : undefined}>
             <div className="ck-scene-fade" key={surface}>
               <CookingScene recipe={recipe} plan={plan} dish={dish} step={step} surface={surface} fx={fx} view={view} />
             </div>
+            {step?.kind === "cut" && <ChopBoard key={step.id} step={step} dish={dish} host={gestureHost} handleRef={gestureRef} onCut={onCut} />}
+            {step?.kind === "mash" && <MashBowl key={step.id} step={step} dish={dish} host={gestureHost} handleRef={gestureRef} onMash={onMash} />}
+            {step?.kind === "stir" && <WhiskBowl key={step.id} step={step} dish={dish} host={gestureHost} handleRef={gestureRef} recipeId={recipe.id} surface={surface} onStir={onStir} />}
             {!paused && !advancing && hotspots.map((h) => (
               <button
                 key={h.id}
@@ -640,7 +632,7 @@ export function CookingStudio({
                 onClick={(e) => {
                   if (suppressClick.current) return;
                   if (h.id === "zone" || h.id === "spread" || h.id === "stir") zoneClick(e);
-                  else h.onActivate(null);
+                  else h.onActivate(null, e.detail > 0);
                 }}
               >
                 {h.marker && <span aria-hidden="true">{h.marker}</span>}

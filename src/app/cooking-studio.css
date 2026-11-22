@@ -593,3 +593,48 @@
 @media (max-height: 560px) and (min-aspect-ratio: 5/4) {
   .ck-app .ck-dish-sprig-tray { --sprig-size: 88px; margin-top: 0; }
 }
+
+/* ---- Gestures: chop, mash and whisk (src/components/gestures) ---------------- */
+.ck-gesture-layer { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+/* The tool follows a mouse pointer, so the arrow cursor is hidden over the dish. */
+.ck-app[data-step-kind="cut"] .ck-stage, .ck-app[data-step-kind="mash"] .ck-stage, .ck-app[data-step-kind="stir"] .ck-stage { cursor: none; }
+.ck-app[data-step-kind="cut"] .ck-hot.marker { cursor: pointer; }
+.ck-chop-guide { stroke: transparent; stroke-width: 10; stroke-linecap: round; transition: stroke 120ms ease; }
+.ck-chop-guide.near { stroke: rgb(73 201 138 / 60%); }
+.ck-chop-trail { fill: none; stroke: #fff; stroke-width: 10; stroke-linecap: round; stroke-linejoin: round; opacity: 0.5; }
+.ck-bubble { animation: ck-twinkle 1.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes ck-twinkle { 0%, 100% { opacity: 0.85; transform: scale(1); } 50% { opacity: 0.35; transform: scale(0.7); } }
+/* Mash spots are soft rings around each lump, so the food stays visible. */
+.ck-app .ck-stage .ck-hot[aria-label^="Mash"] {
+  background: transparent;
+  border: 3px dashed rgb(255 255 255 / 75%);
+  box-shadow: 0 0 0 2px rgb(181 79 36 / 25%);
+}
+.ck-app .ck-stage[data-tap-only] .ck-hot[aria-label^="Mash"].round { background: rgb(255 255 255 / 18%); }
+.ck-gmeter {
+  position: absolute;
+  left: 50%;
+  bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 82%);
+  box-shadow: 0 2px 8px rgb(60 40 20 / 18%);
+  color: #4a3a2c;
+  font-size: 12px;
+  font-weight: 800;
+  pointer-events: none;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+.ck-gmeter-bar { position: relative; width: clamp(70px, 22vw, 140px); height: 9px; overflow: hidden; border-radius: 999px; background: #eadfcd; }
+.ck-gmeter-bar b { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: linear-gradient(90deg, #f2b84b, #6fc28f); transition: width 240ms ease-out; }
+.ck-gmeter-pips { display: flex; gap: 6px; }
+.ck-gmeter-pips i { width: 12px; height: 12px; border: 2px solid #2f8f80; border-radius: 50%; background: #fff; transition: background 160ms ease; }
+.ck-gmeter-pips i.on { background: #2f8f80; }
+/* Seedy's hint bubble floats over the top of the dish; during a gesture it must never
+   block a swipe that starts under it (its "Read it to me" link stays tappable). */
+.ck-app[data-step-kind="cut"] .ck-hint, .ck-app[data-step-kind="mash"] .ck-hint, .ck-app[data-step-kind="stir"] .ck-hint { pointer-events: none; }
+.ck-app .ck-hint .ck-link { pointer-events: auto; }

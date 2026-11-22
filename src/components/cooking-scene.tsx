@@ -1,6 +1,9 @@
 import { useId, type CSSProperties, type ReactNode } from "react";
 import type { LittleRecipe } from "@/lib/little-kitchen";
 import { extraScene } from "./cooking-scene-extra";
+import { chopGuideX } from "@/lib/gestures";
+import { pieceGap } from "./gestures/chop-board";
+import { WhiskArt } from "./gestures/whisk-bowl";
 import {
   browning, stirAmount, totalScoops,
   type AssetKey, type DishState, type Drop, type Step,
@@ -16,8 +19,6 @@ import {
 } from "./food-art";
 
 export interface Fx {
-  knife: { x: number; y: number; down: boolean } | null;
-  masher: { x: number; y: number; down: boolean } | null;
   spoon: { key: number; kind: "scoop" | "pour"; from: Point; to: Point; asset: AssetKey } | null;
   pointer: Point | null;
   stirAngle: number | null;
@@ -27,7 +28,7 @@ export interface Fx {
   landed: number | null;
 }
 export const noFx: Fx = {
-  knife: null, masher: null, spoon: null, pointer: null, stirAngle: null,
+  spoon: null, pointer: null, stirAngle: null,
   flip: null, cooking: false, target: false, landed: null,
 };
 
@@ -91,7 +92,7 @@ function boardFood(plan: Step[], dish: DishState, step: Step | null) {
 }
 
 function BoardScene(props: SceneProps & { fx: Fx }) {
-  const { plan, dish, step, fx, presenting } = props;
+  const { plan, dish, step, presenting } = props;
   const uid = useId().replace(/\W/g, "");
   const info = boardFood(plan, dish, step);
   const shape = info ? FOOD_SHAPES[info.food] : null;
@@ -105,7 +106,9 @@ function BoardScene(props: SceneProps & { fx: Fx }) {
   const mashed = mode === "mash" && info?.mashStep ? dish.mash[info.mashStep.id] ?? [] : [];
   const half = (length / 2) / scale;
   const bounds = Array.from({ length: segs + 1 }, (_, k) => -half + ((half * 2) * k) / segs);
-  const gap = (info?.food === "banana" ? 32 : 22) / scale;
+  const gap = (info ? pieceGap(info.food) : 22) / scale;
+  // While the child mashes, the food is drawn in the mash bowl by the gesture layer.
+  const mashing = mode === "mash" && step?.kind === "mash" && !presenting;
 
   const body = (k: number) => {
     if (!shape || !info) return null;
@@ -117,7 +120,7 @@ function BoardScene(props: SceneProps & { fx: Fx }) {
     const isMashed = mashed.includes(k);
     const cx = (bounds[k] + bounds[k + 1]) / 2;
     return (
-      <g key={k} style={{ transform: `translate(${dx}px, 0) rotate(${rot}deg)`, transformOrigin: `${cx}px ${mid}px`, transition: "transform 420ms cubic-bezier(.3,.7,.3,1)" }}>
+      <g key={k} style={{ transform: `translate(${dx}px, 0) rotate(${rot}deg)`, transformOrigin: `${cx}px ${mid}px`, transition: "transform 460ms cubic-bezier(.34,1.56,.64,1)" }}>
         {!isMashed && (
           <g>
             <clipPath id={`seg-${uid}-${k}`}><rect x={x0} y={shape.top - 40} width={x1 - x0} height={shape.bottom - shape.top + 80} /></clipPath>
@@ -134,8 +137,6 @@ function BoardScene(props: SceneProps & { fx: Fx }) {
     );
   };
 
-  const knife = fx.knife;
-  const masher = fx.masher;
   return (
     <g>
       <Counter />
@@ -159,7 +160,7 @@ function BoardScene(props: SceneProps & { fx: Fx }) {
           })}
         </g>
       ))}
-      {info && shape && (
+      {info && shape && !mashing && (
         <g transform={`translate(${BOARD_FOOD.cx} ${BOARD_FOOD.cy - mid * scale}) scale(${scale})`}>
           {info.placed ? (
             <g>
@@ -168,7 +169,7 @@ function BoardScene(props: SceneProps & { fx: Fx }) {
               ))}
               {Array.from({ length: segs }, (_, k) => body(k))}
               {mode === "cut" && !presenting && info.cutStep?.kind === "cut" && info.cutStep === step &&
-                cutPositions(info.cutStep.cuts, length).map((x, i) => {
+                chopGuideX(cutPositions(info.cutStep.cuts, length), done, gap * scale).map((x, i) => {
                   const lx = (x - BOARD_FOOD.cx) / scale;
                   return done.includes(i) ? null : (
                     <line key={i} className="ck-mark" x1={lx} x2={lx} y1={shape.top - 26} y2={shape.bottom + 18} strokeWidth={3 / scale} strokeDasharray={`${8 / scale} ${7 / scale}`} />
@@ -178,16 +179,6 @@ function BoardScene(props: SceneProps & { fx: Fx }) {
           ) : (
             <path d={shape.path} fill="none" className="ck-ghost-outline" strokeWidth={3 / scale} strokeDasharray={`${10 / scale} ${8 / scale}`} />
           )}
-        </g>
-      )}
-      {step?.kind === "mash" && masher && (
-        <g style={{ transform: `translate(${masher.x}px, ${masher.y + (masher.down ? 70 : -6)}px)`, transition: "transform 200ms ease-out" }}>
-          <Masher />
-        </g>
-      )}
-      {step?.kind === "cut" && (
-        <g style={{ transform: `translate(${knife?.x ?? Math.min(678, (props.view?.x ?? 0) + (props.view?.w ?? 800) - 30)}px, ${(knife?.y ?? 262) + (knife?.down ? 70 : 0)}px) rotate(${knife ? -6 : -14}deg)`, transition: "transform 240ms cubic-bezier(.3,.7,.3,1)" }}>
-          <Knife />
         </g>
       )}
     </g>
@@ -450,7 +441,7 @@ function BowlScene({ recipe, plan, dish, step, fx, presenting }: SceneProps & { 
           <g transform="rotate(-62)"><Spoon load={<g className="ck-spoon-load" transform="translate(0 -22) scale(.62)">{spoon.asset.startsWith("beans") ? <BeansBowlLoad /> : <CornBowlLoad />}</g>} /></g>
         </g>
       )}
-      {(stirring || (stir && (dish.stir[stir.id] ?? 0) > 0 && !presenting)) && (
+      {!stirring && stir && (dish.stir[stir.id] ?? 0) > 0 && !presenting && (
         <g style={{ transformOrigin: `${BOWL.cx}px ${BOWL.cy}px`, transform: `rotate(${angle}deg)`, transition: fx.stirAngle === null ? "transform 360ms ease-out" : "none" }}>
           <g transform={`translate(${BOWL.cx + 96} ${BOWL.cy}) rotate(86)`}><Spoon /></g>
         </g>
@@ -756,11 +747,11 @@ export function CookingScene(props: SceneProps) {
 }
 
 /** Small picture of the tool used in the current step. */
-export function ToolIcon({ tool, size = 56 }: { tool: "knife" | "masher" | "spoon" | "spatula"; size?: number }) {
+export function ToolIcon({ tool, size = 56 }: { tool: "knife" | "masher" | "spoon" | "spatula" | "whisk"; size?: number }) {
   return (
     <svg className="ck-icon" width={size} height={size} viewBox="-70 -70 140 140" aria-hidden="true" focusable="false">
-      <g transform={tool === "knife" ? "translate(0 12) rotate(35) scale(.5)" : tool === "masher" ? "translate(0 28) rotate(-20) scale(.5)" : tool === "spoon" ? "translate(-14 -2) rotate(-40) scale(.5)" : "translate(0 -10) rotate(20) scale(.6)"}>
-        {tool === "knife" ? <Knife /> : tool === "masher" ? <Masher /> : tool === "spoon" ? <Spoon /> : (
+      <g transform={tool === "knife" ? "translate(0 12) rotate(35) scale(.5)" : tool === "masher" ? "translate(0 28) rotate(-20) scale(.5)" : tool === "spoon" ? "translate(-14 -2) rotate(-40) scale(.5)" : tool === "whisk" ? "translate(-22 40) rotate(30) scale(.62)" : "translate(0 -10) rotate(20) scale(.6)"}>
+        {tool === "knife" ? <Knife /> : tool === "masher" ? <Masher /> : tool === "spoon" ? <Spoon /> : tool === "whisk" ? <WhiskArt /> : (
           <g><rect x="-8" y="10" width="14" height="110" rx="7" fill="#a87440" /><path d="M -34 -40 L 34 -40 L 30 20 L -30 20 Z" fill="url(#fa-steel)" stroke="#9aa09d" strokeWidth="1" /></g>
         )}
       </g>
