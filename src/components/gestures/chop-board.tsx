@@ -77,12 +77,17 @@ export function ChopBoard({ step, dish, host, handleRef, onCut }: {
   const queue = useRef<number[]>([]);
   const [near, setNear] = useState<number | null>(null);
   const view = host.view;
-  // At rest the knife waits in the top corner of the board, clear of the food.
-  const rest = { x: Math.min(view.x + view.w - 40, 664), y: layout.top - 12, rot: -16 };
+  // At rest the knife lies on the board below the food, handle to the right, fully in
+  // view on a 360px phone as well as on a wide screen.
+  const rest = { x: Math.min(view.x + view.w - 24, 646) - 196, y: Math.min(layout.bottom + 38, 386), rot: 84 };
 
-  const place = (x: number, y: number, rot = 0) =>
+  const shadowRef = useRef<SVGEllipseElement>(null);
+  const place = (x: number, y: number, rot = 0, resting = false) => {
     knifeRef.current?.setAttribute("transform", `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${rot.toFixed(1)})`);
-  const restKnife = () => place(rest.x, rest.y, rest.rot);
+    // The drop shadow belongs under an upright knife; a lying knife has its own outline.
+    shadowRef.current?.setAttribute("opacity", resting ? "0" : ".18");
+  };
+  const restKnife = () => place(rest.x, rest.y, rest.rot, true);
   const reach = () => Math.max(34, Math.min(60, 40 / pxPerUnit(L.current.host)));
 
   /** The knife lands: cut, juice, a tiny shake and the food's own chop sound. */
@@ -204,7 +209,7 @@ export function ChopBoard({ step, dish, host, handleRef, onCut }: {
         <polyline ref={trailRef} className="ck-chop-trail" points="" />
         <g ref={fxRef} />
         <g ref={knifeRef} transform={`translate(${rest.x} ${rest.y}) rotate(${rest.rot})`} className="ck-knife">
-          <ellipse cx="6" cy="10" rx="26" ry="5" fill="#4a3118" opacity=".18" />
+          <ellipse ref={shadowRef} cx="6" cy="10" rx="26" ry="5" fill="#4a3118" opacity="0" />
           <g ref={bladeRef}><KnifeArt /></g>
         </g>
       </GestureLayer>
