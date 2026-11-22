@@ -94,3 +94,14 @@
   /* The recipe photo no longer fills the whole dialog; the recipe starts on the first screen. */
   .kitchen-app .library-dialog-photo img { max-height: 45dvh; width: 100%; object-fit: cover; }
 }
+
+/* ---------- Notches and the home indicator (viewport-fit=cover) ---------- */
+/* The insets are 0 on desktops and on phones without a notch, so nothing moves there.
+   Landscape notches sit at the sides: keep page content clear of them. The full-screen
+   cooking studio already pads its own bars. */
+body {
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+.kitchen-app footer { padding-bottom: max(26px, calc(env(safe-area-inset-bottom, 0px) + 16px)); }
+.kitchen-app .kitchen-toast { bottom: max(22px, calc(env(safe-area-inset-bottom, 0px) + 12px)); }

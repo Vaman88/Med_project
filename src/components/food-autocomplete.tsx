@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useId, useRef, useState, type KeyboardEvent, type RefObject } from 'react';
 import { searchFoods, type CatalogFood } from '@/lib/food-catalog';
+import { useKeepListInView } from './keep-in-view';
 
 const MAX_ROWS = 8;
 const DEBOUNCE_MS = 120;
@@ -26,6 +27,7 @@ export function FoodAutocomplete({ label, value, onTextChange, onPick, inputRef,
   const inputId = `${uid}-input`;
   const listId = `${uid}-list`;
   const wrap = useRef<HTMLDivElement>(null);
+  const list = useRef<HTMLUListElement>(null);
   const [results, setResults] = useState<CatalogFood[]>([]);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
@@ -71,6 +73,7 @@ export function FoodAutocomplete({ label, value, onTextChange, onPick, inputRef,
   const typedIndex = rows.length; // fallback row sits after the matches
   const totalRows = showList ? rows.length + (rows.length === 0 || !rows.some(item => item.label.toLowerCase() === query.toLowerCase()) ? 1 : 0) : 0;
   const hasTyped = totalRows > rows.length;
+  useKeepListInView(wrap, list, showList, totalRows);
   const optionId = (index: number) => `${listId}-opt-${index}`;
 
   function choose(index: number) {
@@ -97,7 +100,7 @@ export function FoodAutocomplete({ label, value, onTextChange, onPick, inputRef,
       autoComplete="off" required maxLength={maxLength} value={value} placeholder={placeholder}
       onChange={event => { setSuppressed(false); setOpen(true); setActive(-1); onTextChange(event.target.value); }}
       onKeyDown={onKeyDown} />
-    <ul id={listId} role="listbox" aria-label={`${label} suggestions`} className="autocomplete-list" hidden={!showList}>
+    <ul ref={list} id={listId} role="listbox" aria-label={`${label} suggestions`} className="autocomplete-list" hidden={!showList}>
       {rows.map((food, index) => <li key={food.id} id={optionId(index)} role="option" aria-selected={active === index} className={active === index ? 'active' : ''}
         onMouseDown={event => event.preventDefault()} onClick={() => choose(index)} onMouseMove={() => active !== index && setActive(index)}>
         <span className="option-name"><Highlight text={food.label} query={query} /></span>

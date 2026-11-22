@@ -33,7 +33,9 @@ export const metadata: Metadata = {
   title: "Healthy Steps — meals that work for your family",
   description: "Simple pantry-first food planning, grocery budgeting, food preferences, and public food support."
 };
-export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover" };
+// resizes-content: on Android the page shrinks above the on-screen keyboard, so dropdowns and
+// footers stay visible while typing (iOS ignores it and pans the page instead).
+export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover", interactiveWidget: "resizes-content" };
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return <html lang="en" className={kitchenFont.variable}><body><FoodDefsHost />{children}</body></html>;
 }

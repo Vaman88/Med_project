@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState, type FormEvent, type KeyboardEvent } from "react";
+import { useId, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { PIN_PATTERN, createParentPin, hasParentPin } from "@/lib/parent-lock";
 import {
   allergyChoices,
@@ -18,6 +18,7 @@ import {
   validChildAge,
 } from "@/lib/family-setup";
 import { ChefAvatar } from "./chef-avatar";
+import { useKeepListInView } from "./keep-in-view";
 
 export function PantryPicker({
   selected,
@@ -28,12 +29,15 @@ export function PantryPicker({
 }) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
+  const search = useRef<HTMLDivElement>(null);
+  const list = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(-1);
   const listId = useId();
   const term = query.trim();
   const { matches, custom: customFood } = pantryMatches(query, selected);
   const custom = customFood !== null;
   const options = [...matches, ...(customFood !== null ? [customFood] : [])];
+  useKeepListInView(search, list, open && options.length > 0, options.length);
   const alreadyAdded = !!term && selected.some((food) => food.toLowerCase() === term.toLowerCase());
   function add(food: string) {
     if (selected.length >= 100) return;
@@ -66,7 +70,7 @@ export function PantryPicker({
   return (
     <div className="pantry-picker">
       <label htmlFor={`${listId}-input`}>Search for a food</label>
-      <div className="pantry-search">
+      <div className="pantry-search" ref={search}>
         <input
           id={`${listId}-input`}
           role="combobox"
@@ -89,7 +93,7 @@ export function PantryPicker({
           onKeyDown={keyDown}
         />
         {open && options.length > 0 && (
-          <div id={listId} role="listbox" className="pantry-options">
+          <div ref={list} id={listId} role="listbox" className="pantry-options">
             {options.map((food, index) => (
               <button
                 id={`${listId}-${index}`}
