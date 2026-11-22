@@ -21,3 +21,32 @@
   .family-entry button { min-height: 44px !important; padding: 8px 14px !important; font-size: 13px !important; }
   .kitchen-app .header-settings { min-width: 44px; min-height: 44px; justify-content: center; }
 }
+
+/* ---------- Every form field: 16px text on phones so iOS does not zoom into it ---------- */
+@media (max-width: 940px) {
+  html body :is(input:not([type=checkbox]):not([type=radio]):not([type=range]), select, textarea):not(.budget-fields input, .ob-field input, .ob-add input) {
+    font-size: 16px;
+  }
+}
+
+/* ---------- Parent planner: comfortable taps and readable small print ---------- */
+@media (max-width: 940px), (pointer: coarse) {
+  .kitchen-app .welcome-chips .chip-main { min-height: 44px; }
+  .kitchen-app .welcome-chips .chip-remove { min-width: 44px; min-height: 44px; }
+  .kitchen-app .welcome-more summary { display: inline-flex; align-items: center; min-height: 44px; }
+  .kitchen-app .welcome-stat .text-button,
+  .kitchen-app .welcome-rowhead .text-button,
+  .guest-storage-note .text-button { min-height: 44px; }
+  .kitchen-app .chip-button { min-height: 44px; }
+  .kitchen-app .library-close { width: 44px; height: 44px; }
+}
+@media (max-width: 650px) {
+  .kitchen-app .eyebrow,
+  .kitchen-app .welcome-card-meta,
+  .kitchen-app .library-card-meta,
+  .kitchen-app .library-unchecked,
+  .kitchen-app .count-pill,
+  .kitchen-app .recipe-topline > span,
+  .kitchen-app .recipe-topline > span:first-child { font-size: 12px; }
+  .guest-storage-note .text-button { font-size: 13px; }
+}
