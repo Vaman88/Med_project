@@ -167,6 +167,12 @@ export function ChopBoard({ step, dish, host, handleRef, onCut }: {
       trailRef.current?.setAttribute("points", "");
       setNear(null);
       const h = L.current.host, lay = L.current.layout;
+      // Busy phones coalesce pointer moves, so the last stretch of a fast swipe (the
+      // part that reaches into the food) may only arrive with the finger lifting.
+      if (moved && s && !h.tapOnly && !busy.current && !h.locked() && (p.x !== s.last.x || p.y !== s.last.y)) {
+        const hit = chopAt(s.last, p, Math.min(s.minY, p.y), lay.guides, { reach: reach(), foodLeft: lay.left, foodRight: lay.right });
+        if (hit?.kind === "cut") { cut(hit.index); s.cut = true; }
+      }
       if (!moved && !onHotspot && !h.locked()) {
         const g = nearestGuide(lay.guides, p.x, 90);
         if (h.tapOnly) { if (g) autoChop(g.index); }
